@@ -114,6 +114,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
   CPPUNIT_TEST(testQTChapterListNoOrphanedMdat);
+  CPPUNIT_TEST(testQTChapterListSharedMdatPreservesAudio);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1301,6 +1302,105 @@ public:
 
     // No orphaned mdat atoms should remain.
     CPPUNIT_ASSERT_EQUAL(baseMdatTagLib, countMdatTagLib());
+  }
+
+  // Regression test for the data-loss bug reported in PR #1343 by ufleisch.
+  // Audiobook-style files co-locate chapter text samples inside the main
+  // audio mdat.  In that case the chapter track's stco[0] does NOT mark a
+  // dedicated chapter mdat -- it points into the shared audio mdat, and
+  // naively deleting "the mdat at stco[0] - 8" destroys the audio payload.
+  //
+  // Simulate that layout by writing a chapter track, then rewriting its
+  // stco[0] to point at the start of the primary audio mdat.  Removing the
+  // chapter track must leave the audio mdat fully intact.
+  void testQTChapterListSharedMdatPreservesAudio()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    struct MdatInfo { offset_t offset; offset_t length; };
+    auto findFirstMdat = [&]() -> MdatInfo {
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      for(const auto *atom : atoms.atoms())
+        if(atom->name() == "mdat")
+          return {atom->offset(), atom->length()};
+      return {-1, 0};
+    };
+
+    const MdatInfo audioMdat = findFirstMdat();
+    CPPUNIT_ASSERT(audioMdat.offset >= 0);
+    CPPUNIT_ASSERT(audioMdat.length > 16);
+
+    // Capture the audio mdat bytes so we can confirm byte-for-byte preservation.
+    ByteVector originalAudioMdat;
+    {
+      PlainFile pf(filename.c_str());
+      pf.seek(audioMdat.offset);
+      originalAudioMdat = pf.readBlock(audioMdat.length);
+    }
+
+    // Add a chapter track.  write() appends its own mdat for the chapter text
+    // at EOF; we'll relocate stco[0] below to simulate the shared-mdat case.
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 2", 1000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // Rewrite the chapter track's stco[0] to point inside the audio mdat's
+    // data, so findMdatContaining() will identify the audio mdat as the
+    // candidate target.  Choosing audioMdat.offset + 8 (the data start) is
+    // the worst case: without the shared-mdat guard, the old code would
+    // treat the audio mdat header as the chapter mdat header and wipe it.
+    {
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      const MP4::Atom *moov = atoms.find("moov");
+      CPPUNIT_ASSERT(moov);
+      const MP4::AtomList traks = moov->findall("trak");
+      CPPUNIT_ASSERT(traks.size() >= 2);
+      // The chapter trak is the most recently added -- find the one whose
+      // hdlr handler_type is "text".
+      MP4::Atom *chapterTrak = nullptr;
+      for(auto *t : traks) {
+        MP4::Atom *hdlr = t->find("mdia", "hdlr");
+        if(!hdlr) continue;
+        pf.seek(hdlr->offset());
+        if(ByteVector d = pf.readBlock(hdlr->length()); d.containsAt("text", 16)) {
+          chapterTrak = t;
+          break;
+        }
+      }
+      CPPUNIT_ASSERT(chapterTrak);
+      MP4::Atom *stco = chapterTrak->find("mdia", "minf", "stbl", "stco");
+      CPPUNIT_ASSERT(stco);
+      // stco payload: full-box header(4) + entry_count(4) + offsets[]
+      pf.seek(stco->offset() + 16);
+      pf.writeBlock(ByteVector::fromUInt(
+        static_cast<unsigned int>(audioMdat.offset + 8)));
+    }
+
+    // Trigger the chapter-removal path with the crafted stco[0].
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // The audio mdat must survive with its contents byte-identical.
+    const MdatInfo afterMdat = findFirstMdat();
+    CPPUNIT_ASSERT(afterMdat.offset >= 0);
+    CPPUNIT_ASSERT_EQUAL(audioMdat.length, afterMdat.length);
+    {
+      PlainFile pf(filename.c_str());
+      pf.seek(afterMdat.offset);
+      const ByteVector afterBytes = pf.readBlock(afterMdat.length);
+      CPPUNIT_ASSERT(afterBytes == originalAudioMdat);
+    }
   }
 
 };

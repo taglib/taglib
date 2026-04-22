@@ -935,30 +935,102 @@ namespace
     }
   }
 
-  // Removes the QT chapter trak, the tref from the audio track, and the orphaned
-  // mdat atom that holds the chapter text samples.
+  //! Finds the top-level mdat atom that covers the given file offset.
+  const MP4::Atom *findMdatContaining(const MP4::Atoms *atoms, offset_t fileOffset)
+  {
+    for(const auto *atom : atoms->atoms()) {
+      if(atom->name() != "mdat")
+        continue;
+      const offset_t dataStart = atom->offset() + 8;
+      const offset_t end = atom->offset() + atom->length();
+      if(fileOffset >= dataStart && fileOffset < end)
+        return atom;
+    }
+    return nullptr;
+  }
+
+  //! True if any stco/co64 entry in the atom tree points inside the given mdat range.
+  //! Used to detect mdats that are shared with other tracks (audio data + chapter
+  //! text co-located in a single mdat) so we never delete live track data.
+  bool mdatIsUsedByAnyTrack(TagLib::File *file, const MP4::Atoms *atoms,
+                            offset_t mdatStart, offset_t mdatSize)
+  {
+    const offset_t dataStart = mdatStart + 8;
+    const offset_t dataEnd = mdatStart + mdatSize;
+
+    const MP4::Atom *moov = atoms->find("moov");
+    if(!moov)
+      return false;
+
+    for(const auto &stco : moov->findall("stco", true)) {
+      file->seek(stco->offset() + 12);
+      ByteVector data = file->readBlock(stco->length() - 12);
+      if(data.size() < 4)
+        continue;
+      unsigned int count = data.toUInt();
+      unsigned int pos = 4;
+      const unsigned int maxPos = data.size() - 4;
+      while(count-- && pos <= maxPos) {
+        const auto o = static_cast<offset_t>(data.toUInt(pos));
+        if(o >= dataStart && o < dataEnd)
+          return true;
+        pos += 4;
+      }
+    }
+
+    for(const auto &co64 : moov->findall("co64", true)) {
+      file->seek(co64->offset() + 12);
+      ByteVector data = file->readBlock(co64->length() - 12);
+      if(data.size() < 4)
+        continue;
+      unsigned int count = data.toUInt();
+      unsigned int pos = 4;
+      const unsigned int maxPos = data.size() - 8;
+      while(count-- && pos <= maxPos) {
+        const offset_t o = data.toLongLong(pos);
+        if(o >= dataStart && o < dataEnd)
+          return true;
+        pos += 8;
+      }
+    }
+
+    return false;
+  }
+
+  // Removes the QT chapter trak and the tref from the audio track, plus the
+  // chapter text mdat if (and only if) no other track points into it.
   //
-  // The chapter mdat was appended at EOF by write().  Its location is derived
-  // from the chapter track's stco entry before the track is deleted.  Both the
-  // chapter trak and tref live inside moov, which precedes the mdat, so removing
-  // them shifts the mdat by -(chapterLen + trefLen).
+  // The chapter mdat identity is resolved by looking up which top-level mdat
+  // contains the chapter track's first chunk offset.  After removing the trak
+  // and tref, we re-parse and verify the mdat is not referenced by any other
+  // track before deleting it.  Audiobook-style files commonly co-locate chapter
+  // text inside the main audio mdat; in that case the mdat is shared and MUST
+  // NOT be deleted -- the text bytes are left as dead space and the chapter
+  // track alone is removed.
   void removeQTChapterTrack(TagLib::File *file, const MP4::Atoms *atoms,
                              MP4::Atom *moov, MP4::Atom *chapterTrak,
                              const MP4::Atom *audioTrak)
   {
-    // Read the first stco chunk offset BEFORE deleting the trak: the chapter
-    // mdat data starts at stco[0], so the mdat atom header is 8 bytes earlier.
+    // Identify the chapter text mdat BEFORE removal (while stco is still valid).
     offset_t chapterMdatOffset = -1;
+    offset_t chapterMdatSize = 0;
     {
       const std::vector<unsigned int> stco = readStco(file, chapterTrak);
-      if(!stco.empty() && stco[0] >= 8)
-        chapterMdatOffset = static_cast<offset_t>(stco[0]) - 8;
+      if(!stco.empty()) {
+        if(const MP4::Atom *mdat = findMdatContaining(atoms,
+                                                     static_cast<offset_t>(stco[0]))) {
+          chapterMdatOffset = mdat->offset();
+          chapterMdatSize = mdat->length();
+        }
+      }
     }
 
-    // Record tref length BEFORE removeAudioTref so we can adjust the mdat offset.
+    // Capture tref/chapter trak locations for mdat offset fix-up below.
+    offset_t trefOff = -1;
     offset_t trefLen = 0;
     for(const auto &child : audioTrak->children()) {
       if(child->name() == "tref") {
+        trefOff = child->offset();
         trefLen = child->length();
         break;
       }
@@ -981,18 +1053,32 @@ namespace
     // Remove tref from audio trak (lower offset, still valid after chapter trak removal).
     removeAudioTref(file, atoms, audioTrak);
 
-    // Remove the orphaned chapter mdat.  Both removals above are inside moov,
-    // which precedes the mdat at EOF, so adjust the stored offset accordingly.
-    if(chapterMdatOffset >= 0) {
-      const offset_t adjustedOffset = chapterMdatOffset - chapterLen - trefLen;
-      file->seek(adjustedOffset);
-      const ByteVector header = file->readBlock(8);
-      if(header.size() == 8 && header.mid(4, 4) == "mdat") {
-        const offset_t mdatSize = header.toUInt();
-        if(mdatSize >= 8)
-          file->removeBlock(adjustedOffset, mdatSize);
-      }
-    }
+    // Decide whether the chapter mdat is safe to delete.
+    if(chapterMdatOffset < 0)
+      return;
+
+    // Shift the original mdat offset by however much of the removed bytes
+    // preceded it in the file.
+    offset_t adjustedOffset = chapterMdatOffset;
+    if(chapterMdatOffset > chapterOff)
+      adjustedOffset -= chapterLen;
+    if(trefOff >= 0 && chapterMdatOffset > trefOff)
+      adjustedOffset -= trefLen;
+
+    // Re-parse to verify the post-removal on-disk state matches expectations
+    // and that no surviving track references this mdat's data range.
+    const MP4::Atoms cleanAtoms(file);
+    if(mdatIsUsedByAnyTrack(file, &cleanAtoms, adjustedOffset, chapterMdatSize))
+      return;
+
+    file->seek(adjustedOffset);
+    const ByteVector header = file->readBlock(8);
+    if(header.size() != 8 || header.mid(4, 4) != "mdat")
+      return;
+    if(static_cast<offset_t>(header.toUInt()) != chapterMdatSize)
+      return;
+
+    file->removeBlock(adjustedOffset, chapterMdatSize);
   }
 
 }  // namespace
