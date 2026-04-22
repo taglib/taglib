@@ -113,6 +113,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListOverwrite);
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
+  CPPUNIT_TEST(testQTChapterListNoOrphanedMdat);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1257,6 +1258,49 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title());
       CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title());
     }
+  }
+
+  // Regression test for the orphaned-mdat bug reported in PR #1325 by ufleisch.
+  // Each add/remove cycle must leave the file's mdat count unchanged.  Before
+  // the fix, the chapter mdat appended by write() was never removed, so three
+  // cycles produced originalCount + 3 mdat atoms.
+  void testQTChapterListNoOrphanedMdat()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // Count top-level mdat atoms using TagLib's own atom parser.
+    auto countMdatTagLib = [&]() -> int {
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      int count = 0;
+      for(const auto *atom : atoms.atoms())
+        if(atom->name() == "mdat")
+          ++count;
+      return count;
+    };
+
+    const int baseMdatTagLib = countMdatTagLib();
+
+    // Three add/remove cycles (the scenario ufleisch demonstrated).
+    for(int cycle = 0; cycle < 3; ++cycle) {
+      {
+        MP4::File f(filename.c_str());
+        f.setQtChapters(MP4::ChapterList{
+          MP4::Chapter("Chapter 1", 0),
+          MP4::Chapter("Chapter 2", 10000LL)
+        });
+        CPPUNIT_ASSERT(f.save());
+      }
+      {
+        MP4::File f(filename.c_str());
+        f.setQtChapters(MP4::ChapterList());
+        CPPUNIT_ASSERT(f.save());
+      }
+    }
+
+    // No orphaned mdat atoms should remain.
+    CPPUNIT_ASSERT_EQUAL(baseMdatTagLib, countMdatTagLib());
   }
 
 };
