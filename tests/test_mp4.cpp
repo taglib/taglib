@@ -115,6 +115,12 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
   CPPUNIT_TEST(testQTChapterListNoOrphanedMdat);
   CPPUNIT_TEST(testQTChapterListSharedMdatPreservesAudio);
+  CPPUNIT_TEST(testQTChapterListUnicodeTitles);
+  CPPUNIT_TEST(testChapterListUnicodeTitles);
+  CPPUNIT_TEST(testQTChapterListEmptyTitleStripped);
+  CPPUNIT_TEST(testQTChapterListSingleEmptyTitleNotStripped);
+  CPPUNIT_TEST(testNeroAndQTChaptersAreIndependent);
+  CPPUNIT_TEST(testNeroChaptersAloneWhenNoQT);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1400,6 +1406,231 @@ public:
       pf.seek(afterMdat.offset);
       const ByteVector afterBytes = pf.readBlock(afterMdat.length);
       CPPUNIT_ASSERT(afterBytes == originalAudioMdat);
+    }
+  }
+
+  // Unicode titles (CJK, Latin with diacritics, Cyrillic) survive the
+  // write -> save -> open -> read round-trip through the QT chapter track.
+  // This exercises the text-sample serialisation in mp4qtchapterlist.cpp.
+  void testQTChapterListUnicodeTitles()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // UTF-8: 日本語, Über, Привет
+    const String japanese("\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e", String::UTF8);
+    const String german("\xc3\x9c" "ber", String::UTF8);
+    const String russian("\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82", String::UTF8);
+
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter(japanese, 0),
+        MP4::Chapter(german,   15000LL),
+        MP4::Chapter(russian,  30000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
+      CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(japanese, chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(german,   chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(russian,  chapters[2].title());
+    }
+  }
+
+  // Unicode titles survive the write -> save -> open -> read round-trip
+  // through the Nero chpl atom, which uses a different serialisation path
+  // (length-prefixed UTF-8 inside udta/chpl).
+  void testChapterListUnicodeTitles()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // UTF-8: 日本語, Über, Привет
+    const String japanese("\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e", String::UTF8);
+    const String german("\xc3\x9c" "ber", String::UTF8);
+    const String russian("\xd0\x9f\xd1\x80\xd0\xb8\xd0\xb2\xd0\xb5\xd1\x82", String::UTF8);
+
+    {
+      MP4::File f(filename.c_str());
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter(japanese, 0),
+        MP4::Chapter(german,   15000LL),
+        MP4::Chapter(russian,  30000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.neroChapters();
+      CPPUNIT_ASSERT_EQUAL(3U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(japanese, chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(german,   chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(russian,  chapters[2].title());
+    }
+  }
+
+  // When a multi-chapter list begins with an empty-titled chapter at time 0,
+  // that entry matches the QT dummy-marker pattern and must be stripped on
+  // read-back.  This test documents the stripping behaviour so a regression
+  // is immediately detectable.
+  void testQTChapterListEmptyTitleStripped()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    {
+      MP4::File f(filename.c_str());
+      // First entry has an empty title at t=0.  write() sees the list already
+      // starts at t=0 so no dummy is prepended; the empty entry is written
+      // as-is.  read() must strip it because size > 1 && startTime()==0 &&
+      // title().isEmpty().
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("",           0),
+        MP4::Chapter("Chapter 1", 5000LL),
+        MP4::Chapter("Chapter 2", 10000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
+      // The empty t=0 entry is stripped; only the two real chapters remain.
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(5000LL,            chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter 1"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(10000LL,           chapters[1].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Chapter 2"), chapters[1].title());
+    }
+  }
+
+  // A single chapter with an empty title at time 0 must NOT be stripped.
+  // The stripping rule applies only when size > 1 -- a file with exactly one
+  // chapter is valid and its t=0 marker is not a dummy.
+  void testQTChapterListSingleEmptyTitleNotStripped()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("", 0)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      MP4::File f(filename.c_str());
+      MP4::ChapterList chapters = f.qtChapters();
+      CPPUNIT_ASSERT_EQUAL(1U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(0LL,        chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String(""), chapters[0].title());
+    }
+  }
+
+  // Both Nero (chpl) and QT chapter tracks can coexist in the same file.
+  // Writing one format must not disturb the other, and removing one must
+  // leave the other intact -- this validates the saveChaptersIfModified lazy
+  // save contract in mp4file.cpp.
+  void testNeroAndQTChaptersAreIndependent()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // Write both formats in a single save.
+    {
+      MP4::File f(filename.c_str());
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Nero 1", 0),
+        MP4::Chapter("Nero 2", 10000LL)
+      });
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("QT 1", 0),
+        MP4::Chapter("QT 2", 20000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // Verify both are present and distinct.
+    {
+      MP4::File f(filename.c_str());
+      const MP4::ChapterList nero = f.neroChapters();
+      const MP4::ChapterList qt   = f.qtChapters();
+
+      CPPUNIT_ASSERT_EQUAL(2U, nero.size());
+      CPPUNIT_ASSERT_EQUAL(String("Nero 1"), nero[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("Nero 2"), nero[1].title());
+
+      CPPUNIT_ASSERT_EQUAL(2U, qt.size());
+      CPPUNIT_ASSERT_EQUAL(String("QT 1"), qt[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("QT 2"), qt[1].title());
+
+      // Remove only the QT track.
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // QT removed; Nero chapters must be fully intact.
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.qtChapters().isEmpty());
+
+      const MP4::ChapterList nero = f.neroChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, nero.size());
+      CPPUNIT_ASSERT_EQUAL(String("Nero 1"), nero[0].title());
+      CPPUNIT_ASSERT_EQUAL(String("Nero 2"), nero[1].title());
+    }
+  }
+
+  // Writing only Nero chapters must not accidentally create a QT chapter track,
+  // and writing only QT chapters must not accidentally create a Nero chpl atom.
+  void testNeroChaptersAloneWhenNoQT()
+  {
+    // Nero only -- QT track must remain absent.
+    {
+      ScopedFileCopy copy("no-tags", ".m4a");
+      string filename = copy.fileName();
+
+      {
+        MP4::File f(filename.c_str());
+        f.setNeroChapters(MP4::ChapterList{
+          MP4::Chapter("Nero Only", 0)
+        });
+        CPPUNIT_ASSERT(f.save());
+      }
+
+      {
+        MP4::File f(filename.c_str());
+        CPPUNIT_ASSERT_EQUAL(1U, f.neroChapters().size());
+        CPPUNIT_ASSERT(f.qtChapters().isEmpty());
+      }
+    }
+
+    // QT only -- Nero chpl atom must remain absent.
+    {
+      ScopedFileCopy copy("no-tags", ".m4a");
+      string filename = copy.fileName();
+
+      {
+        MP4::File f(filename.c_str());
+        f.setQtChapters(MP4::ChapterList{
+          MP4::Chapter("QT Only", 0)
+        });
+        CPPUNIT_ASSERT(f.save());
+      }
+
+      {
+        MP4::File f(filename.c_str());
+        CPPUNIT_ASSERT_EQUAL(1U, f.qtChapters().size());
+        CPPUNIT_ASSERT(f.neroChapters().isEmpty());
+      }
     }
   }
 
