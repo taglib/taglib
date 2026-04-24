@@ -222,6 +222,8 @@ public:
 MP4::Atoms::Atoms(File *file) :
   d(std::make_unique<AtomsPrivate>())
 {
+  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 5000;
+
   d->atoms.setAutoDelete(true);
 
   file->seek(0, File::End);
@@ -232,6 +234,13 @@ MP4::Atoms::Atoms(File *file) :
     d->atoms.append(atom);
     if (atom->length() == 0)
       break;
+
+    if(d->atoms.size() > MAX_MP4_ATOM_COUNT_PER_LEVEL) {
+      debug("MP4: Maximum atom count exceeded");
+      // Make sure the file is detected as invalid.
+      d->atoms.clear();
+      break;
+    }
   }
 }
 
