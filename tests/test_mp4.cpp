@@ -34,6 +34,7 @@
 #include "mp4atom.h"
 #include "mp4file.h"
 #include "mp4itemfactory.h"
+#include "mp4chapterholder.h"
 #include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
@@ -69,6 +70,56 @@ namespace
   };
 
   CustomItemFactory CustomItemFactory::factory;
+
+  class MockChapterList : public MP4::ChapterHolder {
+  public:
+    static const MP4::ChapterList mockChapters;
+
+    bool read(TagLib::File *)
+    {
+      chapterList = mockChapters;
+      ++readCount;
+      return true;
+    }
+
+    bool write(TagLib::File *)
+    {
+      ++writeCount;
+      return true;
+    }
+
+    int readCount = 0;
+    int writeCount = 0;
+  };
+
+  const MP4::ChapterList MockChapterList::mockChapters = {
+    MP4::Chapter("Mock", 123)
+  };
+
+  class MockChapterFile : public PlainFile {
+  public:
+    explicit MockChapterFile(FileName name) : PlainFile(name)
+    {
+    }
+
+    MP4::ChapterList chapters()
+    {
+      return getChaptersLazy(chapterList, this);
+    }
+
+    void setChapters(const MP4::ChapterList& chapters)
+    {
+      setChaptersLazy(chapterList, chapters);
+    }
+
+    bool save() override
+    {
+      return MP4::saveChaptersIfModified(chapterList, this);
+    }
+
+    std::unique_ptr<MockChapterList> chapterList;
+  };
+
 }  // namespace
 
 class TestMP4 : public CppUnit::TestFixture
@@ -121,6 +172,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListSingleEmptyTitleNotStripped);
   CPPUNIT_TEST(testNeroAndQTChaptersAreIndependent);
   CPPUNIT_TEST(testNeroChaptersAloneWhenNoQT);
+  CPPUNIT_TEST(testLazyReadingAndWritingChapters);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1631,6 +1683,105 @@ public:
         CPPUNIT_ASSERT_EQUAL(1U, f.qtChapters().size());
         CPPUNIT_ASSERT(f.neroChapters().isEmpty());
       }
+    }
+  }
+
+  void testLazyReadingAndWritingChapters()
+  {
+    // No reads or writes if chapters are not used
+    {
+      MockChapterFile f(TEST_FILE_PATH_C("no-tags.m4a"));
+      f.save();
+      CPPUNIT_ASSERT(!f.chapterList);
+    }
+    // Do not read if already read, do not write if not modified
+    {
+      MockChapterFile f(TEST_FILE_PATH_C("no-tags.m4a"));
+      auto chapters = f.chapters();
+      CPPUNIT_ASSERT(chapters == MockChapterList::mockChapters);
+      CPPUNIT_ASSERT(f.chapterList);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      chapters = f.chapters();
+      CPPUNIT_ASSERT(chapters == MockChapterList::mockChapters);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      CPPUNIT_ASSERT_EQUAL(0, f.chapterList->writeCount);
+    }
+    // Do not write if not modified
+    {
+      MockChapterFile f(TEST_FILE_PATH_C("no-tags.m4a"));
+      auto chapters = f.chapters();
+      CPPUNIT_ASSERT(chapters == MockChapterList::mockChapters);
+      CPPUNIT_ASSERT(f.chapterList);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      f.setChapters(MockChapterList::mockChapters);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      CPPUNIT_ASSERT_EQUAL(0, f.chapterList->writeCount);
+    }
+    // Write if set without being read before
+    {
+      MockChapterFile f(TEST_FILE_PATH_C("no-tags.m4a"));
+      f.setChapters(MP4::ChapterList());
+      f.save();
+      CPPUNIT_ASSERT(f.chapterList);
+      CPPUNIT_ASSERT_EQUAL(0, f.chapterList->readCount);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->writeCount);
+    }
+    // Do write if modified
+    {
+      MockChapterFile f(TEST_FILE_PATH_C("no-tags.m4a"));
+      CPPUNIT_ASSERT(f.chapters() == MockChapterList::mockChapters);
+      CPPUNIT_ASSERT(f.chapterList);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      const auto chapters1 = MP4::ChapterList({
+        MP4::Chapter("Chapter 1", 0),
+      });
+      f.setChapters(chapters1);
+      CPPUNIT_ASSERT(f.chapters() == chapters1);
+      f.save();
+      CPPUNIT_ASSERT(f.chapters() == chapters1);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->readCount);
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->writeCount);
+      f.setChapters(chapters1);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(1, f.chapterList->writeCount);
+      auto chapters2 = MP4::ChapterList({
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 2", 1),
+      });
+      f.setChapters(chapters2);
+      CPPUNIT_ASSERT(f.chapters() == chapters2);
+      f.save();
+      CPPUNIT_ASSERT(f.chapters() == chapters2);
+      CPPUNIT_ASSERT_EQUAL(2, f.chapterList->writeCount);
+      chapters2 = MP4::ChapterList({
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 2", 2),
+      });
+      f.setChapters(chapters2);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(3, f.chapterList->writeCount);
+      f.setChapters(chapters2);
+      CPPUNIT_ASSERT(f.chapters() == chapters2);
+      f.save();
+      CPPUNIT_ASSERT(f.chapters() == chapters2);
+      CPPUNIT_ASSERT_EQUAL(3, f.chapterList->writeCount);
+      const auto chapters3 = MP4::ChapterList({
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 3", 2),
+      });
+      f.setChapters(chapters3);
+      CPPUNIT_ASSERT(f.chapters() == chapters3);
+      f.save();
+      CPPUNIT_ASSERT(f.chapters() == chapters3);
+      CPPUNIT_ASSERT_EQUAL(4, f.chapterList->writeCount);
+      f.setChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.chapters().isEmpty());
+      f.save();
+      CPPUNIT_ASSERT(f.chapters().isEmpty());
+      CPPUNIT_ASSERT_EQUAL(5, f.chapterList->writeCount);
     }
   }
 

@@ -61,6 +61,16 @@ MP4::Chapter &MP4::Chapter::Chapter::operator=(const Chapter &other)
 MP4::Chapter &MP4::Chapter::Chapter::operator=(
   Chapter &&other) noexcept = default;
 
+bool MP4::Chapter::operator==(const Chapter &other) const
+{
+  return title() == other.title() && startTime() == other.startTime();
+}
+
+bool MP4::Chapter::operator!=(const Chapter &other) const
+{
+  return !(*this == other);
+}
+
 void MP4::Chapter::swap(Chapter &other) noexcept
 {
   using std::swap;

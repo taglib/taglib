@@ -69,6 +69,16 @@ namespace TagLib {
       Chapter &operator=(Chapter &&other) noexcept;
 
       /*!
+       * Returns \c true if the chapter and \a other contain the same data.
+       */
+      bool operator==(const Chapter &other) const;
+
+      /*!
+       * Returns \c true if the chapter and \a other differ in data.
+       */
+      bool operator!=(const Chapter &other) const;
+
+      /*!
        * Exchanges the content of the object with the content of \a other.
        */
       void swap(Chapter &other) noexcept;

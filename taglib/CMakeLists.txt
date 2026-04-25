@@ -377,7 +377,6 @@ if(WITH_MP4)
     mp4/mp4stem.cpp
     mp4/mp4itemfactory.cpp
     mp4/mp4chapter.cpp
-    mp4/mp4chapterholder.cpp
     mp4/mp4nerochapterlist.cpp
     mp4/mp4qtchapterlist.cpp
   )

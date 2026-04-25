@@ -39,17 +39,22 @@ namespace TagLib {
       /*!
        * Get list of chapters.
        */
-      ChapterList chapters() const;
+      ChapterList chapters() const { return chapterList; }
 
       /*!
        * Set list of chapters.
        */
-      void setChapters(const ChapterList &chapters);
+      void setChapters(const ChapterList &chapters) { chapterList = chapters; }
 
       /*!
        * Returns \c true if the list of chapters has been modified.
        */
-      bool isModified() const;
+      bool isModified() const { return modified; }
+
+      /*!
+       * Set if the contained chapters are modified.
+       */
+      void setModified(bool chaptersModified) { modified = chaptersModified; }
 
     protected:
       ChapterList chapterList;
@@ -84,8 +89,15 @@ namespace TagLib {
     {
       if (!holder) {
         holder = std::make_unique<T>();
+        // The chapters have not been read before, so we do not know their
+        // current state and mark them as modified. Otherwise, the check below
+        // would not set the chapters if they are empty.
+        holder->setModified(true);
       }
-      holder->setChapters(chapters);
+      if(holder->isModified() || holder->chapters() != chapters) {
+        holder->setChapters(chapters);
+        holder->setModified(true);
+      }
     }
 
     /*!
@@ -99,7 +111,11 @@ namespace TagLib {
     bool saveChaptersIfModified(std::unique_ptr<T> &holder, TagLib::File *file)
     {
       if(holder && holder->isModified()) {
-        return holder->write(file);
+        if(holder->write(file)) {
+          holder->setModified(false);
+          return true;
+        }
+        return false;
       }
       return true;
     }
