@@ -35,10 +35,20 @@ namespace TagLib {
     {
     public:
       MkAttachments(int sizeLength, offset_t dataSize, offset_t offset);
-      MkAttachments(Id, int sizeLength, offset_t dataSize, offset_t offset);
+      MkAttachments(Id id, int sizeLength, offset_t dataSize, offset_t offset);
       MkAttachments();
-
       std::unique_ptr<Matroska::Attachments> parse() const;
+
+      /*!
+       * Read the children of this element but skip the binary data of every
+       * MkAttachedFileData child.  The resulting Matroska::AttachedFile
+       * objects expose all metadata (file name, media type, UID, description,
+       * size) but their data() will be empty.
+       *
+       * Used for AudioProperties::Fast to avoid reading potentially large
+       * attachments (cover art, fonts) when the caller only wants metadata.
+       */
+      bool readMetadataOnly(File& file);
     };
   }
 }
