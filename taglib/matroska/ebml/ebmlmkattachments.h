@@ -48,7 +48,7 @@ namespace TagLib {
        * Used for AudioProperties::Fast to avoid reading potentially large
        * attachments (cover art, fonts) when the caller only wants metadata.
        */
-      bool readMetadataOnly(File& file);
+      bool readMetadataOnly(File &file);
     };
   }
 }

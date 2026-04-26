@@ -32,46 +32,46 @@ using namespace TagLib;
 
 namespace {
 
-  template <EBML::Element::Id Id, typename ElementType>
-  std::unique_ptr<ElementType> readElementAt(File& file,
-    offset_t offset,
-    offset_t maxOffset)
-  {
-    if (offset < 0 || offset >= maxOffset) {
-      return nullptr;
-    }
-
-    file.seek(offset);
-    auto element = EBML::Element::factory(file);
-    if (!element || element->getId() != Id) {
-      return nullptr;
-    }
-
-    auto typed = EBML::element_cast<Id>(std::move(element));
-    if (!typed || !typed->read(file)) {
-      return nullptr;
-    }
-    return typed;
+template <EBML::Element::Id Id, typename ElementType>
+std::unique_ptr<ElementType> readElementAt(File &file,
+                                           offset_t offset,
+                                           offset_t maxOffset)
+{
+  if(offset < 0 || offset >= maxOffset) {
+    return nullptr;
   }
 
-  // Specialised read-at for MkAttachments that skips the binary data of
-  // every MkAttachedFileData child.  See MkAttachments::readMetadataOnly().
-  std::unique_ptr<EBML::MkAttachments> readAttachmentsMetadataAt(
-    File& file, offset_t offset, offset_t maxOffset)
-  {
-    if (offset < 0 || offset >= maxOffset)
-      return nullptr;
-
-    file.seek(offset);
-    auto element = EBML::Element::factory(file);
-    if (!element || element->getId() != EBML::Element::Id::MkAttachments)
-      return nullptr;
-
-    auto typed = EBML::element_cast<EBML::Element::Id::MkAttachments>(std::move(element));
-    if (!typed || !typed->readMetadataOnly(file))
-      return nullptr;
-    return typed;
+  file.seek(offset);
+  auto element = EBML::Element::factory(file);
+  if(!element || element->getId() != Id) {
+    return nullptr;
   }
+
+  auto typed = EBML::element_cast<Id>(std::move(element));
+  if(!typed || !typed->read(file)) {
+    return nullptr;
+  }
+  return typed;
+}
+
+// Specialised read-at for MkAttachments that skips the binary data of
+// every MkAttachedFileData child.  See MkAttachments::readMetadataOnly().
+std::unique_ptr<EBML::MkAttachments> readAttachmentsMetadataAt(
+    File &file, offset_t offset, offset_t maxOffset)
+{
+  if(offset < 0 || offset >= maxOffset)
+    return nullptr;
+
+  file.seek(offset);
+  auto element = EBML::Element::factory(file);
+  if(!element || element->getId() != EBML::Element::Id::MkAttachments)
+    return nullptr;
+
+  auto typed = EBML::element_cast<EBML::Element::Id::MkAttachments>(std::move(element));
+  if(!typed || !typed->readMetadataOnly(file))
+    return nullptr;
+  return typed;
+}
 
 } // namespace
 
@@ -97,7 +97,7 @@ bool EBML::MkSegment::read(File &file)
   return readLimited(file, dataSize);
 }
 
-bool EBML::MkSegment::readLimited(File& file, offset_t scanLimit)
+bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
 {
   const offset_t filePos = file.tell();
   const offset_t maxOffset = filePos + dataSize;
@@ -109,57 +109,57 @@ bool EBML::MkSegment::readLimited(File& file, offset_t scanLimit)
   // network filesystems.
   const bool isFastScan = scanLimit < dataSize;
   std::unique_ptr<Element> element;
-  while ((element = findNextElement(file, maxScanOffset))) {
-    if (const Id id = element->getId(); id == Id::MkSeekHead) {
+  while((element = findNextElement(file, maxScanOffset))) {
+    if(const Id id = element->getId(); id == Id::MkSeekHead) {
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
-      if (!seekHead->read(file))
+      if(!seekHead->read(file))
         return false;
       // We have a seek head, let's use it for faster access to the other elements
-      if (const auto elementAfterSeekHead = findNextElement(file, maxScanOffset);
-        elementAfterSeekHead && elementAfterSeekHead->getId() == Id::VoidElement)
+      if(const auto elementAfterSeekHead = findNextElement(file, maxScanOffset);
+         elementAfterSeekHead && elementAfterSeekHead->getId() == Id::VoidElement)
         seekHead->setPadding(elementAfterSeekHead->getSize());
       const offset_t segDataOffset = segmentDataOffset();
       const auto matroskaSeekHead = parseSeekHead();
-      for (const auto& [idValue, relativeOffset] : matroskaSeekHead->entryList()) {
+      for(const auto &[idValue, relativeOffset] : matroskaSeekHead->entryList()) {
         const offset_t absoluteOffset = segDataOffset + relativeOffset;
-        switch (static_cast<Id>(idValue)) {
+        switch(static_cast<Id>(idValue)) {
         case Id::MkCues:
           // Skip Cues in fast scan mode; they are only used for Accurate validation.
-          if (!isFastScan) {
-            if (!((cues = readElementAt<Id::MkCues, MkCues>(
+          if(!isFastScan) {
+            if(!((cues = readElementAt<Id::MkCues, MkCues>(
               file, absoluteOffset, maxOffset))))
               return false;
           }
           break;
         case Id::MkInfo:
-          if (!((info = readElementAt<Id::MkInfo, MkInfo>(
+          if(!((info = readElementAt<Id::MkInfo, MkInfo>(
             file, absoluteOffset, maxOffset))))
             return false;
           break;
         case Id::MkTracks:
-          if (!((tracks = readElementAt<Id::MkTracks, MkTracks>(
+          if(!((tracks = readElementAt<Id::MkTracks, MkTracks>(
             file, absoluteOffset, maxOffset))))
             return false;
           break;
         case Id::MkTags:
-          if (!((tags = readElementAt<Id::MkTags, MkTags>(
+          if(!((tags = readElementAt<Id::MkTags, MkTags>(
             file, absoluteOffset, maxOffset))))
             return false;
           break;
         case Id::MkAttachments:
-          if (isFastScan) {
-            if (!((attachments = readAttachmentsMetadataAt(
+          if(isFastScan) {
+            if(!((attachments = readAttachmentsMetadataAt(
               file, absoluteOffset, maxOffset))))
               return false;
           }
           else {
-            if (!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
+            if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
               file, absoluteOffset, maxOffset))))
               return false;
           }
           break;
         case Id::MkChapters:
-          if (!((chapters = readElementAt<Id::MkChapters, MkChapters>(
+          if(!((chapters = readElementAt<Id::MkChapters, MkChapters>(
             file, absoluteOffset, maxOffset))))
             return false;
           break;
@@ -169,43 +169,43 @@ bool EBML::MkSegment::readLimited(File& file, offset_t scanLimit)
       }
       return true;
     }
-    else if (id == Id::MkCues) {
+    else if(id == Id::MkCues) {
       // Skip Cues in fast scan mode; they are only used for Accurate validation.
-      if (isFastScan) {
+      if(isFastScan) {
         element->skipData(file);
       }
       else {
         cues = element_cast<Id::MkCues>(std::move(element));
-        if (!cues->read(file))
+        if(!cues->read(file))
           return false;
       }
     }
-    else if (id == Id::MkInfo) {
+    else if(id == Id::MkInfo) {
       info = element_cast<Id::MkInfo>(std::move(element));
-      if (!info->read(file))
+      if(!info->read(file))
         return false;
     }
-    else if (id == Id::MkTracks) {
+    else if(id == Id::MkTracks) {
       tracks = element_cast<Id::MkTracks>(std::move(element));
-      if (!tracks->read(file))
+      if(!tracks->read(file))
         return false;
     }
-    else if (id == Id::MkTags) {
+    else if(id == Id::MkTags) {
       tags = element_cast<Id::MkTags>(std::move(element));
-      if (!tags->read(file))
+      if(!tags->read(file))
         return false;
     }
-    else if (id == Id::MkAttachments) {
+    else if(id == Id::MkAttachments) {
       attachments = element_cast<Id::MkAttachments>(std::move(element));
       const bool ok = isFastScan
         ? attachments->readMetadataOnly(file)
         : attachments->read(file);
-      if (!ok)
+      if(!ok)
         return false;
     }
-    else if (id == Id::MkChapters) {
+    else if(id == Id::MkChapters) {
       chapters = element_cast<Id::MkChapters>(std::move(element));
-      if (!chapters->read(file))
+      if(!chapters->read(file))
         return false;
     }
     else {
