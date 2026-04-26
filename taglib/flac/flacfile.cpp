@@ -70,6 +70,8 @@ public:
 
   std::unique_ptr<Properties> properties;
   ByteVector xiphCommentData;
+  String iXMLData;
+  ByteVector bextData;
   List<FLAC::MetadataBlock *> blocks;
 
   offset_t flacStart { 0 };
@@ -240,6 +242,52 @@ bool FLAC::File::save()
     Tag::duplicate(&d->tag, xiphComment(true), false);
 
   d->xiphCommentData = xiphComment()->render(false);
+
+  // Drop any APPLICATION blocks we recognize as iXML or bext from the block
+  // list.  Recognized blocks were normally extracted to d->iXMLData /
+  // d->bextData during scan() and never added here, but this also catches
+  // entries inserted after scan() (defensive).
+  for(auto it = d->blocks.begin(); it != d->blocks.end();) {
+    if((*it)->code() == MetadataBlock::Application) {
+      const ByteVector blockData = (*it)->render();
+      if(blockData.size() >= 4) {
+        const ByteVector appId = blockData.mid(0, 4);
+        ByteVector innerId;
+        if(appId == "riff" && blockData.size() >= 12)
+          innerId = blockData.mid(4, 4);
+        else if(appId == "iXML" || appId == "bext")
+          innerId = appId;
+
+        if(innerId == "iXML" || innerId == "bext") {
+          delete *it;
+          it = d->blocks.erase(it);
+          continue;
+        }
+      }
+    }
+    ++it;
+  }
+
+  // Append fresh APPLICATION/"riff" blocks for iXML and bext if non-empty.
+  // Per FLAC foreign-metadata convention the payload is a RIFF chunk:
+  // <4 byte FOURCC><4 byte LE size><data>.
+  if(!d->iXMLData.isEmpty()) {
+    const ByteVector xml = d->iXMLData.data(String::UTF8);
+    ByteVector payload;
+    payload.append("riff");
+    payload.append("iXML");
+    payload.append(ByteVector::fromUInt(xml.size(), false));
+    payload.append(xml);
+    d->blocks.append(new UnknownMetadataBlock(MetadataBlock::Application, payload));
+  }
+  if(!d->bextData.isEmpty()) {
+    ByteVector payload;
+    payload.append("riff");
+    payload.append("bext");
+    payload.append(ByteVector::fromUInt(d->bextData.size(), false));
+    payload.append(d->bextData);
+    d->blocks.append(new UnknownMetadataBlock(MetadataBlock::Application, payload));
+  }
 
   // Replace metadata blocks
 
@@ -433,6 +481,26 @@ void FLAC::File::removePictures()
   }
 }
 
+String FLAC::File::iXMLData() const
+{
+  return d->iXMLData;
+}
+
+void FLAC::File::setiXMLData(const String &data)
+{
+  d->iXMLData = data;
+}
+
+ByteVector FLAC::File::BEXTData() const
+{
+  return d->bextData;
+}
+
+void FLAC::File::setBEXTData(const ByteVector &data)
+{
+  d->bextData = data;
+}
+
 void FLAC::File::strip(int tags)
 {
   if(tags & ID3v1)
@@ -460,6 +528,16 @@ bool FLAC::File::hasID3v1Tag() const
 bool FLAC::File::hasID3v2Tag() const
 {
   return d->ID3v2Location >= 0;
+}
+
+bool FLAC::File::hasiXMLData() const
+{
+  return !d->iXMLData.isEmpty();
+}
+
+bool FLAC::File::hasBEXTData() const
+{
+  return !d->bextData.isEmpty();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -612,6 +690,49 @@ void FLAC::File::scan()
     }
     else if(blockType == MetadataBlock::Padding) {
       // Skip all padding blocks.
+    }
+    else if(blockType == MetadataBlock::Application && data.size() >= 4) {
+      // APPLICATION block (RFC 9639 § 8.4):
+      //   <4 bytes>  big-endian application ID (ASCII FOURCC in practice)
+      //   <n bytes>  application-defined data
+      //
+      // We recognize two conventions for carrying RIFF iXML / bext metadata:
+      //   1. App ID "riff" — IANA-registered FLAC foreign-metadata wrapper.
+      //      Payload is a RIFF chunk: <4 byte FOURCC><4 byte LE size><data>.
+      //   2. App ID "iXML" or "bext" — direct, used by some third-party tools
+      //      (e.g. Sequoia). Payload is the chunk data verbatim.
+      //
+      // Other application IDs (and "riff" wrapping FOURCCs we don't recognize)
+      // fall through to UnknownMetadataBlock so they round-trip unchanged.
+      const ByteVector appId = data.mid(0, 4);
+      ByteVector innerId;
+      ByteVector innerData;
+
+      if(appId == "riff" && data.size() >= 12) {
+        innerId = data.mid(4, 4);
+        const unsigned int innerSize = data.toUInt(8U, false);
+        innerData = data.mid(12, innerSize);
+      }
+      else if(appId == "iXML" || appId == "bext") {
+        innerId = appId;
+        innerData = data.mid(4);
+      }
+
+      if(innerId == "iXML") {
+        if(d->iXMLData.isEmpty())
+          d->iXMLData = String(innerData, String::UTF8);
+        else
+          debug("FLAC::File::scan() -- multiple iXML blocks found, discarding");
+      }
+      else if(innerId == "bext") {
+        if(d->bextData.isEmpty())
+          d->bextData = innerData;
+        else
+          debug("FLAC::File::scan() -- multiple BEXT blocks found, discarding");
+      }
+      else {
+        block = new UnknownMetadataBlock(blockType, data);
+      }
     }
     else {
       block = new UnknownMetadataBlock(blockType, data);

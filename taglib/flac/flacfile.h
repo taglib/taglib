@@ -297,6 +297,52 @@ namespace TagLib {
       void addPicture(Picture *picture);
 
       /*!
+       * Returns the raw iXML data as a String.  Empty if no iXML metadata
+       * is present.  Read from an APPLICATION metadata block (RFC 9639 § 8.4)
+       * carrying either the FLAC foreign-metadata application ID "riff"
+       * (with an iXML RIFF chunk as payload) or the direct application ID
+       * "iXML" used by some third-party tools.
+       *
+       * \see setiXMLData()
+       * \see hasiXMLData()
+       */
+      String iXMLData() const;
+
+      /*!
+       * Sets the iXML data.  Pass an empty string to remove the iXML
+       * APPLICATION block on save.  On save, the data is written using the
+       * FLAC foreign-metadata convention: an APPLICATION block with
+       * application ID "riff" wrapping an iXML RIFF chunk.
+       *
+       * \see iXMLData()
+       * \see hasiXMLData()
+       */
+      void setiXMLData(const String &data);
+
+      /*!
+       * Returns the raw BEXT (Broadcast Audio Extension) data as a
+       * ByteVector.  Empty if no BEXT metadata is present.  Read from an
+       * APPLICATION metadata block (RFC 9639 § 8.4) carrying either the FLAC
+       * foreign-metadata application ID "riff" (with a bext RIFF chunk as
+       * payload) or the direct application ID "bext".
+       *
+       * \see setBEXTData()
+       * \see hasBEXTData()
+       */
+      ByteVector BEXTData() const;
+
+      /*!
+       * Sets the BEXT data.  Pass an empty ByteVector to remove the BEXT
+       * APPLICATION block on save.  On save, the data is written using the
+       * FLAC foreign-metadata convention: an APPLICATION block with
+       * application ID "riff" wrapping a bext RIFF chunk.
+       *
+       * \see BEXTData()
+       * \see hasBEXTData()
+       */
+      void setBEXTData(const ByteVector &data);
+
+      /*!
        * This will remove the tags that match the OR-ed together TagTypes from
        * the file.  By default it removes all tags.
        *
@@ -331,6 +377,22 @@ namespace TagLib {
        * \see ID3v2Tag()
        */
       bool hasID3v2Tag() const;
+
+      /*!
+       * Returns whether or not the file on disk actually has iXML data
+       * stored in an APPLICATION metadata block.
+       *
+       * \see iXMLData()
+       */
+      bool hasiXMLData() const;
+
+      /*!
+       * Returns whether or not the file on disk actually has BEXT data
+       * stored in an APPLICATION metadata block.
+       *
+       * \see BEXTData()
+       */
+      bool hasBEXTData() const;
 
       /*!
        * Returns whether or not the given \a stream can be opened as a FLAC

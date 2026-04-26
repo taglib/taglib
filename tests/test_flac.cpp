@@ -28,6 +28,7 @@
 
 #include "tstringlist.h"
 #include "tpropertymap.h"
+#include "tbytevectorstream.h"
 #include "tag.h"
 #include "flacfile.h"
 #include "xiphcomment.h"
@@ -67,6 +68,13 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testRemoveXiphField);
   CPPUNIT_TEST(testEmptySeekTable);
   CPPUNIT_TEST(testPictureStoredAfterComment);
+  CPPUNIT_TEST(testReadiXMLDirect);
+  CPPUNIT_TEST(testReadiXMLRiffWrapped);
+  CPPUNIT_TEST(testReadBEXTDirect);
+  CPPUNIT_TEST(testReadBEXTRiffWrapped);
+  CPPUNIT_TEST(testWriteiXMLAndBEXT);
+  CPPUNIT_TEST(testWriteEmptyClearsiXMLAndBEXT);
+  CPPUNIT_TEST(testRoundTripPreservesUnknownApplicationBlock);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -661,6 +669,209 @@ public:
     expectedData.append(picData);
     const ByteVector fileData = PlainFile(copy.fileName().c_str()).readAll();
     CPPUNIT_ASSERT(fileData.startsWith(expectedData));
+  }
+
+  // Build a 4-byte FLAC metadata-block header:
+  // <1 bit last><7 bit type><24 bit length, big-endian>.
+  static ByteVector flacBlockHeader(unsigned int payloadSize, int blockType, bool isLast)
+  {
+    ByteVector h = ByteVector::fromUInt(payloadSize);
+    h[0] = static_cast<char>(blockType | (isLast ? 0x80 : 0x00));
+    return h;
+  }
+
+  // Build the body of an APPLICATION/"riff"-wrapped RIFF chunk:
+  // [appID="riff"][FOURCC][LE size][data].
+  static ByteVector riffWrappedAppData(const ByteVector &fourcc, const ByteVector &data)
+  {
+    ByteVector body("riff", 4);
+    body.append(fourcc);
+    body.append(ByteVector::fromUInt(data.size(), false));
+    body.append(data);
+    return body;
+  }
+
+  // Build a minimal synthetic FLAC stream: "fLaC" + zero-init STREAMINFO +
+  // one APPLICATION block (which gets the last-block flag).  Caller passes
+  // the full APPLICATION block payload starting with the 4-byte appID.
+  static ByteVector synthFlacWithApp(const ByteVector &appPayload)
+  {
+    ByteVector flac("fLaC", 4);
+    flac.append(flacBlockHeader(34, 0, false));   // STREAMINFO header
+    flac.append(ByteVector(34, '\0'));            // STREAMINFO body
+    flac.append(flacBlockHeader(appPayload.size(), 2, true));
+    flac.append(appPayload);
+    return flac;
+  }
+
+  void testReadiXMLDirect()
+  {
+    const String xml("<BWFXML><IXML_VERSION>1.0</IXML_VERSION></BWFXML>");
+    ByteVector appPayload("iXML", 4);
+    appPayload.append(xml.data(String::UTF8));
+
+    ByteVector data = synthFlacWithApp(appPayload);
+    ByteVectorStream stream(data);
+    FLAC::File f(&stream, false);
+
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.hasiXMLData());
+    CPPUNIT_ASSERT(!f.hasBEXTData());
+    CPPUNIT_ASSERT_EQUAL(xml, f.iXMLData());
+  }
+
+  void testReadiXMLRiffWrapped()
+  {
+    const String xml("<BWFXML><SCENE>1</SCENE></BWFXML>");
+    const ByteVector appPayload =
+      riffWrappedAppData("iXML", xml.data(String::UTF8));
+
+    ByteVector data = synthFlacWithApp(appPayload);
+    ByteVectorStream stream(data);
+    FLAC::File f(&stream, false);
+
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.hasiXMLData());
+    CPPUNIT_ASSERT_EQUAL(xml, f.iXMLData());
+  }
+
+  void testReadBEXTDirect()
+  {
+    const ByteVector bext("test bext data");
+    ByteVector appPayload("bext", 4);
+    appPayload.append(bext);
+
+    ByteVector data = synthFlacWithApp(appPayload);
+    ByteVectorStream stream(data);
+    FLAC::File f(&stream, false);
+
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.hasBEXTData());
+    CPPUNIT_ASSERT(!f.hasiXMLData());
+    CPPUNIT_ASSERT_EQUAL(bext, f.BEXTData());
+  }
+
+  void testReadBEXTRiffWrapped()
+  {
+    const ByteVector bext("test bext data");
+    const ByteVector appPayload = riffWrappedAppData("bext", bext);
+
+    ByteVector data = synthFlacWithApp(appPayload);
+    ByteVectorStream stream(data);
+    FLAC::File f(&stream, false);
+
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.hasBEXTData());
+    CPPUNIT_ASSERT_EQUAL(bext, f.BEXTData());
+  }
+
+  void testWriteiXMLAndBEXT()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    const string newname = copy.fileName();
+
+    const String xml("<BWFXML><IXML_VERSION>1.6</IXML_VERSION></BWFXML>");
+    const ByteVector bext("bext payload bytes");
+
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
+      f.setiXMLData(xml);
+      f.setBEXTData(bext);
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
+      CPPUNIT_ASSERT_EQUAL(xml, f.iXMLData());
+      CPPUNIT_ASSERT_EQUAL(bext, f.BEXTData());
+    }
+
+    // On-disk format check: written blocks must use the IANA-registered
+    // "riff" wrapper, not the direct "iXML"/"bext" application IDs.
+    const ByteVector fileBytes = PlainFile(newname.c_str()).readAll();
+    ByteVector expectediXMLApp("riff", 4);
+    expectediXMLApp.append("iXML");
+    expectediXMLApp.append(ByteVector::fromUInt(xml.data(String::UTF8).size(), false));
+    expectediXMLApp.append(xml.data(String::UTF8));
+    CPPUNIT_ASSERT(fileBytes.find(expectediXMLApp) >= 0);
+
+    ByteVector expectedBEXTApp("riff", 4);
+    expectedBEXTApp.append("bext");
+    expectedBEXTApp.append(ByteVector::fromUInt(bext.size(), false));
+    expectedBEXTApp.append(bext);
+    CPPUNIT_ASSERT(fileBytes.find(expectedBEXTApp) >= 0);
+  }
+
+  void testWriteEmptyClearsiXMLAndBEXT()
+  {
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    const string newname = copy.fileName();
+
+    {
+      FLAC::File f(newname.c_str());
+      f.setiXMLData("<BWFXML/>");
+      f.setBEXTData(ByteVector("bext"));
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
+      f.setiXMLData(String());
+      f.setBEXTData(ByteVector());
+      f.save();
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
+      CPPUNIT_ASSERT(f.iXMLData().isEmpty());
+      CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+    }
+  }
+
+  void testRoundTripPreservesUnknownApplicationBlock()
+  {
+    // Source: silence-44-s with an extra APPLICATION/"SMED" block injected
+    // just before its existing VORBIS_COMMENT block.  Goal: setting iXML and
+    // saving must not disturb the SMED block (it's an unrecognized app ID).
+    const ByteVector smedAppPayload("SMED", 4);
+    ByteVector smedExtra("opaque sequoia metadata payload");
+    ByteVector smedBlock = smedAppPayload;
+    smedBlock.append(smedExtra);
+
+    // Splice a fresh APPLICATION/SMED block into a synthetic FLAC.  Use the
+    // file we just built as the input stream so we don't have to mutate a
+    // real FLAC's seek table / picture offsets.
+    ByteVector flac("fLaC", 4);
+    flac.append(flacBlockHeader(34, 0, false));
+    flac.append(ByteVector(34, '\0'));
+    flac.append(flacBlockHeader(smedBlock.size(), 2, true));
+    flac.append(smedBlock);
+
+    ByteVectorStream stream(flac);
+    {
+      FLAC::File f(&stream, false);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      f.setiXMLData("<BWFXML/>");
+      f.save();
+    }
+
+    // SMED block must still be present on disk after save.
+    ByteVector saved = *stream.data();
+    CPPUNIT_ASSERT(saved.find(smedAppPayload) >= 0);
+    CPPUNIT_ASSERT(saved.find(smedExtra) >= 0);
+
+    // And the iXML data must round-trip.
+    ByteVectorStream stream2(saved);
+    FLAC::File f2(&stream2, false);
+    CPPUNIT_ASSERT(f2.isValid());
+    CPPUNIT_ASSERT(f2.hasiXMLData());
+    CPPUNIT_ASSERT_EQUAL(String("<BWFXML/>"), f2.iXMLData());
   }
 
 };
