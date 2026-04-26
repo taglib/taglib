@@ -31,6 +31,48 @@
 
 using namespace TagLib;
 
+namespace {
+
+Matroska::Chapter parseChapterAtom(
+  const std::unique_ptr<EBML::Element> &atomElement)
+{
+  Matroska::Chapter::UID chapterUid = 0;
+  Matroska::Chapter::Time chapterTimeStart = 0;
+  Matroska::Chapter::Time chapterTimeEnd = 0;
+  List<Matroska::Chapter::Display> chapterDisplays;
+  bool chapterHidden = false;
+
+  const auto chapterAtom = EBML::element_cast<EBML::Element::Id::MkChapterAtom>(atomElement);
+  for(const auto &chapterChild : *chapterAtom) {
+    if(const EBML::Element::Id cid = chapterChild->getId(); cid == EBML::Element::Id::MkChapterUID)
+      chapterUid = EBML::element_cast<EBML::Element::Id::MkChapterUID>(chapterChild)->getValue();
+    else if(cid == EBML::Element::Id::MkChapterTimeStart)
+      chapterTimeStart = EBML::element_cast<EBML::Element::Id::MkChapterTimeStart>(chapterChild)->getValue();
+    else if(cid == EBML::Element::Id::MkChapterTimeEnd)
+      chapterTimeEnd = EBML::element_cast<EBML::Element::Id::MkChapterTimeEnd>(chapterChild)->getValue();
+    else if(cid == EBML::Element::Id::MkChapterFlagHidden)
+      chapterHidden = EBML::element_cast<EBML::Element::Id::MkChapterFlagHidden>(chapterChild)->getValue() != 0;
+    else if (cid == EBML::Element::Id::MkChapterDisplay) {
+      const auto display = EBML::element_cast<EBML::Element::Id::MkChapterDisplay>(chapterChild);
+      String displayString;
+      String displayLanguage;
+      for(const auto &displayChild : *display) {
+        if (const EBML::Element::Id did = displayChild->getId(); did == EBML::Element::Id::MkChapString)
+          displayString = EBML::element_cast<EBML::Element::Id::MkChapString>(displayChild)->getValue();
+        else if(did == EBML::Element::Id::MkChapLanguage)
+          displayLanguage = EBML::element_cast<EBML::Element::Id::MkChapLanguage>(displayChild)->getValue();
+      }
+      if(!displayString.isEmpty()) {
+        chapterDisplays.append(Matroska::Chapter::Display(displayString, displayLanguage));
+      }
+    }
+  }
+  return Matroska::Chapter(chapterTimeStart, chapterTimeEnd, chapterDisplays,
+    chapterUid, chapterHidden);
+}
+
+} // namespae
+
 EBML::MkChapters::MkChapters(int sizeLength, offset_t dataSize, offset_t offset):
   MasterElement(Id::MkChapters, sizeLength, dataSize, offset)
 {
@@ -41,7 +83,7 @@ EBML::MkChapters::MkChapters(Id, int sizeLength, offset_t dataSize, offset_t off
 {
 }
 
-EBML::MkChapters::MkChapters():
+EBML::MkChapters::MkChapters() :
   MasterElement(Id::MkChapters, 0, 0, 0)
 {
 }
@@ -52,7 +94,20 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
   chapters->setOffset(offset);
   chapters->setSize(getSize());
 
+  // Collect any orphan ChapterAtom elements not wrapped in an EditionEntry.
+  // The Matroska spec requires ChapterAtom to be inside an EditionEntry, but
+  // some muxers produce files with ChapterAtom directly under Chapters.
+  // MKVToolNix and FFmpeg handle this case by treating the orphan atoms as
+  // belonging to an implicit default edition.
+  List<Matroska::Chapter> orphanChapters;
+
   for(const auto &element : elements) {
+    if(element->getId() == Id::MkChapterAtom) {
+      if(auto chapter = parseChapterAtom(element); chapter.uid()) {
+        orphanChapters.append(chapter);
+      }
+      continue;
+    }
     if(element->getId() != Id::MkEditionEntry)
       continue;
 
@@ -69,39 +124,8 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
       else if(id == Id::MkEditionFlagOrdered)
         editionIsOrdered = element_cast<Id::MkEditionFlagOrdered>(editionChild)->getValue() != 0;
       else if(id == Id::MkChapterAtom) {
-        Matroska::Chapter::UID chapterUid = 0;
-        Matroska::Chapter::Time chapterTimeStart = 0;
-        Matroska::Chapter::Time chapterTimeEnd = 0;
-        List<Matroska::Chapter::Display> chapterDisplays;
-        bool chapterHidden = false;
-        const auto chapterAtom = element_cast<Id::MkChapterAtom>(editionChild);
-        for(const auto &chapterChild : *chapterAtom) {
-          if(const Id cid = chapterChild->getId(); cid == Id::MkChapterUID)
-            chapterUid = element_cast<Id::MkChapterUID>(chapterChild)->getValue();
-          else if(cid == Id::MkChapterTimeStart)
-            chapterTimeStart = element_cast<Id::MkChapterTimeStart>(chapterChild)->getValue();
-          else if(cid == Id::MkChapterTimeEnd)
-            chapterTimeEnd = element_cast<Id::MkChapterTimeEnd>(chapterChild)->getValue();
-          else if(cid == Id::MkChapterFlagHidden)
-            chapterHidden = element_cast<Id::MkChapterFlagHidden>(chapterChild)->getValue() != 0;
-          else if(cid == Id::MkChapterDisplay) {
-            const auto display = element_cast<Id::MkChapterDisplay>(chapterChild);
-            String displayString;
-            String displayLanguage;
-            for(const auto &displayChild : *display) {
-              if(const Id did = displayChild->getId(); did == Id::MkChapString)
-                displayString = element_cast<Id::MkChapString>(displayChild)->getValue();
-              else if(did == Id::MkChapLanguage)
-                displayLanguage = element_cast<Id::MkChapLanguage>(displayChild)->getValue();
-            }
-            if(!displayString.isEmpty()) {
-              chapterDisplays.append(Matroska::Chapter::Display(displayString, displayLanguage));
-            }
-          }
-        }
-        if(chapterUid) {
-          editionChapters.append(Matroska::Chapter(
-            chapterTimeStart, chapterTimeEnd, chapterDisplays, chapterUid, chapterHidden));
+        if(auto chapter = parseChapterAtom(editionChild); chapter.uid()) {
+          editionChapters.append(chapter);
         }
       }
     }
@@ -110,5 +134,13 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
         editionChapters, editionIsDefault, editionIsOrdered, editionUid));
     }
   }
+
+  // If orphan chapters were found, wrap them in an implicit default edition
+  // so they are not silently lost.
+  if (!orphanChapters.isEmpty()) {
+    chapters->addChapterEdition(Matroska::ChapterEdition(
+      orphanChapters, true, false, 0));
+  }
+
   return chapters;
 }
