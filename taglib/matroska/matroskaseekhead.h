@@ -39,6 +39,13 @@ namespace TagLib {
       bool isValid(TagLib::File &file) const;
       void addEntry(const Element &element);
       void addEntry(ID id, offset_t offset);
+      /*!
+       * Update the offset of an existing entry with the given id.
+       * If no entry with that ID exists, a new entry is added.
+       * Used when an element is relocated to the end of the file
+       * (mkvpropedit-style fast save).
+       */
+      void updateEntry(ID id, offset_t newOffset);
       const List<std::pair<unsigned int, offset_t>> &entryList() const;
       void write(TagLib::File &file) override;
       void sort();

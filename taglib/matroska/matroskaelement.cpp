@@ -163,6 +163,15 @@ offset_t Matroska::Element::sizeRenderedOrWritten() const
 
 void Matroska::Element::write(File &file)
 {
-  file.insert(e->data, e->offset, e->size);
+  // If the element has been relocated to the end of the file (mkvpropedit-
+  // style fast save), use a plain seek + write instead of the slow insert()
+  // path which would shift cluster data.
+  if(e->offset >= file.length()) {
+    file.seek(e->offset);
+    file.writeBlock(e->data);
+  }
+  else {
+    file.insert(e->data, e->offset, e->size);
+  }
   e->size = e->data.size();
 }
