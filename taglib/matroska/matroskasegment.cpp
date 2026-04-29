@@ -69,3 +69,8 @@ offset_t Matroska::Segment::dataOffset() const
 {
   return offset() + sizeLength;
 }
+
+offset_t Matroska::Segment::endOffset() const
+{
+  return dataOffset() + dataSize;
+}

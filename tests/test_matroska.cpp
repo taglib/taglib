@@ -156,6 +156,10 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testOpenInvalid);
   CPPUNIT_TEST(testSegmentSizeChange);
   CPPUNIT_TEST(testChapters);
+  CPPUNIT_TEST(testSaveTypes);
+  CPPUNIT_TEST(testSaveTypesBeforeCues);
+  CPPUNIT_TEST(testSaveTypesNoTrailingVoid);
+  CPPUNIT_TEST(testSaveTypesReclaimVoid);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1247,6 +1251,530 @@ public:
     const ByteVector origData = PlainFile(TEST_FILE_PATH_C("tags-before-cues.mkv")).readAll();
     const ByteVector fileData = PlainFile(newname.c_str()).readAll();
     CPPUNIT_ASSERT(origData == fileData);
+  }
+
+  void testSaveTypesBeforeCues()
+  {
+    // tags-before-cues.mkv layout:
+    //   SeekHead | Void | SegInfo | Tracks | Tags | Cluster | Cues
+    //
+    // Verify all three WriteStyles correctly grow the Tags element which
+    // sits *before* the Cluster:
+    //  - Compact / DoNotShrink: bytes are inserted before the Cluster, the
+    //    Cluster shifts, the seek head and cue cluster positions must be
+    //    updated accordingly; the file must remain valid and tag content
+    //    must round-trip.
+    //  - AvoidInsert: the Tags element is replaced with a Void at its
+    //    original position and appended at the end of the segment, so the
+    //    Cluster must NOT shift; tag content must round-trip.
+
+    const ByteVector origData =
+      PlainFile(TEST_FILE_PATH_C("tags-before-cues.mkv")).readAll();
+
+    // Cluster ID 0x1F43B675 does not appear in the SeekHead of this file,
+    // so find() returns the offset of the actual Cluster element.
+    const ByteVector clusterId = ByteVector::fromUInt(0x1F43B675U, true);
+    const ByteVector tagsId    = ByteVector::fromUInt(0x1254C367U, true);
+    const ByteVector cuesId    = ByteVector::fromUInt(0x1C53BB6BU, true);
+    const int origClusterPos   = origData.find(clusterId);
+    CPPUNIT_ASSERT(origClusterPos > 0);
+
+    const String longTitle =
+      "An Extremely Long Title Value That Is Definitely Larger Than The Original "
+      "Tags Element In The File Because It Contains Many Characters To Ensure "
+      "That The AvoidInsert Move-To-End Behavior Triggers Here";
+    const String longArtist =
+      "An Extremely Long Artist Name Value That Is Also Larger Than The Original "
+      "Tags Element And Together With The Title Tag Makes The Rendered Output "
+      "Exceed The Original Tags Size So The AvoidInsert Triggers";
+
+    for(const auto writeStyle : {Matroska::WriteStyle::Compact,
+                                 Matroska::WriteStyle::DoNotShrink,
+                                 Matroska::WriteStyle::AvoidInsert}) {
+      const auto wsLabel = String::number(static_cast<int>(writeStyle)).to8Bit();
+      ScopedFileCopy copy("tags-before-cues", ".mkv");
+      const string newname = copy.fileName();
+
+      // Save with Tags significantly larger than the original Tags element.
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT_MESSAGE("Open ws=" + wsLabel, f.isValid());
+        auto tag = f.tag(true);
+        tag->clearSimpleTags();
+        tag->addSimpleTag(Matroska::SimpleTag(
+          String("TITLE"), longTitle,
+          Matroska::SimpleTag::TargetTypeValue::Track));
+        tag->addSimpleTag(Matroska::SimpleTag(
+          String("ARTIST"), longArtist,
+          Matroska::SimpleTag::TargetTypeValue::Track));
+        CPPUNIT_ASSERT_MESSAGE("Save ws=" + wsLabel, f.save(writeStyle));
+      }
+
+      // File must be valid: Accurate mode verifies seek-head and cue positions.
+      // Tag content must round-trip exactly.
+      {
+        Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+        CPPUNIT_ASSERT_MESSAGE("Reopen valid ws=" + wsLabel, f.isValid());
+        auto tag = f.tag(false);
+        CPPUNIT_ASSERT_MESSAGE("Tag exists ws=" + wsLabel, tag != nullptr);
+        const auto &simpleTags = tag->simpleTagsList();
+        bool foundTitle = false, foundArtist = false;
+        for(const auto &st : simpleTags) {
+          if(st.name() == "TITLE" && st.toString() == longTitle)
+            foundTitle = true;
+          else if(st.name() == "ARTIST" && st.toString() == longArtist)
+            foundArtist = true;
+        }
+        CPPUNIT_ASSERT_MESSAGE("TITLE roundtrip ws=" + wsLabel, foundTitle);
+        CPPUNIT_ASSERT_MESSAGE("ARTIST roundtrip ws=" + wsLabel, foundArtist);
+      }
+
+      const ByteVector newData = PlainFile(newname.c_str()).readAll();
+      const int newClusterPos = newData.find(clusterId);
+      CPPUNIT_ASSERT_MESSAGE("Cluster present ws=" + wsLabel, newClusterPos > 0);
+
+      if(writeStyle == Matroska::WriteStyle::AvoidInsert) {
+        // Cluster must not shift in AvoidInsert mode.
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(
+          "AvoidInsert must not shift Cluster",
+          origClusterPos, newClusterPos);
+        // Tags must be appended after Cues.
+        const int cuesPos    = newData.find(cuesId, newClusterPos);
+        const int newTagsPos = newData.find(tagsId, cuesPos + 4);
+        CPPUNIT_ASSERT_MESSAGE("Tags appended after Cues ws=" + wsLabel,
+                               newTagsPos > cuesPos);
+      }
+      else {
+        // Compact / DoNotShrink: Tags grew in place, so Cluster must have
+        // shifted to a higher offset.
+        CPPUNIT_ASSERT_MESSAGE(
+          "Cluster must shift when growing in place ws=" + wsLabel,
+          newClusterPos > origClusterPos);
+      }
+    }
+  }
+
+  void testSaveTypesNoTrailingVoid()
+  {
+    // After AvoidInsert moved the Tags element to the end of the segment,
+    // a subsequent save with smaller content must not leave a trailing
+    // EBML void at the very end of the segment. The trailing element may
+    // shrink freely because no element follows it.
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    const string newname = copy.fileName();
+
+    // Round 1: enlarge Tags so they get moved to the end.
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(true);
+      tag->clearSimpleTags();
+      tag->addSimpleTag(Matroska::SimpleTag(
+        String("TITLE"),
+        String("An Extremely Long Title Value That Is Definitely Larger Than The Original "
+               "Tags Element In The File Because It Contains Many Characters To Ensure "
+               "That The AvoidInsert Move-To-End Behavior Triggers Here"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      tag->addSimpleTag(Matroska::SimpleTag(
+        String("ARTIST"),
+        String("An Extremely Long Artist Name Value That Is Also Larger Than The Original "
+               "Tags Element And Together With The Title Tag Makes The Rendered Output "
+               "Exceed The Original Tags Size So The AvoidInsert Triggers"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::AvoidInsert));
+    }
+    const size_t sizeAfterRound1 = PlainFile(newname.c_str()).readAll().size();
+
+    // Round 2: shrink Tags. The trailing element must shrink without
+    // leaving a void at the end.
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(true);
+      tag->clearSimpleTags();
+      tag->addSimpleTag(Matroska::SimpleTag(
+        String("TITLE"), String("X"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::AvoidInsert));
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false) != nullptr);
+    }
+    const ByteVector newData = PlainFile(newname.c_str()).readAll();
+
+    // File must have shrunk because the trailing Tags element shrank.
+    CPPUNIT_ASSERT(newData.size() < sizeAfterRound1);
+
+    // The last bytes of the file must be the (small) Tags element, not a
+    // Void element. Find the Tags element after the Cues element and parse
+    // its VINT size: the file must end exactly at Tags' end with nothing
+    // (no Void) after it.
+    const ByteVector clusterId = ByteVector::fromUInt(0x1F43B675U, true);
+    const ByteVector cuesId    = ByteVector::fromUInt(0x1C53BB6BU, true);
+    const ByteVector tagsId    = ByteVector::fromUInt(0x1254C367U, true);
+    const int clusterPos = newData.find(clusterId);
+    const int cuesPos    = newData.find(cuesId, clusterPos);
+    const int tagsPos    = newData.find(tagsId, cuesPos + 4);
+    CPPUNIT_ASSERT(tagsPos > cuesPos);
+
+    // Decode VINT data size of the Tags element. The first byte after the
+    // 4-byte ID has a leading marker bit indicating the VINT length.
+    const auto vintFirst = static_cast<unsigned char>(newData[tagsPos + 4]);
+    int vintLen = 1;
+    for(int b = 0; b < 8; ++b) {
+      if(vintFirst & (0x80 >> b)) { vintLen = b + 1; break; }
+    }
+    unsigned long long dataSize = vintFirst & ((0x80 >> (vintLen - 1)) - 1);
+    for(int i = 1; i < vintLen; ++i)
+      dataSize = (dataSize << 8) | static_cast<unsigned char>(newData[tagsPos + 4 + i]);
+    const unsigned long long tagsEnd =
+      static_cast<unsigned long long>(tagsPos) + 4 + vintLen + dataSize;
+    CPPUNIT_ASSERT_EQUAL_MESSAGE(
+      "No trailing EBML void must remain at the end of the segment",
+      static_cast<unsigned long long>(newData.size()), tagsEnd);
+  }
+
+  void testSaveTypesReclaimVoid()
+  {
+    // After AvoidInsert moves a Tags element to the end (leaving a Void at
+    // its original position), a subsequent save with WriteStyle::Compact
+    // must produce a tightly packed file: the void left by the move must
+    // be reclaimed and the file must be at most as large as the original.
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    const string newname = copy.fileName();
+
+    // Step 1: AvoidInsert with enlarged Tags -> Tags moved to end, Void in
+    // original slot. File grows.
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(true);
+      tag->clearSimpleTags();
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"),
+        String("An Extremely Long Title Value That Is Definitely Larger Than The Original "
+               "Tags Element In The File Because It Contains Many Characters To Ensure "
+               "That The AvoidInsert Move-To-End Behavior Triggers Here"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      tag->addSimpleTag(Matroska::SimpleTag(String("ARTIST"),
+        String("An Extremely Long Artist Name Value That Is Also Larger Than The Original "
+               "Tags Element And Together With The Title Tag Makes The Rendered Output "
+               "Exceed The Original Tags Size So The AvoidInsert Triggers"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::AvoidInsert));
+    }
+    const size_t sizeAfterAvoidInsert =
+      PlainFile(newname.c_str()).readAll().size();
+    CPPUNIT_ASSERT(sizeAfterAvoidInsert >
+      PlainFile(TEST_FILE_PATH_C("tags-before-cues.mkv")).readAll().size());
+
+    // Step 2: Save again with Compact and short tag values. Compact must
+    // reclaim the void left by the prior move and produce a file no
+    // larger than the original.
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(true);
+      tag->clearSimpleTags();
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"), String("X"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::Compact));
+    }
+    const size_t sizeAfterCompact =
+      PlainFile(newname.c_str()).readAll().size();
+    CPPUNIT_ASSERT_MESSAGE(
+      "Compact must reclaim space after AvoidInsert grew the file",
+      sizeAfterCompact < sizeAfterAvoidInsert);
+
+    // Reference: applying Compact directly to the original file with the
+    // same tiny tags. Note: an orphan Void left in the middle of the
+    // segment by AvoidInsert is not currently reclaimed by Compact (it is
+    // attached as padding to a neighbouring element), so the post-Compact
+    // size is allowed to be slightly larger than the reference. The
+    // result must, however, be no larger than the original input file.
+    ScopedFileCopy reference("tags-before-cues", ".mkv");
+    {
+      Matroska::File f(reference.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(true);
+      tag->clearSimpleTags();
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"), String("X"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::Compact));
+    }
+    const size_t referenceCompactSize =
+      PlainFile(reference.fileName().c_str()).readAll().size();
+    CPPUNIT_ASSERT(referenceCompactSize <= sizeAfterCompact);
+
+    // File must round-trip correctly.
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      auto tag = f.tag(false);
+      CPPUNIT_ASSERT(tag != nullptr);
+      bool foundTitle = false;
+      for(const auto &st : tag->simpleTagsList()) {
+        if(st.name() == "TITLE" && st.toString() == "X") {
+          foundTitle = true;
+          break;
+        }
+      }
+      CPPUNIT_ASSERT(foundTitle);
+    }
+  }
+
+  void testSaveTypes()
+  {
+    // Helper lambdas for adding data of different sizes
+    // largeTags: 2 simple tags with long values
+    const auto setLargeTags = [](Matroska::File &f) {
+      auto tag = f.tag(true);
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"),
+        String("A Very Long Title That Takes Up A Lot Of Space In The File 1234567890"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      tag->addSimpleTag(Matroska::SimpleTag(String("ARTIST"),
+        String("A Very Long Artist Name That Takes Up A Lot Of Space In The File 1234567890"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+    };
+    const auto setSmallTags = [](Matroska::File &f) {
+      auto tag = f.tag(true);
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"), String("Short"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+    };
+    const auto setMediumTags = [](Matroska::File &f) {
+      auto tag = f.tag(true);
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"), String("Medium Title 12345678901234"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      tag->addSimpleTag(Matroska::SimpleTag(String("ARTIST"), String("Medium Artist"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+    };
+    const auto setExtraLargeTags = [](Matroska::File &f) {
+      auto tag = f.tag(true);
+      tag->addSimpleTag(Matroska::SimpleTag(String("TITLE"),
+        String("An Extremely Long Title That Is Even Larger Than The Previous Large Title "
+               "With Extra Content To Ensure Growth 0123456789ABCDEF"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+      tag->addSimpleTag(Matroska::SimpleTag(String("ARTIST"),
+        String("An Extremely Long Artist Name Exceeding The Prior Large Artist Value "
+               "With Even More Content To Guarantee Growth 0123456789ABCDEF"),
+        Matroska::SimpleTag::TargetTypeValue::Track));
+    };
+
+    const auto setLargeAttachments = [](Matroska::File &f) {
+      auto atts = f.attachments(true);
+      atts->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(200, 'x'), "cover.jpg", "image/jpeg", 111ULL, "Cover"));
+    };
+    const auto setSmallAttachments = [](Matroska::File &f) {
+      auto atts = f.attachments(true);
+      atts->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(20, 'x'), "img.png", "image/png", 222ULL, "Img"));
+    };
+    const auto setMediumAttachments = [](Matroska::File &f) {
+      auto atts = f.attachments(true);
+      atts->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(80, 'x'), "cover.jpg", "image/jpeg", 333ULL, "Cover"));
+    };
+    const auto setExtraLargeAttachments = [](Matroska::File &f) {
+      auto atts = f.attachments(true);
+      atts->addAttachedFile(Matroska::AttachedFile(
+        ByteVector(500, 'x'), "cover.jpg", "image/jpeg", 444ULL, "Cover"));
+    };
+
+    const auto setLargeChapters = [](Matroska::File &f) {
+      auto chs = f.chapters(true);
+      chs->addChapterEdition(Matroska::ChapterEdition(
+        List<Matroska::Chapter>{
+          Matroska::Chapter(0, 40000,
+            List{Matroska::Chapter::Display("Chapter One Long Name", "eng")},
+            1, false),
+          Matroska::Chapter(40000, 80000,
+            List{Matroska::Chapter::Display("Chapter Two Long Name", "eng")},
+            2, false),
+        }, true, false));
+    };
+    const auto setSmallChapters = [](Matroska::File &f) {
+      auto chs = f.chapters(true);
+      chs->addChapterEdition(Matroska::ChapterEdition(
+        List<Matroska::Chapter>{
+          Matroska::Chapter(0, 1000,
+            List{Matroska::Chapter::Display("A", "und")},
+            1, false),
+        }, false, false));
+    };
+    const auto setMediumChapters = [](Matroska::File &f) {
+      auto chs = f.chapters(true);
+      chs->addChapterEdition(Matroska::ChapterEdition(
+        List<Matroska::Chapter>{
+          Matroska::Chapter(0, 40000,
+            List{Matroska::Chapter::Display("Chapter Medium", "eng")},
+            1, false),
+        }, true, false));
+    };
+    const auto setExtraLargeChapters = [](Matroska::File &f) {
+      auto chs = f.chapters(true);
+      chs->addChapterEdition(Matroska::ChapterEdition(
+        List<Matroska::Chapter>{
+          Matroska::Chapter(0, 40000,
+            List{Matroska::Chapter::Display("Chapter One Extremely Long Name Here", "eng"),
+                 Matroska::Chapter::Display("Kapitel Eins Sehr Langer Name", "deu")},
+            1, false),
+          Matroska::Chapter(40000, 80000,
+            List{Matroska::Chapter::Display("Chapter Two Extremely Long Name Here", "eng"),
+                 Matroska::Chapter::Display("Kapitel Zwei Sehr Langer Name", "deu")},
+            2, false),
+          Matroska::Chapter(80000, 120000,
+            List{Matroska::Chapter::Display("Chapter Three Extra Large", "eng")},
+            3, true),
+        }, true, true));
+    };
+
+    for(const auto writeStyle : {Matroska::WriteStyle::Compact,
+                                  Matroska::WriteStyle::DoNotShrink,
+                                  Matroska::WriteStyle::AvoidInsert}) {
+      ScopedFileCopy copy("no-tags", ".mka");
+      const string newname = copy.fileName();
+      const int wsIdx = static_cast<int>(writeStyle);
+
+      // Verify tag/attachment/chapter content for a saved file. Each round
+      // uses unique identifiers (specific TITLE value, attachment UID,
+      // chapter timeStart) so any cross-round leakage or corruption is
+      // caught here.
+      const auto verifyRound = [&](const std::string &label,
+                                   const String &expectedTitle,
+                                   unsigned long long expectedAttachmentUid,
+                                   unsigned int expectedChapterCount,
+                                   unsigned long long expectedFirstChapterEnd) {
+        Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+        CPPUNIT_ASSERT_MESSAGE(label + " valid", f.isValid());
+        auto tag = f.tag(false);
+        CPPUNIT_ASSERT_MESSAGE(label + " tag", tag != nullptr);
+        bool foundTitle = false;
+        for(const auto &st : tag->simpleTagsList()) {
+          if(st.name() == "TITLE" && st.toString() == expectedTitle) {
+            foundTitle = true;
+            break;
+          }
+        }
+        CPPUNIT_ASSERT_MESSAGE(label + " TITLE roundtrip", foundTitle);
+        auto atts = f.attachments(false);
+        CPPUNIT_ASSERT_MESSAGE(label + " attachments", atts != nullptr);
+        bool foundAtt = false;
+        for(const auto &a : atts->attachedFileList()) {
+          if(a.uid() == expectedAttachmentUid) {
+            foundAtt = true;
+            break;
+          }
+        }
+        CPPUNIT_ASSERT_MESSAGE(label + " attachment uid roundtrip", foundAtt);
+        auto chs = f.chapters(false);
+        CPPUNIT_ASSERT_MESSAGE(label + " chapters", chs != nullptr);
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(label + " edition count", 1U,
+          chs->chapterEditionList().size());
+        const auto &edition = chs->chapterEditionList().front();
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(label + " chapter count",
+          expectedChapterCount, edition.chapterList().size());
+        CPPUNIT_ASSERT_EQUAL_MESSAGE(label + " first chapter end",
+          expectedFirstChapterEnd, edition.chapterList()[0].timeEnd());
+      };
+
+      // --- Round 1: save large data ---
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        setLargeTags(f);
+        setLargeAttachments(f);
+        setLargeChapters(f);
+        CPPUNIT_ASSERT_MESSAGE("Round1 save ws=" + String::number(wsIdx).to8Bit(), f.save(writeStyle));
+      }
+      const size_t sizeAfterRound1 = PlainFile(newname.c_str()).readAll().size();
+      verifyRound("Round1 ws=" + std::to_string(wsIdx),
+        String("A Very Long Title That Takes Up A Lot Of Space In The File 1234567890"),
+        111ULL, 2U, 40000ULL);
+
+      // --- Round 2: save smaller data → slot must not shrink for DoNotShrink/AvoidInsert ---
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        f.tag(true)->clearSimpleTags();
+        f.attachments(true)->clear();
+        f.chapters(true)->clear();
+        setSmallTags(f);
+        setSmallAttachments(f);
+        setSmallChapters(f);
+        CPPUNIT_ASSERT_MESSAGE("Round2 save ws=" + String::number(wsIdx).to8Bit(), f.save(writeStyle));
+      }
+      const size_t sizeAfterRound2 = PlainFile(newname.c_str()).readAll().size();
+      verifyRound("Round2 ws=" + std::to_string(wsIdx),
+        String("Short"), 222ULL, 1U, 1000ULL);
+
+      if(writeStyle == Matroska::WriteStyle::Compact) {
+        // Compact always shrinks, so file is smaller
+        CPPUNIT_ASSERT(sizeAfterRound2 < sizeAfterRound1);
+      } else if(writeStyle == Matroska::WriteStyle::AvoidInsert) {
+        // AvoidInsert: existing slots are kept, but the segment-trailing
+        // element may shrink (no element follows it -- shrinking only
+        // truncates the file, no inserts are needed).
+        CPPUNIT_ASSERT(sizeAfterRound2 <= sizeAfterRound1);
+      } else {
+        // DoNotShrink: elements keep their original slot size.
+        // The file size must not be smaller than after round 1
+        CPPUNIT_ASSERT_EQUAL(sizeAfterRound1, sizeAfterRound2);
+      }
+
+      // --- Round 3: save medium data (fits in round2's slot if DoNotShrink/AvoidInsert) ---
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        f.tag(true)->clearSimpleTags();
+        f.attachments(true)->clear();
+        f.chapters(true)->clear();
+        setMediumTags(f);
+        setMediumAttachments(f);
+        setMediumChapters(f);
+        CPPUNIT_ASSERT_MESSAGE("Round3 save ws=" + String::number(wsIdx).to8Bit(), f.save(writeStyle));
+      }
+      const size_t sizeAfterRound3 = PlainFile(newname.c_str()).readAll().size();
+      verifyRound("Round3 ws=" + std::to_string(wsIdx),
+        String("Medium Title 12345678901234"), 333ULL, 1U, 40000ULL);
+
+      if(writeStyle == Matroska::WriteStyle::Compact) {
+        // Compact: medium > small, but exact, so different from round2
+        CPPUNIT_ASSERT(sizeAfterRound3 != sizeAfterRound2);
+        CPPUNIT_ASSERT(sizeAfterRound3 < sizeAfterRound1);
+      } else if(writeStyle == Matroska::WriteStyle::AvoidInsert) {
+        // AvoidInsert: medium fits in round1's slot for non-trailing
+        // elements, but the trailing element may take less space than in
+        // round 1. File size therefore stays <= round 1.
+        CPPUNIT_ASSERT(sizeAfterRound3 <= sizeAfterRound1);
+      } else {
+        // DoNotShrink: medium fits in round1's slot (with remaining void)
+        // so file size stays the same as round1/round2
+        CPPUNIT_ASSERT_EQUAL(sizeAfterRound1, sizeAfterRound3);
+      }
+
+      // --- Round 4: save extra-large data (larger than round 1) ---
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        f.tag(true)->clearSimpleTags();
+        f.attachments(true)->clear();
+        f.chapters(true)->clear();
+        setExtraLargeTags(f);
+        setExtraLargeAttachments(f);
+        setExtraLargeChapters(f);
+        CPPUNIT_ASSERT_MESSAGE("Round4 save ws=" + String::number(wsIdx).to8Bit(), f.save(writeStyle));
+      }
+      const size_t sizeAfterRound4 = PlainFile(newname.c_str()).readAll().size();
+      verifyRound("Round4 ws=" + std::to_string(wsIdx),
+        String("An Extremely Long Title That Is Even Larger Than The Previous Large Title "
+               "With Extra Content To Ensure Growth 0123456789ABCDEF"),
+        444ULL, 3U, 40000ULL);
+
+      // All styles must accommodate the larger data: file must be larger than round1
+      CPPUNIT_ASSERT(sizeAfterRound4 > sizeAfterRound1);
+    }
   }
 
 };

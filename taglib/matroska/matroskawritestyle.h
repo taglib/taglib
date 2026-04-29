@@ -1,4 +1,9 @@
 /***************************************************************************
+    copyright            : (C) 2026 by Urs Fleisch
+    email                : ufleisch@users.sourceforge.net
+ ***************************************************************************/
+
+/***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
  *   2.1 as published by the Free Software Foundation.                     *
@@ -18,40 +23,27 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#ifndef TAGLIB_MATROSKASEEKHEAD_H
-#define TAGLIB_MATROSKASEEKHEAD_H
-#ifndef DO_NOT_DOCUMENT
+#ifndef TAGLIB_MATROSKAWRITESTYLE_H
+#define TAGLIB_MATROSKAWRITESTYLE_H
 
-#include "matroskaelement.h"
-#include "tlist.h"
-
-namespace TagLib {
-  class File;
-  class ByteVector;
-
-  namespace Matroska {
-    class SeekHead : public Element
-    {
-    public:
-      explicit SeekHead(offset_t segmentDataOffset);
-      ~SeekHead() override;
-
-      bool isValid(TagLib::File &file) const;
-      void addEntry(const Element &element);
-      void addEntry(ID id, offset_t offset);
-      void updateEntry(ID id, offset_t offset);
-      const List<std::pair<unsigned int, offset_t>> &entryList() const;
-      void write(TagLib::File &file) override;
-      void sort();
-      bool sizeChanged(Element &caller, offset_t delta) override;
-
-    private:
-      ByteVector renderInternal() override;
-      List<std::pair<unsigned int, offset_t>> entries;
-      const offset_t segmentDataOffset;
-    };
-  }
+namespace TagLib::Matroska {
+  /*!
+   * Controls the trade-off between file size and write speed when saving.
+   * Mode of writing tags, attachments and chapters to the file.
+   * For very large files and/or slow (network) filesystems, using
+   * \c AvoidInsert will reduce write time significantly.
+   */
+  enum class WriteStyle {
+    //! Write tags, attachments and chapters as compact as possible (default).
+    Compact,
+    //! Do not shrink elements; add void padding when content gets smaller.
+    //! Allow inserts when content gets larger.
+    DoNotShrink,
+    //! Like \c DoNotShrink but also avoid inserts for non-last elements:
+    //! replace a growing non-last element with a void of the old size and
+    //! append the new element at the end of the segment.
+    AvoidInsert
+  };
 }
 
-#endif
-#endif
+#endif //TAGLIB_MATROSKAWRITESTYLE_H

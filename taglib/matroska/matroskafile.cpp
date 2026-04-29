@@ -446,6 +446,11 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
 bool Matroska::File::save()
 {
+  return save(WriteStyle::Compact);
+}
+
+bool Matroska::File::save(WriteStyle writeStyle)
+{
   if(readOnly()) {
     debug("Matroska::File::save() -- File is read only.");
     return false;
@@ -508,6 +513,75 @@ bool Matroska::File::save()
   renderList.sort(sortAscending);
   renderList.append(newElements);
 
+  // Configure write style on each data element. Determines whether elements
+  // may be padded (DoNotShrink/AvoidInsert) or moved to the end (AvoidInsert).
+  // New elements (no prior size) are always written compactly.
+  if(writeStyle != WriteStyle::Compact) {
+    // Determine which existing data element has the highest file offset
+    // (i.e., is "last" among the data elements, before cues/seekHead/segment).
+    // New elements always go after existing ones and are treated as compact.
+    const Element *lastDataElement = nullptr;
+    for(const auto element : renderList) {
+      if(element->size() > 0)
+        lastDataElement = element;
+    }
+
+    // For AvoidInsert: an existing data element (Tags, Chapters, Attachments)
+    // located before the LAST Cluster must not be grown in-place. Doing so
+    // would shift later clusters and invalidate their cue positions. Such
+    // elements are voided at their original position and appended at the
+    // end of the segment instead. The boundary is the maximum cluster offset
+    // (derived from cue-point cluster positions). If no cue points are
+    // available, the Cues element offset is used as a safe upper bound
+    // (Cues are always after the last Cluster). A value of 0 means
+    // "no boundary" – any offset compares >= 0, so the boundary check is
+    // a no-op in non-AvoidInsert modes.
+    offset_t audioBoundary = 0;
+    if(writeStyle == WriteStyle::AvoidInsert && d->cues) {
+      const offset_t segDataOffset = d->segment->dataOffset();
+      for(const auto &cp : d->cues->cuePointList()) {
+        for(const auto &ct : cp->cueTrackList()) {
+          audioBoundary = std::max(audioBoundary,
+            segDataOffset + ct->getClusterPosition());
+        }
+      }
+      if(audioBoundary == 0)
+        audioBoundary = d->cues->offset();
+    }
+
+    for(const auto element : renderList) {
+      if(element->size() > 0) {
+        element->setWriteStyle(writeStyle);
+        // An element is "last" only if it has the highest data-element
+        // offset AND sits past the last cluster. The latter is always true
+        // when audioBoundary == 0 (DoNotShrink, or AvoidInsert without cues).
+        element->setIsLastElement(element == lastDataElement
+                                  && element->offset() >= audioBoundary);
+      }
+    }
+
+    // For AvoidInsert: identify the segment-trailing element (highest offset
+    // among data elements, Cues, SeekHead). The trailing element may shrink
+    // without padding -- there is nothing after it whose offset would shift,
+    // so a trailing void would be wasted space.
+    if(writeStyle == WriteStyle::AvoidInsert) {
+      Element *trailing = nullptr;
+      offset_t maxOffset = 0;
+      const auto consider = [&](Element *e) {
+        if(e && e->size() > 0 && e->offset() > maxOffset) {
+          maxOffset = e->offset();
+          trailing = e;
+        }
+      };
+      for(const auto element : renderList)
+        consider(element);
+      consider(d->cues.get());
+      consider(d->seekHead.get());
+      if(trailing)
+        trailing->setIsTrailingInSegment(true);
+    }
+  }
+
   // Add our new elements to the Seek Head (if the file has one)
   if(d->seekHead) {
     const auto segmentDataOffset = d->segment->dataOffset();
@@ -550,6 +624,12 @@ bool Matroska::File::save()
   bool rendering = true;
   while(rendering && renderRound < 5) {
     rendering = false;
+    // Initialize appendOffset for AvoidInsert elements at the start of each round.
+    if(writeStyle == WriteStyle::AvoidInsert) {
+      const offset_t appendOffset = d->segment->endOffset();
+      for(const auto element : renderList)
+        element->setAppendOffset(appendOffset);
+    }
     for(const auto element : renderList) {
       if(element->needsRender()) {
         rendering = true;
@@ -559,6 +639,51 @@ bool Matroska::File::save()
       }
     }
     ++renderRound;
+  }
+
+  // For AvoidInsert: elements that were moved during rendering may have
+  // stale offsets if in-place elements grew after the move was computed.
+  // Re-assign their offsets sequentially from the correct position.
+  if(writeStyle == WriteStyle::AvoidInsert) {
+    // Collect moved elements in render order (= ascending original-offset order
+    // = order they appear in renderList before any re-sort).
+    List<Element *> movedElements;
+    offset_t totalMovedSize = 0;
+    for(const auto element : renderList) {
+      if(element->wasMoved()) {
+        movedElements.append(element);
+        totalMovedSize += static_cast<offset_t>(element->data().size());
+      }
+    }
+    if(!movedElements.isEmpty()) {
+      // The segment end includes in-place growths AND all moved element sizes.
+      // The moved elements start right after all in-place content.
+      offset_t appendAt = d->segment->endOffset() - totalMovedSize;
+      for(const auto element : movedElements) {
+        element->setOffset(appendAt);
+        appendAt += static_cast<offset_t>(element->data().size());
+      }
+    }
+  }
+
+  // For elements that were moved to the end by AvoidInsert, update their
+  // seek head entry to reflect the new file position.
+  if(writeStyle == WriteStyle::AvoidInsert && d->seekHead) {
+    const offset_t segDataOffset = d->segment->dataOffset();
+    for(const auto element : renderList) {
+      if(element->wasMoved()) {
+        d->seekHead->updateEntry(element->id(), element->offset() - segDataOffset);
+      }
+    }
+    // Re-render the seekHead (and anything it affects) after updating entries.
+    // The seekHead slot was pre-padded, so this should not cause size changes.
+    d->seekHead->setNeedsRender(true);
+    for(const auto element : renderList) {
+      if(element->needsRender()) {
+        if(!element->render())
+          return false;
+      }
+    }
   }
 
   // Write out to file

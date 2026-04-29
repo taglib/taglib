@@ -364,6 +364,16 @@ ByteVector Matroska::Tag::renderInternal()
     }
     tags.appendElement(std::move(tag));
   }
+  // Pad to the previous size so the element keeps its slot in the file,
+  // unless this element is the trailing element of the segment in
+  // AvoidInsert mode -- shrinking from the end never inserts anything,
+  // so the trailing void would be wasted space.
+  if(writeStyle() != WriteStyle::Compact &&
+     !(writeStyle() == WriteStyle::AvoidInsert && isTrailingInSegment())) {
+    const auto beforeSize = sizeRenderedOrWritten();
+    if(beforeSize > 0)
+      tags.setMinRenderSize(beforeSize);
+  }
   return tags.render();
 }
 
