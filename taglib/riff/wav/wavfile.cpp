@@ -276,7 +276,7 @@ void RIFF::WAV::File::read(bool readProperties)
     }
     else if(name == "iXML") {
       d->hasiXML = true;
-      d->iXMLData = String(chunkData(i));
+      d->iXMLData = String(chunkData(i), String::UTF8);
     }
     else if(name == "bext") {
       d->hasBEXT = true;
