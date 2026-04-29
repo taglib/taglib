@@ -46,7 +46,7 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
 {
   auto attachments = std::make_unique<Matroska::Attachments>();
   attachments->setOffset(offset);
-  attachments->setSize(getSize());
+  attachments->setSize(getSize() + padding);
 
   for(const auto &element : elements) {
     if(element->getId() != Id::MkAttachedFile)

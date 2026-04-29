@@ -33,6 +33,7 @@ namespace TagLib::Matroska {
     bool render() override;
     bool sizeChanged(Element &caller, offset_t delta) override;
     offset_t dataOffset() const;
+    offset_t endOffset() const;
 
   private:
     ByteVector renderInternal() override;

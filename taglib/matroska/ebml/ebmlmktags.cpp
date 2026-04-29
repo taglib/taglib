@@ -47,7 +47,7 @@ std::unique_ptr<Matroska::Tag> EBML::MkTags::parse() const
 {
   auto mTag = std::make_unique<Matroska::Tag>();
   mTag->setOffset(offset);
-  mTag->setSize(getSize());
+  mTag->setSize(getSize() + padding);
   mTag->setID(static_cast<Matroska::Element::ID>(id));
 
   // Loop through each <Tag> element

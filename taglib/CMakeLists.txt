@@ -244,6 +244,7 @@ if(WITH_MATROSKA)
     matroska/matroskaproperties.h
     matroska/matroskasimpletag.h
     matroska/matroskatag.h
+    matroska/matroskawritestyle.h
   )
   set(tag_PRIVATE_HDRS ${tag_PRIVATE_HDRS}
     matroska/ebml/ebmlbinaryelement.h

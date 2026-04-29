@@ -23,6 +23,7 @@
 #include "tlist.h"
 #include "tfile.h"
 #include "tbytevector.h"
+#include "ebmlvoidelement.h"
 
 using namespace TagLib;
 
@@ -42,6 +43,14 @@ public:
   // therefore rendering is required by default and needs to be explicitly set
   // using setNeedsRender(false) together with overriding the write() method.
   bool needsRender = true;
+  WriteStyle writeStyle = WriteStyle::Compact;
+  bool isLastElement = true;
+  bool isTrailingInSegment = false;
+  offset_t appendOffset = 0;
+  // Populated during render() for AvoidInsert+grow+non-last: the offset and
+  // original size of the slot that should be overwritten with a Void element.
+  offset_t voidAtOffset = 0;
+  offset_t voidAtSize = 0;
 };
 
 Matroska::Element::Element(ID id) :
@@ -116,8 +125,24 @@ bool Matroska::Element::render()
   const auto data = renderInternal();
   setNeedsRender(false);
   if(const auto afterSize = data.size(); afterSize != beforeSize) {
-    if(!emitSizeChanged(afterSize - beforeSize)) {
-      return false;
+    if(e->writeStyle == WriteStyle::AvoidInsert && !e->isLastElement
+       && afterSize > beforeSize && beforeSize > 0) {
+      // Record old slot for void-overwrite, move element to end of segment.
+      e->voidAtOffset = e->offset;
+      e->voidAtSize = beforeSize;
+      e->offset = e->appendOffset;
+      // Notify listeners that a new element of afterSize bytes appeared at
+      // appendOffset (which is past all other elements, so no offset shifts).
+      if(!emitSizeChanged(static_cast<offset_t>(afterSize))) {
+        return false;
+      }
+      // Update appendOffset for any subsequent AvoidInsert-grow in this round.
+      e->appendOffset += static_cast<offset_t>(afterSize);
+    }
+    else {
+      if(!emitSizeChanged(afterSize - beforeSize)) {
+        return false;
+      }
     }
   }
 
@@ -161,8 +186,55 @@ offset_t Matroska::Element::sizeRenderedOrWritten() const
   return dataSize != 0 ? dataSize : e->size;
 }
 
+void Matroska::Element::setWriteStyle(WriteStyle style)
+{
+  e->writeStyle = style;
+}
+
+Matroska::WriteStyle Matroska::Element::writeStyle() const
+{
+  return e->writeStyle;
+}
+
+void Matroska::Element::setIsLastElement(bool isLast)
+{
+  e->isLastElement = isLast;
+}
+
+void Matroska::Element::setAppendOffset(offset_t appendOffset)
+{
+  e->appendOffset = appendOffset;
+}
+
+void Matroska::Element::setIsTrailingInSegment(bool isTrailing)
+{
+  e->isTrailingInSegment = isTrailing;
+}
+
+bool Matroska::Element::isTrailingInSegment() const
+{
+  return e->isTrailingInSegment;
+}
+
+bool Matroska::Element::wasMoved() const
+{
+  // voidAtSize is set when the element was moved during render().
+  // After write() it is cleared, but the caller checks before write().
+  return e->voidAtOffset != 0 || e->voidAtSize != 0;
+}
+
 void Matroska::Element::write(File &file)
 {
+  if(e->voidAtSize > 0) {
+    // AvoidInsert: overwrite the old slot with a Void element.
+    const auto voidData = EBML::VoidElement::renderSize(e->voidAtSize);
+    file.insert(voidData, e->voidAtOffset, e->voidAtSize);
+    e->voidAtOffset = 0;
+    // The element was moved to a new position (end of segment),
+    // so there are no existing bytes to replace at the new offset.
+    e->size = 0;
+    e->voidAtSize = 0;
+  }
   file.insert(e->data, e->offset, e->size);
   e->size = e->data.size();
 }

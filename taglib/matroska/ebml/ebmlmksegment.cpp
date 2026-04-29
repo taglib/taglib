@@ -83,6 +83,8 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
   const offset_t filePos = file.tell();
   const offset_t maxOffset = filePos + dataSize;
   const offset_t maxScanOffset = filePos + std::min(scanLimit, dataSize);
+  MasterElement *pendingPaddingTarget = nullptr;
+  offset_t accumulatedPadding = 0;
   std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxScanOffset))) {
     if(const Id id = element->getId(); id == Id::MkSeekHead) {
@@ -95,6 +97,17 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
         seekHead->setPadding(elementAfterSeekHead->getSize());
       const offset_t segDataOffset = segmentDataOffset();
       const auto matroskaSeekHead = parseSeekHead();
+      const auto accumulateVoidPadding = [&](MasterElement *target) {
+        offset_t accPadding = 0;
+        while(const auto next = findNextElement(file, maxOffset)) {
+          if(next->getId() != Id::VoidElement)
+            break;
+          accPadding += next->getSize();
+          next->skipData(file);
+        }
+        if(accPadding > 0)
+          target->setPadding(accPadding);
+      };
       for(const auto &[idValue, relativeOffset] : matroskaSeekHead->entryList()) {
         const offset_t absoluteOffset = segDataOffset + relativeOffset;
         switch(static_cast<Id>(idValue)) {
@@ -117,16 +130,19 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
           if(!((tags = readElementAt<Id::MkTags, MkTags>(
             file, absoluteOffset, maxOffset))))
             return false;
+          accumulateVoidPadding(tags.get());
           break;
         case Id::MkAttachments:
           if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
             file, absoluteOffset, maxOffset))))
             return false;
+          accumulateVoidPadding(attachments.get());
           break;
         case Id::MkChapters:
           if(!((chapters = readElementAt<Id::MkChapters, MkChapters>(
             file, absoluteOffset, maxOffset))))
             return false;
+          accumulateVoidPadding(chapters.get());
           break;
         default:
           break;
@@ -134,37 +150,61 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       }
       return true;
     }
+    else if(id == Id::VoidElement) {
+      if(pendingPaddingTarget) {
+        accumulatedPadding += element->getSize();
+        pendingPaddingTarget->setPadding(accumulatedPadding);
+      }
+      element->skipData(file);
+    }
     else if(id == Id::MkCues) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       cues = element_cast<Id::MkCues>(std::move(element));
       if(!cues->read(file))
         return false;
     }
     else if(id == Id::MkInfo) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       info = element_cast<Id::MkInfo>(std::move(element));
       if(!info->read(file))
         return false;
     }
     else if(id == Id::MkTracks) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       tracks = element_cast<Id::MkTracks>(std::move(element));
       if(!tracks->read(file))
         return false;
     }
     else if(id == Id::MkTags) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       tags = element_cast<Id::MkTags>(std::move(element));
       if(!tags->read(file))
         return false;
+      pendingPaddingTarget = tags.get();
     }
     else if(id == Id::MkAttachments) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       attachments = element_cast<Id::MkAttachments>(std::move(element));
       if(!attachments->read(file))
         return false;
+      pendingPaddingTarget = attachments.get();
     }
     else if(id == Id::MkChapters) {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       chapters = element_cast<Id::MkChapters>(std::move(element));
       if(!chapters->read(file))
         return false;
+      pendingPaddingTarget = chapters.get();
     }
     else {
+      pendingPaddingTarget = nullptr;
+      accumulatedPadding = 0;
       element->skipData(file);
     }
   }

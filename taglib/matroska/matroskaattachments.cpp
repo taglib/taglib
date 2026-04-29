@@ -137,5 +137,14 @@ ByteVector Matroska::Attachments::renderInternal()
 
     attachments.appendElement(std::move(attachedFileElement));
   }
+  // Pad to the previous size so the element keeps its slot in the file,
+  // unless this element is the trailing element of the segment in
+  // AvoidInsert mode -- shrinking from the end never inserts anything.
+  if(writeStyle() != WriteStyle::Compact &&
+     !(writeStyle() == WriteStyle::AvoidInsert && isTrailingInSegment())) {
+    const auto beforeSize = sizeRenderedOrWritten();
+    if(beforeSize > 0)
+      attachments.setMinRenderSize(beforeSize);
+  }
   return attachments.render();
 }

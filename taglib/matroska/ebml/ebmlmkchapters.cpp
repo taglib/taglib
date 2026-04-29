@@ -92,7 +92,7 @@ std::unique_ptr<Matroska::Chapters> EBML::MkChapters::parse() const
 {
   auto chapters = std::make_unique<Matroska::Chapters>();
   chapters->setOffset(offset);
-  chapters->setSize(getSize());
+  chapters->setSize(getSize() + padding);
 
   // Collect any orphan ChapterAtom elements not wrapped in an EditionEntry.
   // The Matroska spec requires ChapterAtom to be inside an EditionEntry, but

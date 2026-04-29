@@ -24,6 +24,7 @@
 #include "taglib_export.h"
 #include "tfile.h"
 #include "matroskaproperties.h"
+#include "matroskawritestyle.h"
 
 //! An implementation of Matroska metadata
 namespace TagLib::Matroska {
@@ -144,6 +145,13 @@ namespace TagLib::Matroska {
      * This returns \c true if the save was successful.
      */
     bool save() override;
+
+    /*!
+     * Save the file with the specified write style.
+     *
+     * This returns \c true if the save was successful.
+     */
+    bool save(WriteStyle style);
 
     /*!
      * Returns a pointer to the attachments of the file.

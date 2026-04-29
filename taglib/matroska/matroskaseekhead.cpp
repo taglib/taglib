@@ -63,6 +63,17 @@ void Matroska::SeekHead::addEntry(ID id, offset_t offset)
   setNeedsRender(true);
 }
 
+void Matroska::SeekHead::updateEntry(ID id, offset_t newOffset)
+{
+  for(auto &entry : entries) {
+    if(entry.first == id) {
+      entry.second = newOffset;
+      setNeedsRender(true);
+      return;
+    }
+  }
+}
+
 const List<std::pair<unsigned int, offset_t>> &Matroska::SeekHead::entryList() const
 {
   return entries;
