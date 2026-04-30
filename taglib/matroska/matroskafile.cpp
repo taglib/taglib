@@ -144,7 +144,7 @@ PropertyMap Matroska::File::setProperties(const PropertyMap &properties)
 
 namespace {
 
-  constexpr offset_t FAST_SCAN_LIMIT = static_cast<offset_t>(512 * 1024);
+  constexpr offset_t FAST_SCAN_LIMIT = static_cast<offset_t>(10 * 1024 * 1024); // 10MB
 
   String keyForAttachedFile(const Matroska::AttachedFile &attachedFile)
   {

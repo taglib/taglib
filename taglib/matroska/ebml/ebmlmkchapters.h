@@ -28,6 +28,7 @@
 #ifndef DO_NOT_DOCUMENT
 
 #include "ebmlmasterelement.h"
+#include "matroskachapter.h"
 #include "taglib.h"
 
 namespace TagLib {
@@ -44,6 +45,9 @@ namespace TagLib {
       MkChapters();
 
       std::unique_ptr<Matroska::Chapters> parse() const;
+
+    private:
+      Matroska::Chapter parseChapterAtom(const std::unique_ptr<Element> &atomElement) const;
     };
   }
 }
