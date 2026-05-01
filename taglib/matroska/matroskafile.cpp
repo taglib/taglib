@@ -34,6 +34,7 @@
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlmksegment.h"
+#include "ebmlvoidelement.h"
 #include "tlist.h"
 #include "tdebug.h"
 #include "tagutils.h"
@@ -144,7 +145,7 @@ PropertyMap Matroska::File::setProperties(const PropertyMap &properties)
 
 namespace {
 
-  constexpr offset_t FAST_SCAN_LIMIT = static_cast<offset_t>(512 * 1024);
+  constexpr offset_t FAST_SCAN_LIMIT = static_cast<offset_t>(10 * 1024 * 1024); // 10MB
 
   String keyForAttachedFile(const Matroska::AttachedFile &attachedFile)
   {
@@ -534,18 +535,63 @@ bool Matroska::File::save()
     }
     d->cues->addSizeListener(d->segment.get());
   }
+  // mkvpropedit-style fast save: when a modified element grew beyond its
+  // on-disk size, relocate it to the end of the file and write a Void
+  // element of the original size at the old location.  This avoids the
+  // O(filesize) FileStream::insert() shift, which can take many minutes
+  // for large Matroska files (e.g. multi-GB videos) over network shares.
+  //
+  // Safe because:
+  //   * Tags / Chapters / Attachments are never referenced by Cues
+  //   * Cluster data is not moved, so cluster offsets remain valid
+  //   * SeekHead is updated to point to the new offset
+  //
+  // Falls back to the existing in-place rewrite when:
+  //   * The file has no SeekHead (cannot update absolute pointers)
+  //   * The freed slot is too small to hold a minimum Void element
   if(d->seekHead) {
-    renderList.append(d->seekHead.get());
-    d->seekHead->addSizeListeners(renderList);
-    d->seekHead->addSizeListener(d->segment.get());
-  }
-  d->segment->addSizeListeners(renderList);
-  renderList.append(d->segment.get());
+    const offset_t segmentDataOffset = d->segment->dataOffset();
+    offset_t appendCursor = length();
 
-  // Render the elements.
-  // Because size changes of elements can cause segment offset updates and
-  // size changes in other elements, we might need multiple rounds until no more
-  // element needs rendering.
+    for (Element *element : { static_cast<Element *>(d->chapters.get()), static_cast<Element *>(d->attachments.get()), static_cast<Element *>(d->tag.get()) }) {
+      if(!element)
+        continue;
+
+      const offset_t renderedSize = static_cast<offset_t>(element->data().size());
+      const offset_t onDiskSize   = element->size();
+
+      // Only relocate elements that exist on disk and grew.  Brand new
+      // elements (size==0) are already appended by the existing code.
+      // Equal-size or shrunk elements use the fast in-place path of
+      // FileStream::insert().
+      if(onDiskSize == 0 || renderedSize <= onDiskSize)
+        continue;
+
+      // Make sure the freed slot can hold a Void element header
+      if(onDiskSize < EBML::MIN_VOID_ELEMENT_SIZE)
+        continue;
+
+      const offset_t oldOffset = element->offset();
+
+      // 1. Write Void at the old location to preserve subsequent offsets
+      const ByteVector voidBlock = EBML::VoidElement::renderSize(onDiskSize);
+      seek(oldOffset);
+      writeBlock(voidBlock);
+
+      // 2. Mark the relocated element as appended at end-of-file
+      element->setOffset(appendCursor);
+      appendCursor += renderedSize;
+
+      // 3. Update SeekHead to point to the new offset
+      d->seekHead->updateEntry(element->id(),
+                               element->offset() - segmentDataOffset);
+    }
+
+    // SeekHead may have changed, ensure it gets re-rendered before write
+    if(d->seekHead->needsRender())
+      d->seekHead->render();
+  }
+
   int renderRound = 0;
   bool rendering = true;
   while(rendering && renderRound < 5) {
