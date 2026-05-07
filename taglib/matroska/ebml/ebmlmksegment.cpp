@@ -108,9 +108,36 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
         if(accPadding > 0)
           target->setPadding(accPadding);
       };
-      for(const auto &[idValue, relativeOffset] : matroskaSeekHead->entryList()) {
+
+      // Build a work list of seek entries.  Some muxers (e.g. MakeMKV,
+      // mkvmerge) write a small primary SeekHead at the start of the segment
+      // that only references a secondary SeekHead at the end of the file,
+      // which in turn lists Info / Tracks / Tags / Chapters / Attachments.
+      // Follow such MkSeekHead -> MkSeekHead chains so the real entries are
+      // not silently dropped.
+      List<std::pair<unsigned int, offset_t>> entries =
+        matroskaSeekHead->entryList();
+      // Guard against pathological / circular chains.
+      int chainedSeekHeadsFollowed = 0;
+      constexpr int MAX_CHAINED_SEEKHEADS = 8;
+
+      for(size_t i = 0; i < entries.size(); ++i) {
+        const auto &[idValue, relativeOffset] = entries[i];
         const offset_t absoluteOffset = segDataOffset + relativeOffset;
         switch(static_cast<Id>(idValue)) {
+        case Id::MkSeekHead: {
+          if(chainedSeekHeadsFollowed++ >= MAX_CHAINED_SEEKHEADS)
+            break;
+          auto chained = readElementAt<Id::MkSeekHead, MkSeekHead>(
+            file, absoluteOffset, maxOffset);
+          if(!chained)
+            break;
+          if(const auto parsed = chained->parse(segDataOffset)) {
+            for(const auto &entry : parsed->entryList())
+              entries.append(entry);
+          }
+          break;
+        }
         case Id::MkCues:
           if(!((cues = readElementAt<Id::MkCues, MkCues>(
             file, absoluteOffset, maxOffset))))
