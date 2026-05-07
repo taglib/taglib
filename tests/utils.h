@@ -32,7 +32,11 @@
 #else
 #include <unistd.h>
 #include <fcntl.h>
+#ifdef __HAIKU__
+#include <fcntl.h>
+#else
 #include <sys/fcntl.h>
+#endif
 #include <sys/stat.h>
 #endif
 #include <cstdio>
