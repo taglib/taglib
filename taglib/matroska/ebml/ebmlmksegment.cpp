@@ -121,7 +121,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       int chainedSeekHeadsFollowed = 0;
       constexpr int MAX_CHAINED_SEEKHEADS = 8;
 
-      for(size_t i = 0; i < entries.size(); ++i) {
+      for(unsigned int i = 0; i < entries.size(); ++i) {
         const auto &[idValue, relativeOffset] = entries[i];
         const offset_t absoluteOffset = segDataOffset + relativeOffset;
         switch(static_cast<Id>(idValue)) {
