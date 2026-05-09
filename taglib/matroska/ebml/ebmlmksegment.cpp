@@ -83,6 +83,12 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
   const offset_t filePos = file.tell();
   const offset_t maxOffset = filePos + dataSize;
   const offset_t maxScanOffset = filePos + std::min(scanLimit, dataSize);
+  // When scanLimit is less than dataSize, the caller has requested a
+  // fast/limited scan (e.g. AudioProperties::Fast).  In that case and if the
+  // file has been opened in read-only mode, we skip parsing the Cues element,
+  // which can be tens of MB on large files, causing severe slowdowns over
+  // network filesystems, and do not have to be updated in read-only mode.
+  const bool skipCues = file.readOnly() && scanLimit < dataSize;
   MasterElement *pendingPaddingTarget = nullptr;
   offset_t accumulatedPadding = 0;
   std::unique_ptr<Element> element;
@@ -139,9 +145,11 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
           break;
         }
         case Id::MkCues:
-          if(!((cues = readElementAt<Id::MkCues, MkCues>(
-            file, absoluteOffset, maxOffset))))
-            return false;
+          if(!skipCues) {
+            if(!((cues = readElementAt<Id::MkCues, MkCues>(
+              file, absoluteOffset, maxOffset))))
+              return false;
+          }
           break;
         case Id::MkInfo:
           if(!((info = readElementAt<Id::MkInfo, MkInfo>(
@@ -187,9 +195,14 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
     else if(id == Id::MkCues) {
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
-      cues = element_cast<Id::MkCues>(std::move(element));
-      if(!cues->read(file))
-        return false;
+      if(!skipCues) {
+        cues = element_cast<Id::MkCues>(std::move(element));
+        if(!cues->read(file))
+          return false;
+      }
+      else {
+        element->skipData(file);
+      }
     }
     else if(id == Id::MkInfo) {
       pendingPaddingTarget = nullptr;
