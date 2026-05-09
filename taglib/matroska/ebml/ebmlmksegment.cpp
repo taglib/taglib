@@ -54,6 +54,25 @@ std::unique_ptr<ElementType> readElementAt(File &file,
   return typed;
 }
 
+// Specialised read-at for MkAttachments that skips the binary data of
+// every MkAttachedFileData child.  See MkAttachments::readMetadataOnly().
+std::unique_ptr<EBML::MkAttachments> readAttachmentsMetadataAt(
+    File &file, offset_t offset, offset_t maxOffset)
+{
+  if(offset < 0 || offset >= maxOffset)
+    return nullptr;
+
+  file.seek(offset);
+  auto element = EBML::Element::factory(file);
+  if(!element || element->getId() != EBML::Element::Id::MkAttachments)
+    return nullptr;
+
+  auto typed = EBML::element_cast<EBML::Element::Id::MkAttachments>(std::move(element));
+  if(!typed || !typed->readMetadataOnly(file))
+    return nullptr;
+  return typed;
+}
+
 } // namespace
 
 EBML::MkSegment::MkSegment(int sizeLength, offset_t dataSize, offset_t offset):
@@ -89,6 +108,9 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
   // which can be tens of MB on large files, causing severe slowdowns over
   // network filesystems, and do not have to be updated in read-only mode.
   const bool skipCues = file.readOnly() && scanLimit < dataSize;
+  // With AudioProperties::Fast, we also skip the binary data of attachments
+  // (cover art, fonts), which is rarely needed during a fast metadata read.
+  const bool skipAttachmentData = scanLimit < dataSize;
   MasterElement *pendingPaddingTarget = nullptr;
   offset_t accumulatedPadding = 0;
   std::unique_ptr<Element> element;
@@ -168,9 +190,16 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
           accumulateVoidPadding(tags.get());
           break;
         case Id::MkAttachments:
-          if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
-            file, absoluteOffset, maxOffset))))
-            return false;
+          if(!skipAttachmentData) {
+            if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
+              file, absoluteOffset, maxOffset))))
+              return false;
+          }
+          else {
+            if(!((attachments = readAttachmentsMetadataAt(
+              file, absoluteOffset, maxOffset))))
+              return false;
+          }
           accumulateVoidPadding(attachments.get());
           break;
         case Id::MkChapters:
@@ -230,7 +259,9 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       attachments = element_cast<Id::MkAttachments>(std::move(element));
-      if(!attachments->read(file))
+      if(!(skipAttachmentData
+             ? attachments->readMetadataOnly(file)
+             : attachments->read(file)))
         return false;
       pendingPaddingTarget = attachments.get();
     }

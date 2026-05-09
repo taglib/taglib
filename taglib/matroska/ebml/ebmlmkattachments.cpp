@@ -22,6 +22,8 @@
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmlutils.h"
+#include "tfile.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
 
@@ -40,6 +42,32 @@ EBML::MkAttachments::MkAttachments(Id, int sizeLength, offset_t dataSize, offset
 EBML::MkAttachments::MkAttachments():
   MasterElement(Id::MkAttachments, 0, 0, 0)
 {
+}
+
+bool EBML::MkAttachments::readMetadataOnly(File &file)
+{
+  const offset_t maxOffset = file.tell() + dataSize;
+  std::unique_ptr<Element> element;
+  while((element = findNextElement(file, maxOffset))) {
+    if(element->getId() != Id::MkAttachedFile) {
+      element->skipData(file);
+      continue;
+    }
+    // Manually iterate MkAttachedFile children so we can skip the binary
+    // MkAttachedFileData payload, which can be very large (cover art, fonts).
+    auto attachedFile = std::make_unique<MasterElement>(Id::MkAttachedFile);
+    const offset_t childMaxOffset = file.tell() + element->getDataSize();
+    std::unique_ptr<Element> child;
+    while((child = findNextElement(file, childMaxOffset))) {
+      if(child->getId() == Id::MkAttachedFileData)
+        child->skipData(file);
+      else if(!child->read(file))
+        return false;
+      attachedFile->appendElement(std::move(child));
+    }
+    elements.push_back(std::move(attachedFile));
+  }
+  return file.tell() == maxOffset;
 }
 
 std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
@@ -70,11 +98,14 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
       else if(id == Id::MkAttachedFileUID)
         uid = element_cast<Id::MkAttachedFileUID>(attachedFileChild)->getValue();
     }
-    if(!(filename && data))
+    // In Fast mode, MkAttachedFileData has been skipped; emit the
+    // attachment with an empty data ByteVector so callers still see its
+    // metadata (filename, media type, UID, description).
+    if(!filename)
       continue;
 
     attachments->addAttachedFile(Matroska::AttachedFile(
-      *data, *filename, mediaType ? *mediaType : String(),
+      data ? *data : ByteVector(), *filename, mediaType ? *mediaType : String(),
       uid, description ? *description : String()));
   }
   return attachments;
