@@ -58,7 +58,7 @@ MP4::Chapter &MP4::Chapter::Chapter::operator=(const Chapter &other)
   return *this;
 }
 
-MP4::Chapter &MP4::Chapter::Chapter::operator=(
+MP4::Chapter &MP4::Chapter::operator=(
   Chapter &&other) noexcept = default;
 
 bool MP4::Chapter::operator==(const Chapter &other) const
