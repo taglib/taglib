@@ -74,6 +74,7 @@ class TestFLAC : public CppUnit::TestFixture
   CPPUNIT_TEST(testReadBEXTRiffWrapped);
   CPPUNIT_TEST(testWriteiXMLAndBEXT);
   CPPUNIT_TEST(testWriteEmptyClearsiXMLAndBEXT);
+  CPPUNIT_TEST(testHasiXMLAndBEXTReflectFileState);
   CPPUNIT_TEST(testRoundTripPreservesUnknownApplicationBlock);
   CPPUNIT_TEST_SUITE_END();
 
@@ -830,6 +831,45 @@ public:
       CPPUNIT_ASSERT(!f.hasBEXTData());
       CPPUNIT_ASSERT(f.iXMLData().isEmpty());
       CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+    }
+  }
+
+  void testHasiXMLAndBEXTReflectFileState()
+  {
+    // hasiXMLData() / hasBEXTData() must report whether the *file* carries an
+    // iXML / bext APPLICATION block, not whether in-memory payload happens to
+    // be non-empty.  Regression test for an issue where the accessors were
+    // implemented as !data.isEmpty() and so flipped on as soon as set*Data()
+    // was called, before save(), and missed a real-but-empty block.
+    ScopedFileCopy copy("silence-44-s", ".flac");
+    const string newname = copy.fileName();
+
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
+      f.setiXMLData("<BWFXML/>");
+      f.setBEXTData(ByteVector("bext"));
+      // File hasn't been saved yet — file still has no blocks.
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
+      f.save();
+      // After save the blocks are on disk.
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
+    }
+    {
+      FLAC::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
+      f.setiXMLData(String());
+      f.setBEXTData(ByteVector());
+      // In-memory payload now empty but the file still carries both blocks.
+      CPPUNIT_ASSERT(f.hasiXMLData());
+      CPPUNIT_ASSERT(f.hasBEXTData());
+      f.save();
+      CPPUNIT_ASSERT(!f.hasiXMLData());
+      CPPUNIT_ASSERT(!f.hasBEXTData());
     }
   }
 
