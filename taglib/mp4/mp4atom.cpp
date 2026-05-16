@@ -25,6 +25,7 @@
 
 #include "mp4atom.h"
 
+#include <algorithm>
 #include <array>
 #include <climits>
 #include <utility>

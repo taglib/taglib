@@ -25,6 +25,7 @@
 
 #include "textidentificationframe.h"
 
+#include <algorithm>
 #include <array>
 #include <utility>
 

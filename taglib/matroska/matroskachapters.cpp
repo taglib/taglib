@@ -24,6 +24,9 @@
  ***************************************************************************/
 
 #include "matroskachapters.h"
+
+#include <algorithm>
+
 #include "matroskachapteredition.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"

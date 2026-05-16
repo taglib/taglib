@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "matroskaattachments.h"
+
+#include <algorithm>
+
 #include "matroskaattachedfile.h"
 #include "ebmlmkattachments.h"
 #include "ebmlmasterelement.h"
