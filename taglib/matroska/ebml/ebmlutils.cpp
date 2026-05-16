@@ -19,7 +19,10 @@
  ***************************************************************************/
 
 #include "ebmlutils.h"
+
+#include <algorithm>
 #include <random>
+
 #include "tbytevector.h"
 #include "matroskafile.h"
 #include "tutils.h"

@@ -25,6 +25,8 @@
 
 #include "modfile.h"
 
+#include <algorithm>
+
 #include "tstringlist.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
