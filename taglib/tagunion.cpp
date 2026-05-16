@@ -25,6 +25,7 @@
 
 #include "tagunion.h"
 
+#include <algorithm>
 #include <array>
 
 #include "tstringlist.h"

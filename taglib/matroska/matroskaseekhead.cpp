@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "matroskaseekhead.h"
+
+#include <algorithm>
+
 #include "ebmlmkseekhead.h"
 #include "ebmlbinaryelement.h"
 #include "ebmluintelement.h"

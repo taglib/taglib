@@ -19,9 +19,11 @@
  ***************************************************************************/
 
 #include "matroskatag.h"
+
 #include <algorithm>
 #include <array>
 #include <tuple>
+
 #include "ebmlmasterelement.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"
