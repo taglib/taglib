@@ -50,7 +50,7 @@ MP4::Chapter::Chapter(const Chapter &other) :
 
 MP4::Chapter::Chapter(Chapter &&other) noexcept = default;
 
-MP4::Chapter::Chapter::~Chapter() = default;
+MP4::Chapter::~Chapter() = default;
 
 MP4::Chapter &MP4::Chapter::Chapter::operator=(const Chapter &other)
 {
