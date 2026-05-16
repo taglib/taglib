@@ -153,7 +153,7 @@ namespace TagLib {
       Time timeStart() const;
 
       /*!
-       * Returns the timestamp of the start of the chapter in nanoseconds.
+       * Returns the timestamp of the end of the chapter in nanoseconds.
        */
       Time timeEnd() const;
 
