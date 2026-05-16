@@ -19,7 +19,10 @@
  ***************************************************************************/
 
 #include "matroskafile.h"
+
+#include <algorithm>
 #include <memory>
+
 #include "matroskatag.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"

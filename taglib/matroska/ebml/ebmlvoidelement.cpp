@@ -19,7 +19,9 @@
  ***************************************************************************/
 
 #include "ebmlvoidelement.h"
+
 #include <algorithm>
+
 #include "ebmlutils.h"
 #include "tbytevector.h"
 

@@ -19,6 +19,9 @@
  ***************************************************************************/
 
 #include "ebmlmksegment.h"
+
+#include <algorithm>
+
 #include "ebmlutils.h"
 #include "matroskafile.h"
 #include "matroskatag.h"
