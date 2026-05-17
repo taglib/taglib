@@ -72,13 +72,13 @@ public:
   ByteVector xiphCommentData;
   String iXMLData;
   ByteVector bextData;
-  bool hasiXML { false };
-  bool hasBEXT { false };
   List<FLAC::MetadataBlock *> blocks;
 
   offset_t flacStart { 0 };
   offset_t streamStart { 0 };
   bool scanned { false };
+  bool hasiXML { false };
+  bool hasBEXT { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
