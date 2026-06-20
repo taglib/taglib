@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "tzlib.h"
+#include <climits>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
@@ -50,7 +51,8 @@ bool zlib::isAvailable()
 #endif
 }
 
-ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
+ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data,
+                            unsigned int maxLength)
 {
 #ifdef HAVE_ZLIB
 
@@ -90,6 +92,12 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
     }
 
     outData.resize(outData.size() - stream.avail_out);
+
+    if(outData.size() > maxLength && maxLength != UINT_MAX) {
+      debug("zlib::decompress() - Too long compressed stream.");
+      outData.resize(maxLength);
+      break;
+    }
   } while(stream.avail_out == 0);
 
   inflateEnd(&stream);
@@ -101,4 +109,9 @@ ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
   return ByteVector();
 
 #endif
+}
+
+ByteVector zlib::decompress([[maybe_unused]] const ByteVector &data)
+{
+  return decompress(data, UINT_MAX);
 }

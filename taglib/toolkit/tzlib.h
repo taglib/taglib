@@ -46,6 +46,11 @@ namespace TagLib {
       */
      ByteVector decompress(const ByteVector &data);
 
+     /*!
+      * Decompress \a data by zlib, at most \a maxLength bytes.
+      */
+     ByteVector decompress(const ByteVector &data, unsigned int maxLength);
+
   }  // namespace zlib
 }  // namespace TagLib
 

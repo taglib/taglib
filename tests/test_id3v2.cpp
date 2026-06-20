@@ -1121,7 +1121,7 @@ public:
 
   void testCompressedFrameWithBrokenLength()
   {
-    MPEG::File f(TEST_FILE_PATH_C("compressed_id3_frame.mp3"), false);
+    MPEG::File f(TEST_FILE_PATH_C("compressed_id3_frame_invalid.mp3"), false);
     CPPUNIT_ASSERT(f.ID3v2Tag()->frameListMap().contains("APIC"));
 
     if(zlib::isAvailable()) {
@@ -1132,7 +1132,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("image/bmp"), frame->mimeType());
       CPPUNIT_ASSERT_EQUAL(ID3v2::AttachedPictureFrame::Other, frame->type());
       CPPUNIT_ASSERT_EQUAL(String(""), frame->description());
-      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(86414), frame->picture().size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(142), frame->picture().size());
     }
     else {
       // Skip the test if ZLIB is not installed.
