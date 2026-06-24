@@ -122,7 +122,7 @@ namespace TagLib
       int64_t getDataSize() const;
       ByteVector renderId() const;
       virtual ByteVector render();
-      static std::unique_ptr<Element> factory(File &file);
+      static std::unique_ptr<Element> factory(File &file, offset_t maxOffset);
       static unsigned int readId(File &file);
 
     protected:
