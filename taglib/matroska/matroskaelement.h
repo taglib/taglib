@@ -53,6 +53,7 @@ namespace TagLib {
       void setData(const ByteVector &data);
       const ByteVector &data() const;
       virtual void write(TagLib::File &file);
+      void clearSizeListeners();
       void addSizeListener(Element *element);
       void addSizeListeners(const List<Element *> &elements);
       bool emitSizeChanged(offset_t delta);

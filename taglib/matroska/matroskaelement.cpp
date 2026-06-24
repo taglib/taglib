@@ -101,6 +101,11 @@ Matroska::Element::ID Matroska::Element::id() const
   return e->id;
 }
 
+void Matroska::Element::clearSizeListeners()
+{
+  e->sizeListeners.clear();
+}
+
 void Matroska::Element::addSizeListener(Element *element)
 {
   e->sizeListeners.append(element);
