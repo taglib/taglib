@@ -368,7 +368,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   // Find the EBML Header
   const auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
-    EBML::Element::factory(*this));
+    EBML::Element::factory(*this, fileLength));
   if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
@@ -389,7 +389,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   // Find the Matroska segment in the file
   const std::unique_ptr<EBML::MkSegment> segment(
     EBML::element_cast<EBML::Element::Id::MkSegment>(
-      EBML::findElement(*this, EBML::Element::Id::MkSegment, maxOffset)
+      EBML::findElement(*this, EBML::Element::Id::MkSegment, maxOffset + tell())
     )
   );
   if(!segment) {

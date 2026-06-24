@@ -45,7 +45,7 @@ std::unique_ptr<ElementType> readElementAt(File &file,
   }
 
   file.seek(offset);
-  auto element = EBML::Element::factory(file);
+  auto element = EBML::Element::factory(file, maxOffset);
   if(!element || element->getId() != Id) {
     return nullptr;
   }
