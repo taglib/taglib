@@ -368,7 +368,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   // Find the EBML Header
   const auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
-    EBML::Element::factory(*this));
+    EBML::Element::factory(*this, fileLength));
   if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
@@ -381,7 +381,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
     head->skipData(*this);
   }
 
-  offset_t maxOffset = fileLength - tell();
+  offset_t maxOffset = fileLength;
   if (readStyle == Properties::ReadStyle::Fast && maxOffset > FAST_SCAN_LIMIT) {
     maxOffset = FAST_SCAN_LIMIT;
   }
