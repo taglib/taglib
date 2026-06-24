@@ -109,16 +109,22 @@ bool EBML::MasterElement::read(File &file, int depth)
   std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxOffset))) {
     if(auto master = dynamic_cast<MasterElement *>(element.get())) {
-      if(!master->read(file, depth + 1))
-        return false;
+      if(!master->read(file, depth + 1)) {
+        debug("EBML: Invalid MasterElement");
+        continue;
+      }
     }
     else {
-      if(!element->read(file))
-        return false;
+      if(!element->read(file)) {
+        debug("EBML: Invalid Element");
+        continue;
+      }
     }
     elements.push_back(std::move(element));
   }
-  return file.tell() == maxOffset;
+  auto tell = file.tell();
+  file.seek(maxOffset, File::Position::Beginning);
+  return tell == maxOffset;
 }
 
 bool EBML::MasterElement::read(File &file)
