@@ -203,10 +203,12 @@ unsigned int Ogg::Page::packetCount() const
 
 ByteVectorList Ogg::Page::packets() const
 {
-  if(!d->packets.isEmpty())
-    return d->packets;
-
   ByteVectorList l;
+
+  if(!d->packets.isEmpty()) {
+    l = d->packets;
+    return l;
+  }
 
   if(d->file && d->header.isValid()) {
 

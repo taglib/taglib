@@ -67,18 +67,21 @@ Ogg::File::~File() = default;
 
 ByteVector Ogg::File::packet(unsigned int i)
 {
+  ByteVector packet;
   // Check to see if we're called setPacket() for this packet since the last
   // save:
 
-  if(d->dirtyPackets.contains(i))
-    return d->dirtyPackets[i];
+  if(d->dirtyPackets.contains(i)) {
+    packet = d->dirtyPackets[i];
+    return packet;
+  }
 
   // If we haven't indexed the page where the packet we're interested in starts,
   // begin reading pages until we have.
 
   if(!readPages(i)) {
     debug("Ogg::File::packet() -- Could not find the requested packet.");
-    return ByteVector();
+    return packet;
   }
 
   // Look for the first page in which the requested packet starts.
@@ -94,7 +97,7 @@ ByteVector Ogg::File::packet(unsigned int i)
   // the pages' packet data until we hit a page that either does not end with the
   // packet that we're fetching or where the last packet is complete.
 
-  ByteVector packet = (*it)->packets()[i - (*it)->firstPacketIndex()];
+  packet = (*it)->packets()[i - (*it)->firstPacketIndex()];
 
   while(nextPacketIndex(*it) <= i) {
     ++it;

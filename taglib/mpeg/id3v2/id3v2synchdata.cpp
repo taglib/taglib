@@ -72,14 +72,15 @@ ByteVector SynchData::fromUInt(unsigned int value)
 
 ByteVector SynchData::decode(const ByteVector &data)
 {
+  ByteVector result;
   if(data.isEmpty()) {
-    return ByteVector();
+    return result;
   }
 
   // We have this optimized method instead of using ByteVector::replace(),
   // since it makes a great difference when decoding huge unsynchronized frames.
 
-  ByteVector result(data.size());
+  result = ByteVector(data.size());
 
   auto src = data.begin();
   auto dst = result.begin();
