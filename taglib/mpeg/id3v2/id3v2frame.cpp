@@ -295,7 +295,8 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
     frameDataLength = SynchData::toUInt(frameData.mid(headerSize, 4));
     frameDataOffset += 4;
   }
-  if(frameData.size() >= headerSize &&
+  if(!d->header->compression() &&
+     frameData.size() >= headerSize &&
      frameDataOffset + frameDataLength > frameData.size()) {
     // The first check is needed because some "dual purpose" frame constructors
     // call this method with only the frame ID, i.e. without a complete header.
@@ -309,7 +310,8 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
       return ByteVector();
     }
 
-    const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset));
+    const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset),
+                                                frameDataLength);
     if(!outData.isEmpty() && frameDataLength != outData.size()) {
       debug("frameDataLength does not match the data length returned by zlib");
     }
