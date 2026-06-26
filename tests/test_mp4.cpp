@@ -883,6 +883,7 @@ public:
       tag->setItem("trkn", MP4::Item(2, 10));
       tag->setItem("rate", MP4::Item(80));
       tag->setItem("plID", MP4::Item(1540934238LL));
+      tag->setItem("cnID", MP4::Item(9876543210LL));
       tag->setItem("rtng", MP4::Item(static_cast<unsigned char>(2)));
       f.save();
     }
@@ -904,6 +905,7 @@ public:
       CPPUNIT_ASSERT_EQUAL(10, item.toIntPair().second);
       CPPUNIT_ASSERT_EQUAL(80, tag->item("rate").toInt());
       CPPUNIT_ASSERT_EQUAL(1540934238LL, tag->item("plID").toLongLong());
+      CPPUNIT_ASSERT_EQUAL(9876543210LL, tag->item("cnID").toLongLong());
       CPPUNIT_ASSERT_EQUAL(static_cast<unsigned char>(2), tag->item("rtng").toByte());
       PropertyMap properties = tag->properties();
       CPPUNIT_ASSERT_EQUAL(StringList("123"), properties.value("TESTINTEGER"));
