@@ -172,7 +172,7 @@ std::pair<ByteVector, Item> ItemFactory::itemFromProperty(
     case ItemHandlerType::UInt:
       return {name, Item(static_cast<unsigned int>(values.front().toInt()))};
     case ItemHandlerType::LongLong:
-      return {name, Item(static_cast<long long>(values.front().toInt()))};
+      return {name, Item(values.front().toLongLong())};
     case ItemHandlerType::Byte:
       return {name, Item(static_cast<unsigned char>(values.front().toInt()))};
     case ItemHandlerType::Bool:
@@ -299,7 +299,7 @@ ItemFactory::NameHandlerMap ItemFactory::nameHandlerMap() const
     {"rate", ItemHandlerType::TextOrInt},
     {"tvsn", ItemHandlerType::UInt},
     {"tves", ItemHandlerType::UInt},
-    {"cnID", ItemHandlerType::UInt},
+    {"cnID", ItemHandlerType::LongLong},
     {"sfID", ItemHandlerType::UInt},
     {"atID", ItemHandlerType::UInt},
     {"geID", ItemHandlerType::UInt},
