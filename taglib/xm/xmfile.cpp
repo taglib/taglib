@@ -457,6 +457,7 @@ bool XM::File::save()
     }
 
     unsigned long sampleHeaderSize = 0;
+    unsigned long sampleDataSize = 0;
     if(sampleCount > 0) {
       seek(pos + 29);
       if(instrumentHeaderSize < 33U || !readU32L(sampleHeaderSize))
@@ -468,8 +469,11 @@ bool XM::File::save()
     for(unsigned short j = 0; j < sampleCount; ++ j) {
       if(sampleHeaderSize > 4U) {
         seek(pos);
-        if(unsigned long sampleLength = 0; !readU32L(sampleLength))
+        unsigned long sampleLength = 0;
+        if(!readU32L(sampleLength))
           return false;
+
+        sampleDataSize += sampleLength;
 
         if(sampleHeaderSize > 18U) {
           seek(pos + 18);
@@ -482,6 +486,8 @@ bool XM::File::save()
       }
       pos += sampleHeaderSize;
     }
+
+    pos += sampleDataSize;
   }
 
   return true;
