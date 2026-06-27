@@ -125,7 +125,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       // Follow such MkSeekHead -> MkSeekHead chains so the real entries are
       // not silently dropped.
       List<std::pair<unsigned int, offset_t>> entries =
-        matroskaSeekHead->entryList();
+        matroskaSeekHead ? matroskaSeekHead->entryList() : List<std::pair<unsigned int, offset_t>>();
       // Guard against pathological / circular chains.
       int chainedSeekHeadsFollowed = 0;
       constexpr int MAX_CHAINED_SEEKHEADS = 8;
