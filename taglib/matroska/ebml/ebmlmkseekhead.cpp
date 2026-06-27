@@ -22,6 +22,8 @@
 #include "matroskaseekhead.h"
 #include "ebmluintelement.h"
 #include "ebmlbinaryelement.h"
+#include "tdebug.h"
+#include "tutils.h"
 
 using namespace TagLib;
 
@@ -51,21 +53,20 @@ std::unique_ptr<Matroska::SeekHead> EBML::MkSeekHead::parse(offset_t segmentData
       continue;
     const auto seekElement = element_cast<Id::MkSeek>(element);
     Matroska::Element::ID entryId = 0;
-    offset_t offset = 0;
+    offset_t offset = -1;
     for(const auto &seekElementChild : *seekElement) {
       if(const Id id = seekElementChild->getId(); id == Id::MkSeekID && !entryId) {
         if(auto data = element_cast<Id::MkSeekID>(seekElementChild)->getValue();
            data.size() == 4)
           entryId = data.toUInt(true);
       }
-      else if(id == Id::MkSeekPosition && !offset)
+      else if(id == Id::MkSeekPosition && offset < 0)
         offset = element_cast<Id::MkSeekPosition>(seekElementChild)->getValue();
     }
-    if(entryId && offset)
+    if(entryId && offset >= 0)
       seekHead->addEntry(entryId, offset);
     else {
-      seekHead.reset();
-      return nullptr;
+      debug(Utils::formatString("Invalid seek element: ID=0x%x, offset=%lld", entryId, offset));
     }
   }
 
