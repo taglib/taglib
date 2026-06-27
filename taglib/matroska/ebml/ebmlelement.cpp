@@ -41,7 +41,7 @@ using namespace TagLib;
 #define RETURN_ELEMENT_FOR_CASE(eid) \
   case (eid): return make_unique_element<eid>(id, sizeLength, dataSize, offset)
 
-std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
+std::unique_ptr<EBML::Element> EBML::Element::factory(File &file, offset_t maxOffset)
 {
   // Get the element ID
   const offset_t offset = file.tell();
@@ -55,6 +55,13 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file)
   const auto &[sizeLength, dataSize] = readVINT(file);
   if(!sizeLength)
     return nullptr;
+
+  if(static_cast<offset_t>(dataSize) > (maxOffset - file.tell())) {
+    debug("EBML: datasize too great: " + std::to_string(dataSize)
+          + " > (" + std::to_string(maxOffset) + " - "
+          + std::to_string(file.tell()) + ")");
+    return nullptr; 
+  }
 
   // Return the subclass
   // The enum switch without default will give us a warning if an ID is missing

@@ -368,7 +368,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   // Find the EBML Header
   const auto head = EBML::element_cast<EBML::Element::Id::EBMLHeader>(
-    EBML::Element::factory(*this));
+    EBML::Element::factory(*this, fileLength));
   if(!head || head->getId() != EBML::Element::Id::EBMLHeader) {
     debug("Failed to find EBML head");
     setValid(false);
@@ -389,7 +389,7 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
   // Find the Matroska segment in the file
   const std::unique_ptr<EBML::MkSegment> segment(
     EBML::element_cast<EBML::Element::Id::MkSegment>(
-      EBML::findElement(*this, EBML::Element::Id::MkSegment, maxOffset)
+      EBML::findElement(*this, EBML::Element::Id::MkSegment, maxOffset + tell())
     )
   );
   if(!segment) {
@@ -595,6 +595,7 @@ bool Matroska::File::save(WriteStyle writeStyle)
 
   // Set up listeners, add seek head and segment length to the end
   for(auto it = renderList.begin(); it != renderList.end(); ++it) {
+    (*it)->clearSizeListeners();
     for(auto it2 = std::next(it); it2 != renderList.end(); ++it2)
       (*it)->addSizeListener(*it2);
     if(d->cues)
@@ -605,6 +606,7 @@ bool Matroska::File::save(WriteStyle writeStyle)
   }
   if(d->cues) {
     renderList.append(d->cues.get());
+    d->cues->clearSizeListeners();
     d->cues->addSizeListeners(renderList);
     if(d->seekHead) {
       d->cues->addSizeListener(d->seekHead.get());
@@ -613,9 +615,11 @@ bool Matroska::File::save(WriteStyle writeStyle)
   }
   if(d->seekHead) {
     renderList.append(d->seekHead.get());
+    d->seekHead->clearSizeListeners();
     d->seekHead->addSizeListeners(renderList);
     d->seekHead->addSizeListener(d->segment.get());
   }
+  d->segment->clearSizeListeners();
   d->segment->addSizeListeners(renderList);
   renderList.append(d->segment.get());
 
