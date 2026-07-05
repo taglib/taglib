@@ -39,7 +39,12 @@
 using namespace TagLib;
 
 #define RETURN_ELEMENT_FOR_CASE(eid) \
-  case (eid): return make_unique_element<eid>(id, sizeLength, dataSize, offset)
+  case (eid): \
+    if (sizeUnknown && !std::is_base_of_v<MasterElement, GetElementTypeById<eid>::type>) { \
+      debug(Utils::formatString("EBML: non MasterElement with unknown size %x" , eid)); \
+      return nullptr; \
+    } \
+    return make_unique_element<eid>(id, sizeLength, dataSize, offset)
 
 std::unique_ptr<EBML::Element> EBML::Element::factory(File &file, offset_t maxOffset)
 {
@@ -52,15 +57,22 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file, offset_t maxOf
   }
 
   // Get the size length and data length
-  const auto &[sizeLength, dataSize] = readVINT(file);
+  auto [sizeLength, dataSize] = readVINT(file);
   if(!sizeLength)
     return nullptr;
 
-  if(const offset_t currentOffset = file.tell();
-     static_cast<offset_t>(dataSize) > maxOffset - currentOffset) {
+  // See https://datatracker.ietf.org/doc/rfc8794/ section 6.2
+  const bool sizeUnknown = sizeLength == 1 && dataSize == 0x7f;
+
+  const offset_t currentOffset = file.tell();
+  if(static_cast<offset_t>(dataSize) > maxOffset - currentOffset) {
     debug(Utils::formatString("EBML: datasize too great: %lu > (%lld - %lld)",
       dataSize, maxOffset, currentOffset));
     return nullptr;
+  }
+
+  if (sizeUnknown) {
+    dataSize = maxOffset - currentOffset;
   }
 
   // Return the subclass
@@ -135,6 +147,10 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file, offset_t maxOf
     RETURN_ELEMENT_FOR_CASE(Id::MkChapterDisplay);
     RETURN_ELEMENT_FOR_CASE(Id::MkChapString);
     RETURN_ELEMENT_FOR_CASE(Id::MkChapLanguage);
+  }
+  if (sizeUnknown) {
+    debug(Utils::formatString("EBML: non MasterElement with unknown size %x" , id));
+    return nullptr;
   }
   return std::make_unique<Element>(id, sizeLength, dataSize);
 }
