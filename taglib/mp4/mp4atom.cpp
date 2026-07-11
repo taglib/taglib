@@ -223,7 +223,7 @@ public:
 MP4::Atoms::Atoms(File *file) :
   d(std::make_unique<AtomsPrivate>())
 {
-  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 5000;
+  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 50000;
 
   d->atoms.setAutoDelete(true);
 
