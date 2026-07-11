@@ -71,6 +71,18 @@ namespace TagLib {
         return 3;
       return 4;
     }
+
+    // See https://datatracker.ietf.org/doc/rfc8794/ section 6.2
+    constexpr bool isUnknownSize(unsigned int sizeLength, uint64_t dataSize)
+    {
+      if(sizeLength == 0 || sizeLength > 8) {
+        return false;
+      }
+
+      const unsigned int numDataBits = sizeLength * 8 - sizeLength;
+      const uint64_t mask = (1ULL << numDataBits) - 1;
+      return (dataSize & mask) == mask;
+    }
   }
 }
 

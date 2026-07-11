@@ -160,6 +160,7 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveTypesBeforeCues);
   CPPUNIT_TEST(testSaveTypesNoTrailingVoid);
   CPPUNIT_TEST(testSaveTypesReclaimVoid);
+  CPPUNIT_TEST(testUnknownSizeSegment);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1777,6 +1778,56 @@ public:
     }
   }
 
+  void testUnknownSizeSegment()
+  {
+    ScopedFileCopy copy("no-tags", ".mka");
+    string newname = copy.fileName();
+
+    // Modify the copied file (/tmp/taglib-test.mka on Linux) to have elements
+    // with unknown size length.
+    {
+      PlainFile file(newname.c_str());
+      ByteVector fileData = file.readAll();
+      CPPUNIT_ASSERT_EQUAL(12390U, fileData.size());
+      // Size of Segment
+      for(int i = 0x2d; i <= 0x33; ++i) {
+        fileData[i] = '\xff';
+      }
+      // Size of Cluster
+      for(int i = 0x2d; i <= 0x33; ++i) {
+        fileData[i] = '\xff';
+      }
+      fileData[0x1482] = '\x7f';
+      fileData[0x1483] = '\xff';
+      file.seek(0);
+      file.writeBlock(fileData);
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(444, f.audioProperties()->lengthInMilliseconds());
+      CPPUNIT_ASSERT_EQUAL(223, f.audioProperties()->bitrate());
+      CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+      CPPUNIT_ASSERT_EQUAL(44100, f.audioProperties()->sampleRate());
+      CPPUNIT_ASSERT_EQUAL(String("matroska"), f.audioProperties()->docType());
+      CPPUNIT_ASSERT_EQUAL(4, f.audioProperties()->docTypeVersion());
+      CPPUNIT_ASSERT_EQUAL(String("A_MPEG/L3"), f.audioProperties()->codecName());
+      CPPUNIT_ASSERT_EQUAL(String(""), f.audioProperties()->title());
+      CPPUNIT_ASSERT(!f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+      auto tag = f.tag(true);
+      CPPUNIT_ASSERT(tag->isEmpty());
+      tag->setTitle("Unknown size");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT_EQUAL(String("Unknown size"), f.tag()->title());
+    }
+  }
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestMatroska);

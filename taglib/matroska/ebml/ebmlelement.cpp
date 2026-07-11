@@ -52,12 +52,14 @@ std::unique_ptr<EBML::Element> EBML::Element::factory(File &file, offset_t maxOf
   }
 
   // Get the size length and data length
-  const auto &[sizeLength, dataSize] = readVINT(file);
+  auto [sizeLength, dataSize] = readVINT(file);
   if(!sizeLength)
     return nullptr;
 
   if(const offset_t currentOffset = file.tell();
-     static_cast<offset_t>(dataSize) > maxOffset - currentOffset) {
+     isUnknownSize(sizeLength, dataSize)) {
+    dataSize = maxOffset - currentOffset;
+  } else if(static_cast<offset_t>(dataSize) > maxOffset - currentOffset) {
     debug(Utils::formatString("EBML: datasize too great: %lu > (%lld - %lld)",
       dataSize, maxOffset, currentOffset));
     return nullptr;
