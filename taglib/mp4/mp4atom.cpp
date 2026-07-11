@@ -88,7 +88,7 @@ MP4::Atom::Atom(File *file, int depth)
   d->name = header.mid(4, 4);
 
   if(d->name == "stem") {
-    file->seek(d->length - 8, File::Current);
+    file->seek(d->offset + d->length);
     return;
   }
 
