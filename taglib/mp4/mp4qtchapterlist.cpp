@@ -825,7 +825,8 @@ namespace
     const std::vector<unsigned int> chunkOffsets = readStco(file, chapterTrak);
     if(chunkOffsets.empty())
       return {};
-    if(sizeInfo.sampleCount == 0)
+    // Sample count cannot be > file length / 4 as every sample consumes 4 bytes in stsz
+    if(sizeInfo.sampleCount == 0 || sizeInfo.sampleCount > file->length() / 4)
       return {};
 
     // Read stsc entries
