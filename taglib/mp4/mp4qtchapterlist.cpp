@@ -825,6 +825,9 @@ namespace
     const std::vector<unsigned int> chunkOffsets = readStco(file, chapterTrak);
     if(chunkOffsets.empty())
       return {};
+    // Sample count cannot be > file length / 4 as every sample consumes 4 bytes in stsz
+    if(sizeInfo.sampleCount == 0 || sizeInfo.sampleCount > file->length() / 4)
+      return {};
 
     // Read stsc entries
     struct StscEntry {
@@ -875,6 +878,9 @@ namespace
       }
 
       unsigned int offsetInChunk = 0;
+      if(samplesInChunk > sizeInfo.sampleCount - sampleIndex)
+        samplesInChunk = sizeInfo.sampleCount - sampleIndex;
+
       for(unsigned int s = 0; s < samplesInChunk; ++s) {
         sampleOffsets.push_back(chunkOffsets[chunkIdx] + offsetInChunk);
 
