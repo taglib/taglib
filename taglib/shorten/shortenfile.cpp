@@ -471,14 +471,27 @@ void Shorten::File::read(AudioProperties::ReadStyle propertiesStyle)
 
     auto sawCommonChunk = false;
     while(offset < chunkData.size()) {
+      if(chunkData.size() - offset < 8) {
+        debug("Shorten::File::read() -- Truncated AIFF chunk header.");
+        setValid(false);
+        return;
+      }
+
       chunkID = chunkData.toUInt(offset, true);
       offset += 4;
 
-      auto chunkSize = chunkData.toUInt(offset, true);
+      const auto chunkSize = chunkData.toUInt(offset, true);
       offset += 4;
 
       // All chunks must have an even length but the pad byte is not included in chunkSize
-      chunkSize += (chunkSize & 1);
+      const uint64_t paddedChunkSize = static_cast<uint64_t>(chunkSize) + (chunkSize & 1);
+      if(paddedChunkSize > chunkData.size() - offset) {
+        debug("Shorten::File::read() -- AIFF chunk exceeds verbatim header.");
+        setValid(false);
+        return;
+      }
+
+      const unsigned int chunkEnd = offset + static_cast<unsigned int>(paddedChunkSize);
 
       switch(chunkID) {
         case 0x434f4d4d /*'COMM'*/:
@@ -523,11 +536,11 @@ void Shorten::File::read(AudioProperties::ReadStyle propertiesStyle)
           break;
         }
 
-          // Skip all other chunks
         default:
-          offset += chunkSize;
           break;
       }
+
+      offset = chunkEnd;
     }
 
     if(!sawCommonChunk) {
