@@ -174,6 +174,8 @@ locations defined when building TagLib. Since we did not give a
 
 ```
 PKG_CONFIG_PATH=$HOME/pkg/lib/pkgconfig pkg-config --libs --cflags taglib
+-I/usr/local/include -I/usr/local/include/taglib -L/usr/local/lib -ltag
+PKG_CONFIG_PATH=$HOME/pkg/lib/pkgconfig pkg-config --static --libs --cflags taglib
 -I/usr/local/include -I/usr/local/include/taglib -L/usr/local/lib -ltag -lz
 ```
 
@@ -182,21 +184,21 @@ parameters affecting the installation location.
 
 - Using the default prefix `-DCMAKE_INSTALL_PREFIX=/usr/local`:
   ```
-  -I/usr/local/include -I/usr/local/include/taglib -L/usr/local/lib -ltag -lz
+  -I/usr/local/include -I/usr/local/include/taglib -L/usr/local/lib -ltag
   ```
 - Using an absolute prefix `-DCMAKE_INSTALL_PREFIX=/usr`:
   ```
-  -I/usr/include/taglib -ltag -lz
+  -I/usr/include/taglib -ltag
   ```
 - Using absolute lib and include directories
   `-DCMAKE_INSTALL_LIBDIR=/abs-lib -DCMAKE_INSTALL_INCLUDEDIR=/abs-include -DCMAKE_INSTALL_PREFIX=/usr`:
   ```
-  -I/abs-include -I/abs-include/taglib -L/abs-lib -ltag -lz
+  -I/abs-include -I/abs-include/taglib -L/abs-lib -ltag
   ```
 - Using relative lib and include directories
   `-DCMAKE_INSTALL_LIBDIR=rel-lib -DCMAKE_INSTALL_INCLUDEDIR=rel-include -DCMAKE_INSTALL_PREFIX=/usr`:
   ```
-  -I/usr/rel-include -I/usr/rel-include/taglib -L/usr/rel-lib -ltag -lz
+  -I/usr/rel-include -I/usr/rel-include/taglib -L/usr/rel-lib -ltag
   ```
   This is the output of
   ```
@@ -213,7 +215,10 @@ PKG_CONFIG_PATH=$HOME/pkg/lib/pkgconfig pkg-config --define-prefix --libs --cfla
 ```
 
 You can use pkg-config from CMake, however, relocation with `--define-prefix`
-is not supported.
+is not supported, you would have to use something like
+`set(PKG_CONFIG_EXECUTABLE pkg-config --define-prefix)` or
+`set(PKG_CONFIG_EXECUTABLE pkg-config --static --define-prefix)` if linking a
+static TagLib.
 
 ```
 cmake_minimum_required(VERSION 3.6.0)
