@@ -298,8 +298,16 @@ MP4::Properties::read(File *file, const Atoms *atoms)
         d->bitsPerSample = ((streamInfo >> 4) & 0x1f) + 1;
       }
     }
+    else if(d->codec == EAC3) {
+      // The 'dec3' box (EC3SpecificBox) starts with the nominal data rate in
+      // kbit/s as a 13 bit value.
+      const auto dec3Pos = data.find("dec3");
+      if(const auto dec3Offset = static_cast<unsigned int>(dec3Pos);
+         dec3Pos >= 0 && data.size() >= dec3Offset + 6)
+        d->bitrate = data.toUShort(dec3Offset + 4) >> 3;
+    }
 
-    if(d->length > 0)
+    if(d->bitrate == 0 && d->length > 0)
       d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
   }
 

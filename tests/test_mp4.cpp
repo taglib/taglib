@@ -296,7 +296,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
-    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(128, f.audioProperties()->bitrate());
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
     CPPUNIT_ASSERT_EQUAL(MP4::Properties::EAC3, f.audioProperties()->codec());
     CPPUNIT_ASSERT_EQUAL(String("ec-3"), f.audioProperties()->codecId());
