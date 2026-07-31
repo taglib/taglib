@@ -57,6 +57,16 @@ public:
   std::unique_ptr<PageHeader> firstPageHeader;
   std::unique_ptr<PageHeader> lastPageHeader;
   Map<unsigned int, ByteVector> dirtyPackets;
+
+  // File offset of the next page to read while scanning the file.  This tracks
+  // the physical position independently of the logical stream's pages so that
+  // pages of other multiplexed streams can be skipped.
+  offset_t currentPageOffset { -1 };
+
+  // Serial number of the logical bitstream packets are read from.  In a
+  // multiplexed Ogg stream only pages of this stream are considered.
+  unsigned int streamSerialNumber { 0 };
+  bool streamSerialNumberSet { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +181,38 @@ Ogg::File::File(IOStream *stream) :
 {
 }
 
+bool Ogg::File::selectStream(const ByteVector &magic)
+{
+  // All beginning-of-stream pages of a (possibly multiplexed) Ogg stream
+  // appear at the very start of the file, before any secondary pages.  Inspect
+  // each one's first packet and lock onto the first logical bitstream whose
+  // identification header matches magic.
+
+  offset_t offset = find("OggS");
+  if(offset < 0)
+    return false;
+
+  while(true) {
+    Page page(this, offset);
+    if(!page.header()->isValid())
+      return false;
+
+    // Once the beginning-of-stream pages are exhausted there are no more
+    // logical bitstreams to discover.
+    if(!page.header()->firstPageOfStream())
+      return false;
+
+    const ByteVectorList packets = page.packets();
+    if(!packets.isEmpty() && packets.front().startsWith(magic)) {
+      d->streamSerialNumber = page.header()->streamSerialNumber();
+      d->streamSerialNumberSet = true;
+      return true;
+    }
+
+    offset += page.size();
+  }
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -178,36 +220,52 @@ Ogg::File::File(IOStream *stream) :
 bool Ogg::File::readPages(unsigned int i)
 {
   while(true) {
-    unsigned int packetIndex;
-    offset_t offset;
 
-    if(d->pages.isEmpty()) {
-      packetIndex = 0;
-      offset = find("OggS");
-      if(offset < 0)
-        return false;
-    }
-    else {
+    // If we've already indexed the page containing packet i, we're done.
+
+    if(!d->pages.isEmpty()) {
       const Page *page = d->pages.back();
-      packetIndex = nextPacketIndex(page);
-      offset = page->fileOffset() + page->size();
-
-      // Enough pages have been fetched.
-      if(packetIndex > i) {
+      if(nextPacketIndex(page) > i)
         return true;
-      }
-      else if(page->header()->lastPageOfStream()) {
+      if(page->header()->lastPageOfStream())
+        return false;
+    }
+
+    // Locate the first page in the file if we haven't started scanning yet.
+
+    if(d->currentPageOffset < 0) {
+      d->currentPageOffset = find("OggS");
+      if(d->currentPageOffset < 0)
+        return false;
+    }
+
+    // Read pages until we find the next one belonging to our logical bitstream,
+    // skipping pages of other streams in a multiplexed Ogg stream.
+
+    Page *nextPage;
+    while(true) {
+      nextPage = new Page(this, d->currentPageOffset);
+      if(!nextPage->header()->isValid()) {
+        delete nextPage;
         return false;
       }
-    }
 
-    // Read the next page and add it to the page list.
+      d->currentPageOffset += nextPage->size();
 
-    auto nextPage = new Page(this, offset);
-    if(!nextPage->header()->isValid()) {
+      const unsigned int serial = nextPage->header()->streamSerialNumber();
+      if(!d->streamSerialNumberSet) {
+        d->streamSerialNumber = serial;
+        d->streamSerialNumberSet = true;
+      }
+
+      if(serial == d->streamSerialNumber)
+        break;
+
       delete nextPage;
-      return false;
     }
+
+    const unsigned int packetIndex
+      = d->pages.isEmpty() ? 0 : nextPacketIndex(d->pages.back());
 
     nextPage->setFirstPacketIndex(packetIndex);
     d->pages.append(nextPage);
@@ -295,4 +353,5 @@ void Ogg::File::writePacket(unsigned int i, const ByteVector &packet)
   // Discard all the pages to keep them up-to-date by fetching them again.
 
   d->pages.clear();
+  d->currentPageOffset = -1;
 }
