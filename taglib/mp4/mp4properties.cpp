@@ -283,6 +283,22 @@ MP4::Properties::read(File *file, const Atoms *atoms)
     d->bitsPerSample = data.toShort(42U);
     d->sampleRate    = data.toUInt(46U);
 
+    if(d->codec == FLAC) {
+      // The AudioSampleEntry sample rate field is only 16 bits wide, so read
+      // the exact values from the FLAC STREAMINFO metadata block in the 'dfLa'
+      // box. This is required for high resolution files (e.g. 96 kHz, 24 bit).
+      const auto dflaPos = data.find("dfLa");
+      if(const auto dflaOffset = static_cast<unsigned int>(dflaPos);
+         dflaPos >= 0 && data.size() >= dflaOffset + 26 &&
+         (static_cast<unsigned char>(data.at(dflaOffset + 8)) & 0x7f) == 0) {
+        const auto streamInfo = data.toUInt(dflaOffset + 22);
+        if(const auto sampleRate = streamInfo >> 12; sampleRate != 0)
+          d->sampleRate = sampleRate;
+        d->channels      = ((streamInfo >> 9) & 0x7) + 1;
+        d->bitsPerSample = ((streamInfo >> 4) & 0x1f) + 1;
+      }
+    }
+
     if(d->length > 0)
       d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
   }

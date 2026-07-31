@@ -133,6 +133,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesAC3);
   CPPUNIT_TEST(testPropertiesEAC3);
   CPPUNIT_TEST(testPropertiesFLAC);
+  CPPUNIT_TEST(testPropertiesFLACHighResolution);
   CPPUNIT_TEST(testPropertiesOpus);
   CPPUNIT_TEST(testPropertiesM4V);
   CPPUNIT_TEST(testFreeForm);
@@ -308,6 +309,23 @@ public:
     CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
     CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
     CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
+    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::FLAC, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("fLaC"), f.audioProperties()->codecId());
+  }
+
+  void testPropertiesFLACHighResolution()
+  {
+    // The AudioSampleEntry sample rate field cannot hold rates above 65535 Hz,
+    // so the exact values must come from the FLAC STREAMINFO in the 'dfLa' box.
+    MP4::File f(TEST_FILE_PATH_C("flac96.m4a"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(96000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(24, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
     CPPUNIT_ASSERT_EQUAL(MP4::Properties::FLAC, f.audioProperties()->codec());
