@@ -130,6 +130,10 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesALAC);
   CPPUNIT_TEST(testPropertiesALACWithoutBitrate);
   CPPUNIT_TEST(testPropertiesAACWithoutLength);
+  CPPUNIT_TEST(testPropertiesAC3);
+  CPPUNIT_TEST(testPropertiesEAC3);
+  CPPUNIT_TEST(testPropertiesFLAC);
+  CPPUNIT_TEST(testPropertiesOpus);
   CPPUNIT_TEST(testPropertiesM4V);
   CPPUNIT_TEST(testFreeForm);
   CPPUNIT_TEST(testCheckValid);
@@ -269,6 +273,58 @@ public:
     CPPUNIT_ASSERT_EQUAL(16, f.audioProperties()->bitsPerSample());
     CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
     CPPUNIT_ASSERT_EQUAL(MP4::Properties::AAC, f.audioProperties()->codec());
+  }
+
+  void testPropertiesAC3()
+  {
+    MP4::File f(TEST_FILE_PATH_C("ac3.m4a"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::AC3, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("ac-3"), f.audioProperties()->codecId());
+  }
+
+  void testPropertiesEAC3()
+  {
+    MP4::File f(TEST_FILE_PATH_C("eac3.m4a"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::EAC3, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("ec-3"), f.audioProperties()->codecId());
+  }
+
+  void testPropertiesFLAC()
+  {
+    MP4::File f(TEST_FILE_PATH_C("flac.m4a"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::FLAC, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("fLaC"), f.audioProperties()->codecId());
+  }
+
+  void testPropertiesOpus()
+  {
+    MP4::File f(TEST_FILE_PATH_C("opus.m4a"));
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->lengthInSeconds());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT(f.audioProperties()->bitrate() > 0);
+    CPPUNIT_ASSERT_EQUAL(false, f.audioProperties()->isEncrypted());
+    CPPUNIT_ASSERT_EQUAL(MP4::Properties::Opus, f.audioProperties()->codec());
+    CPPUNIT_ASSERT_EQUAL(String("Opus"), f.audioProperties()->codecId());
   }
 
   void testPropertiesM4V()

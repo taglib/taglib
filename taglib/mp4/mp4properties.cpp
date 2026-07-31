@@ -27,6 +27,7 @@
 
 #include "tdebug.h"
 #include "tstring.h"
+#include "tmap.h"
 #include "mp4file.h"
 #include "mp4atom.h"
 
@@ -63,6 +64,7 @@ public:
   int bitsPerSample { 0 };
   bool encrypted { false };
   Codec codec { MP4::Properties::Unknown };
+  String codecId;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +120,12 @@ MP4::Properties::Codec
 MP4::Properties::codec() const
 {
   return d->codec;
+}
+
+String
+MP4::Properties::codecId() const
+{
+  return d->codecId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +213,12 @@ MP4::Properties::read(File *file, const Atoms *atoms)
 
   file->seek(atom->offset());
   data = file->readBlock(atom->length());
+
+  // The four character code of the first sample entry identifies the codec and
+  // is exposed directly, also for codecs not represented by the Codec enum.
+  if(data.size() >= 24)
+    d->codecId = String(data.mid(20, 4));
+
   if(data.containsAt("mp4a", 20)) {
     d->codec         = AAC;
     d->channels      = data.toShort(40U);
@@ -248,6 +262,29 @@ MP4::Properties::read(File *file, const Atoms *atoms)
         d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
       }
     }
+  }
+  else if(data.size() >= 50) {
+    // Other audio codecs use the same AudioSampleEntry layout as above, so the
+    // basic properties can be read from the same offsets.  The nominal bitrate
+    // is not parsed from the codec specific configuration box; it is estimated
+    // from the audio data size and the duration.
+    static const Map<ByteVector, Codec> codecMap {
+      {"ac-3", AC3},
+      {"ec-3", EAC3},
+      {"fLaC", FLAC},
+      {"Opus", Opus},
+      {"dtsc", DTS},
+      {"dtse", DTS},
+      {"dtsh", DTS},
+      {"dtsl", DTS}
+    };
+    d->codec         = codecMap.value(data.mid(20, 4), Unknown);
+    d->channels      = data.toShort(40U);
+    d->bitsPerSample = data.toShort(42U);
+    d->sampleRate    = data.toUInt(46U);
+
+    if(d->length > 0)
+      d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
   }
 
   if(atom->find("drms")) {
