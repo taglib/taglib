@@ -27,6 +27,7 @@
 
 #include <array>
 #include <bitset>
+#include <cstdint>
 
 #include "tdebug.h"
 #include "tstringlist.h"
@@ -57,6 +58,9 @@ public:
 
 namespace
 {
+  constexpr unsigned int maxCompressedFrameOutputSize = 64U * 1024U * 1024U;
+  constexpr unsigned int maxCompressedFrameRatio = 64;
+
   bool isValidFrameID(const ByteVector &frameID)
   {
     if(frameID.size() != 4)
@@ -310,8 +314,16 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
       return ByteVector();
     }
 
-    const ByteVector outData = zlib::decompress(frameData.mid(frameDataOffset),
-                                                frameDataLength);
+    const ByteVector compressedData = frameData.mid(frameDataOffset);
+    const uint64_t maxOutputSizeForInput =
+      static_cast<uint64_t>(compressedData.size()) * maxCompressedFrameRatio;
+    if(frameDataLength > maxCompressedFrameOutputSize ||
+       frameDataLength > maxOutputSizeForInput) {
+      debug("Compressed frame exceeds decompression limit");
+      return ByteVector();
+    }
+
+    const ByteVector outData = zlib::decompress(compressedData, frameDataLength);
     if(!outData.isEmpty() && frameDataLength != outData.size()) {
       debug("frameDataLength does not match the data length returned by zlib");
     }
