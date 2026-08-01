@@ -195,6 +195,9 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
       if(atom->offset() > offset) {
         atom->addToOffset(delta);
       }
+      if(atom->length() < 16) {
+        continue;
+      }
       d->file->seek(atom->offset() + 12);
       ByteVector data = d->file->readBlock(atom->length() - 12);
       unsigned int count = data.toUInt();
@@ -215,6 +218,9 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
     for(const auto &atom : co64) {
       if(atom->offset() > offset) {
         atom->addToOffset(delta);
+      }
+      if(atom->length() < 20) {
+        continue;
       }
       d->file->seek(atom->offset() + 12);
       ByteVector data = d->file->readBlock(atom->length() - 12);
@@ -238,6 +244,9 @@ MP4::Tag::updateOffsets(offset_t delta, offset_t offset)
     for(const auto &atom : tfhd) {
       if(atom->offset() > offset) {
         atom->addToOffset(delta);
+      }
+      if(atom->length() < 24) {
+        continue;
       }
       d->file->seek(atom->offset() + 9);
       ByteVector data = d->file->readBlock(atom->length() - 9);

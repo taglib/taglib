@@ -88,6 +88,8 @@ namespace
       for(const auto &atom : stco) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 16)
+          continue;
         file->seek(atom->offset() + 12);
         ByteVector data = file->readBlock(atom->length() - 12);
         unsigned int count = data.toUInt();
@@ -107,6 +109,8 @@ namespace
       for(const auto &atom : co64) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 20)
+          continue;
         file->seek(atom->offset() + 12);
         ByteVector data = file->readBlock(atom->length() - 12);
         unsigned int count = data.toUInt();
@@ -128,6 +132,8 @@ namespace
       for(const auto &atom : tfhd) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 24)
+          continue;
         file->seek(atom->offset() + 9);
         ByteVector data = file->readBlock(atom->length() - 9);
         if(const unsigned int flags = data.toUInt(0, 3, true);
@@ -740,7 +746,7 @@ namespace
   {
     std::vector<SttsEntry> entries;
     const MP4::Atom *stts = chapterTrak->find("mdia", "minf", "stbl", "stts");
-    if(!stts)
+    if(!stts || stts->length() < 12)
       return entries;
 
     file->seek(stts->offset() + 12);  // skip header(8) + version/flags(4)
@@ -765,7 +771,7 @@ namespace
   {
     std::vector<unsigned int> offsets;
     const MP4::Atom *stco = chapterTrak->find("mdia", "minf", "stbl", "stco");
-    if(!stco)
+    if(!stco || stco->length() < 12)
       return offsets;
 
     file->seek(stco->offset() + 12);
@@ -794,7 +800,7 @@ namespace
   {
     SampleSizeInfo info;
     const MP4::Atom *stsz = chapterTrak->find("mdia", "minf", "stbl", "stsz");
-    if(!stsz)
+    if(!stsz || stsz->length() < 12)
       return info;
 
     file->seek(stsz->offset() + 12);
@@ -837,7 +843,8 @@ namespace
     };
     std::vector<StscEntry> stscEntries;
 
-    if(const MP4::Atom *stsc = chapterTrak->find("mdia", "minf", "stbl", "stsc")) {
+    if(const MP4::Atom *stsc = chapterTrak->find("mdia", "minf", "stbl", "stsc");
+       stsc && stsc->length() >= 12) {
       file->seek(stsc->offset() + 12);
       if(const ByteVector data = file->readBlock(stsc->length() - 12);
          data.size() >= 4) {
@@ -969,6 +976,8 @@ namespace
       return false;
 
     for(const auto &stco : moov->findall("stco", true)) {
+      if(stco->length() < 16)
+        continue;
       file->seek(stco->offset() + 12);
       ByteVector data = file->readBlock(stco->length() - 12);
       if(data.size() < 4)
@@ -985,6 +994,8 @@ namespace
     }
 
     for(const auto &co64 : moov->findall("co64", true)) {
+      if(co64->length() < 20)
+        continue;
       file->seek(co64->offset() + 12);
       ByteVector data = file->readBlock(co64->length() - 12);
       if(data.size() < 4)
