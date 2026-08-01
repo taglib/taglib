@@ -30,6 +30,7 @@
 
 #include "tbytevector.h"
 #include "tdebug.h"
+#include "tutils.h"
 
 #include "id3v1genres.h"
 
@@ -39,6 +40,25 @@ using namespace MP4;
 namespace {
 
 constexpr char freeFormPrefix[] = "----:com.apple.iTunes:";
+
+MP4::CoverArt::Format detectImageFormat(const ByteVector &payload)
+{
+  const unsigned int size = payload.size();
+  if(size >= 2 &&
+     static_cast<unsigned char>(payload[0]) == 0xff &&
+     static_cast<unsigned char>(payload[1]) == 0xd8)
+    return MP4::CoverArt::JPEG;
+  if(size >= 8 && payload.startsWith("\x89PNG\x0d\x0a\x1a\x0a"))
+    return MP4::CoverArt::PNG;
+  if(size >= 6 && payload.startsWith("GIF8"))
+    return MP4::CoverArt::GIF;
+  if(size >= 14 &&
+     static_cast<unsigned char>(payload[0]) == 'B' &&
+     static_cast<unsigned char>(payload[1]) == 'M' &&
+     payload.toUInt(6, false) == 0)
+    return MP4::CoverArt::BMP;
+  return MP4::CoverArt::Unknown;
+}
 
 }  // namespace
 
@@ -607,28 +627,6 @@ std::pair<String, Item> ItemFactory::parseFreeForm(
   return {atom->name(), Item()};
 }
 
-namespace {
-
-// Sniff the image format from magic bytes.
-MP4::CoverArt::Format sniffCoverFormat(const ByteVector &payload)
-{
-  if(payload.size() >= 2 &&
-     static_cast<unsigned char>(payload[0]) == 0xff &&
-     static_cast<unsigned char>(payload[1]) == 0xd8)
-    return MP4::CoverArt::JPEG;
-  if(payload.size() >= 4 && payload.startsWith("\x89PNG"))
-    return MP4::CoverArt::PNG;
-  if(payload.size() >= 4 && payload.startsWith("GIF8"))
-    return MP4::CoverArt::GIF;
-  if(payload.size() >= 2 &&
-     static_cast<unsigned char>(payload[0]) == 'B' &&
-     static_cast<unsigned char>(payload[1]) == 'M')
-    return MP4::CoverArt::BMP;
-  return MP4::CoverArt::Unknown;  // TypeImplicit, caller stores it anyway
-}
-
-}  // namespace
-
 std::pair<String, Item> ItemFactory::parseCovr(
   const MP4::Atom *atom, const ByteVector &data)
 {
@@ -647,10 +645,10 @@ std::pair<String, Item> ItemFactory::parseCovr(
       debug("MP4: Unexpected atom \"" + name + "\", expecting \"data\"");
       break;
     }
+    const ByteVector payload = data.mid(pos + 16, length - 16);
     if(flags == TypeJPEG || flags == TypePNG || flags == TypeBMP ||
        flags == TypeGIF || flags == TypeImplicit) {
-      value.append(MP4::CoverArt(static_cast<MP4::CoverArt::Format>(flags),
-                                 data.mid(pos + 16, length - 16)));
+      value.append(MP4::CoverArt(static_cast<MP4::CoverArt::Format>(flags), payload));
     }
     else {
       // The flags field holds an unexpected type written by several buggy encoders/taggers
@@ -658,11 +656,10 @@ std::pair<String, Item> ItemFactory::parseCovr(
       // Because 'covr' is semantically an image-only atom, try to recover the
       // real format by sniffing the payload's magic bytes rather than silently
       // discarding the artwork.
-      const ByteVector payload = data.mid(pos + 16, length - 16);
-      const MP4::CoverArt::Format sniffed = sniffCoverFormat(payload);
-      debug("MP4: covr 'data' atom has unexpected flags " +
-            String::number(flags) + ". recovering format via magic-byte sniff");
-      value.append(MP4::CoverArt(sniffed, payload));
+      const auto format = detectImageFormat(payload);
+      debug(Utils::formatString(
+        "MP4: Replacing unexpected covr flags %d by detected format %d", flags, format));
+      value.append(MP4::CoverArt(format, payload));
     }
     pos += length;
   }
