@@ -304,8 +304,13 @@ ByteVector Frame::fieldData(const ByteVector &frameData) const
      frameDataOffset + frameDataLength > frameData.size()) {
     // The first check is needed because some "dual purpose" frame constructors
     // call this method with only the frame ID, i.e. without a complete header.
-    debug("Invalid frame data length");
-    return ByteVector();
+    if(frameDataOffset > frameData.size()) {
+      debug("Invalid frame data length");
+      return ByteVector();
+    }
+    // Per-frame ID3v2.4 unsynchronisation can shrink frameData after the
+    // header's declared size was set; use what's actually available.
+    frameDataLength = frameData.size() - frameDataOffset;
   }
 
   if(zlib::isAvailable() && d->header->compression() && !d->header->encryption()) {

@@ -72,6 +72,7 @@ class TestID3v2 : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestID3v2);
   CPPUNIT_TEST(testUnsynchDecode);
+  CPPUNIT_TEST(testUnsynchDecodeID3v24Frame);
   CPPUNIT_TEST(testDowngradeUTF8ForID3v23_1);
   CPPUNIT_TEST(testDowngradeUTF8ForID3v23_2);
   CPPUNIT_TEST(testUTF16BEDelimiter);
@@ -149,6 +150,13 @@ public:
     MPEG::File f(TEST_FILE_PATH_C("unsynch.id3"), false);
     CPPUNIT_ASSERT(f.tag());
     CPPUNIT_ASSERT_EQUAL(String("My babe just cares for me"), f.tag()->title());
+  }
+
+  void testUnsynchDecodeID3v24Frame()
+  {
+    MPEG::File f(TEST_FILE_PATH_C("unsynch24.id3"), false);
+    CPPUNIT_ASSERT(f.tag());
+    CPPUNIT_ASSERT_EQUAL(String("Hi"), f.tag()->title());
   }
 
   void testDowngradeUTF8ForID3v23_1()
