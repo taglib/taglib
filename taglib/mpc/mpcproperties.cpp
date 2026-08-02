@@ -27,6 +27,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 
 #include "tdebug.h"
 #include "tstring.h"
@@ -186,7 +187,19 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
       break;
     }
 
-    const unsigned long dataSize = packetSize - 2 - packetSizeLength;
+    const unsigned long headerSize = 2 + packetSizeLength;
+    const offset_t offset = file->tell();
+    if(packetSize < headerSize || offset < 0 || offset > streamLength) {
+      debug("MPC::Properties::readSV8() - Invalid packet size.");
+      break;
+    }
+
+    const unsigned long dataSize = packetSize - headerSize;
+    const auto remaining = static_cast<unsigned long long>(streamLength - offset);
+    if(dataSize > remaining || dataSize > std::numeric_limits<unsigned int>::max()) {
+      debug("MPC::Properties::readSV8() - Packet size exceeds remaining data.");
+      break;
+    }
 
     const ByteVector data = file->readBlock(dataSize);
     if(data.size() != dataSize) {
