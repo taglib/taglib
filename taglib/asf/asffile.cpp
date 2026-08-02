@@ -89,6 +89,21 @@ namespace
   const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
   const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
   const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
+
+  bool attributeDataFits(File *file, long long size, offset_t &end)
+  {
+    if(size < 26)
+      return false;
+
+    const offset_t position = file->tell();
+    const offset_t fileLength = file->length();
+    const auto dataSize = size - 24;
+    if(position < 0 || position > fileLength || dataSize > fileLength - position)
+      return false;
+
+    end = position + dataSize;
+    return true;
+  }
 }  // namespace
 
 class ASF::File::FilePrivate::BaseObject
@@ -290,13 +305,29 @@ ByteVector ASF::File::FilePrivate::ExtendedContentDescriptionObject::guid() cons
   return extendedContentDescriptionGuid;
 }
 
-void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *file, long long /*size*/)
+void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *file, long long size)
 {
+  offset_t end;
+  if(!attributeDataFits(file, size, end)) {
+    file->setValid(false);
+    return;
+  }
+
   int count = readWORD(file);
   while(count--) {
+    if(file->tell() >= end) {
+      file->setValid(false);
+      break;
+    }
+
     ASF::Attribute attribute;
     String name = attribute.parse(*file);
     file->d->tag->addAttribute(name, attribute);
+
+    if(file->tell() > end) {
+      file->setValid(false);
+      break;
+    }
   }
 }
 
@@ -313,13 +344,29 @@ ByteVector ASF::File::FilePrivate::MetadataObject::guid() const
   return metadataGuid;
 }
 
-void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, long long /*size*/)
+void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, long long size)
 {
+  offset_t end;
+  if(!attributeDataFits(file, size, end)) {
+    file->setValid(false);
+    return;
+  }
+
   int count = readWORD(file);
   while(count--) {
+    if(file->tell() >= end) {
+      file->setValid(false);
+      break;
+    }
+
     ASF::Attribute attribute;
     String name = attribute.parse(*file, 1);
     file->d->tag->addAttribute(name, attribute);
+
+    if(file->tell() > end) {
+      file->setValid(false);
+      break;
+    }
   }
 }
 
@@ -336,13 +383,29 @@ ByteVector ASF::File::FilePrivate::MetadataLibraryObject::guid() const
   return metadataLibraryGuid;
 }
 
-void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, long long /*size*/)
+void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, long long size)
 {
+  offset_t end;
+  if(!attributeDataFits(file, size, end)) {
+    file->setValid(false);
+    return;
+  }
+
   int count = readWORD(file);
   while(count--) {
+    if(file->tell() >= end) {
+      file->setValid(false);
+      break;
+    }
+
     ASF::Attribute attribute;
     String name = attribute.parse(*file, 2);
     file->d->tag->addAttribute(name, attribute);
+
+    if(file->tell() > end) {
+      file->setValid(false);
+      break;
+    }
   }
 }
 
