@@ -77,6 +77,8 @@ namespace
       for(const auto &atom : stco) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 16)
+          continue;
         file->seek(atom->offset() + 12);
         ByteVector data = file->readBlock(atom->length() - 12);
         unsigned int count = data.toUInt();
@@ -96,6 +98,8 @@ namespace
       for(const auto &atom : co64) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 20)
+          continue;
         file->seek(atom->offset() + 12);
         ByteVector data = file->readBlock(atom->length() - 12);
         unsigned int count = data.toUInt();
@@ -117,6 +121,8 @@ namespace
       for(const auto &atom : tfhd) {
         if(atom->offset() > offset)
           atom->addToOffset(delta);
+        if(atom->length() < 24)
+          continue;
         file->seek(atom->offset() + 9);
         ByteVector data = file->readBlock(atom->length() - 9);
         if(const unsigned int flags = data.toUInt(0, 3, true);
