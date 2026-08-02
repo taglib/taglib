@@ -69,6 +69,16 @@ namespace
                         [](unsigned char c) { return c < 32 || c > 126; });
   }
 
+  bool chunkFits(offset_t offset, unsigned long long size,
+                 unsigned long long end)
+  {
+    if(offset < 0)
+      return false;
+
+    const auto position = static_cast<unsigned long long>(offset);
+    return position <= end && size <= end - position;
+  }
+
   enum {
     ID3v2Index = 0,
     DIINIndex = 1
@@ -611,7 +621,8 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
 
   // + 12: chunk header at least, fix for additional junk bytes
 
-  while(tell() + 12 <= length()) {
+  const auto fileLength = static_cast<unsigned long long>(length());
+  while(chunkFits(tell(), 12, fileLength)) {
     ByteVector chunkName = readBlock(4);
     unsigned long long chunkSize = readBlock(8).toULongLong(bigEndian);
 
@@ -621,8 +632,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
       break;
     }
 
-    if(static_cast<unsigned long long>(tell()) + chunkSize >
-       static_cast<unsigned long long>(length())) {
+    if(!chunkFits(tell(), chunkSize, fileLength)) {
       debug("DSDIFF::File::read() -- Chunk '" + chunkName
             + "' has invalid size (larger than the file size)");
       setValid(false);
@@ -671,7 +681,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
 
       audioDataSizeinBytes = d->chunks[i].size;
 
-      while(static_cast<unsigned long long>(tell()) + 12 <= dstChunkEnd) {
+      while(chunkFits(tell(), 12, dstChunkEnd)) {
         ByteVector dstChunkName = readBlock(4);
         unsigned long long dstChunkSize = readBlock(8).toULongLong(bigEndian);
 
@@ -681,7 +691,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
           break;
         }
 
-        if(tell() + dstChunkSize > dstChunkEnd) {
+        if(!chunkFits(tell(), dstChunkSize, dstChunkEnd)) {
           debug("DSDIFF::File::read() -- DST Chunk '" + dstChunkName
                 + "' has invalid size (larger than the DST chunk)");
           setValid(false);
@@ -713,7 +723,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
       unsigned long long propChunkEnd = d->chunks[i].offset + d->chunks[i].size;
       // +4 to remove the 'SND ' marker at beginning of 'PROP' chunk
       seek(d->chunks[i].offset + 4);
-      while(static_cast<unsigned long long>(tell()) + 12 <= propChunkEnd) {
+      while(chunkFits(tell(), 12, propChunkEnd)) {
         ByteVector propChunkName = readBlock(4);
         unsigned long long propChunkSize = readBlock(8).toULongLong(bigEndian);
 
@@ -723,7 +733,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
           break;
         }
 
-        if(tell() + propChunkSize > propChunkEnd) {
+        if(!chunkFits(tell(), propChunkSize, propChunkEnd)) {
           debug("DSDIFF::File::read() -- PROP Chunk '" + propChunkName
                 + "' has invalid size (larger than the PROP chunk)");
           setValid(false);
@@ -759,7 +769,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
       unsigned long long diinChunkEnd = d->chunks[i].offset + d->chunks[i].size;
       seek(d->chunks[i].offset);
 
-      while(static_cast<unsigned long long>(tell()) + 12 <= diinChunkEnd) {
+      while(chunkFits(tell(), 12, diinChunkEnd)) {
         ByteVector diinChunkName = readBlock(4);
         unsigned long long diinChunkSize = readBlock(8).toULongLong(bigEndian);
 
@@ -769,7 +779,7 @@ void DSDIFF::File::read(bool readProperties, Properties::ReadStyle propertiesSty
           break;
         }
 
-        if(tell() + diinChunkSize > diinChunkEnd) {
+        if(!chunkFits(tell(), diinChunkSize, diinChunkEnd)) {
           debug("DSDIFF::File::read() -- DIIN Chunk '" + diinChunkName
                 + "' has invalid size (larger than the DIIN chunk)");
           setValid(false);
