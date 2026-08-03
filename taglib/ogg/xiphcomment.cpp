@@ -422,6 +422,8 @@ ByteVector Ogg::XiphComment::render(bool addFramingBit) const
 
 void Ogg::XiphComment::parse(const ByteVector &data)
 {
+  static constexpr unsigned int MAX_XIPH_COMMENT_FIELD_COUNT = 50000;
+
   // The first thing in the comment data is the vendor ID length, followed by a
   // UTF8 string with the vendor ID.
 
@@ -438,7 +440,9 @@ void Ogg::XiphComment::parse(const ByteVector &data)
   const unsigned int commentFields = data.toUInt(pos, false);
   pos += 4;
 
-  if(commentFields > (data.size() - 8) / 4) {
+  if(commentFields > MAX_XIPH_COMMENT_FIELD_COUNT ||
+     commentFields > (data.size() - 8) / 4) {
+    debug("Ogg::XiphComment::parse() - Maximum comment field count exceeded.");
     return;
   }
 
