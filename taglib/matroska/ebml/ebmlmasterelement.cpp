@@ -101,6 +101,7 @@ void EBML::MasterElement::setMinRenderSize(offset_t minimumSize)
 bool EBML::MasterElement::read(File &file, int depth)
 {
   static constexpr int MAX_EBML_DEPTH = 64;
+  static constexpr int MAX_EBML_ELEMENT_COUNT_PER_LEVEL = 50000;
   if(depth > MAX_EBML_DEPTH) {
     debug("EBML: Maximum nesting depth exceeded");
     return false;
@@ -108,6 +109,10 @@ bool EBML::MasterElement::read(File &file, int depth)
   const offset_t maxOffset = file.tell() + dataSize;
   std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxOffset))) {
+    if(elements.size() >= MAX_EBML_ELEMENT_COUNT_PER_LEVEL) {
+      debug("EBML: Maximum element count exceeded");
+      return false;
+    }
     if(auto master = dynamic_cast<MasterElement *>(element.get())) {
       if(!master->read(file, depth + 1)) {
         debug("EBML: Invalid MasterElement");
