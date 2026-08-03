@@ -33,6 +33,12 @@
 
 using namespace TagLib;
 
+namespace {
+
+  constexpr int MAX_RIFF_CHUNK_COUNT = 50000;
+
+}
+
 struct Chunk
 {
   ByteVector   name;
@@ -295,6 +301,12 @@ void RIFF::File::read()
 
   // + 8: chunk header at least, fix for additional junk bytes
   while(offset + 8 <= length()) {
+
+    if(d->chunks.size() >= MAX_RIFF_CHUNK_COUNT) {
+      debug("RIFF::File::read() -- Maximum chunk count exceeded");
+      setValid(false);
+      return;
+    }
 
     seek(offset);
     const ByteVector   chnkName = readBlock(4);
