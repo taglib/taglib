@@ -40,6 +40,7 @@ namespace {
     "stbl", "minf", "moof", "traf", "trak",
     "stsd", "stem"
   };
+  constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 50000;
 } // namespace
 
 class MP4::Atom::AtomPrivate
@@ -116,6 +117,13 @@ MP4::Atom::Atom(File *file, int depth)
         return;
       }
       while(file->tell() < d->offset + d->length) {
+        if(d->children.size() >= MAX_MP4_ATOM_COUNT_PER_LEVEL) {
+          debug("MP4: Maximum atom count exceeded");
+          d->children.clear();
+          d->length = 0;
+          file->seek(0, File::End);
+          return;
+        }
         auto child = new MP4::Atom(file, depth + 1);
         d->children.append(child);
         if(child->d->length == 0)
@@ -223,8 +231,6 @@ public:
 MP4::Atoms::Atoms(File *file) :
   d(std::make_unique<AtomsPrivate>())
 {
-  static constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 50000;
-
   d->atoms.setAutoDelete(true);
 
   file->seek(0, File::End);
