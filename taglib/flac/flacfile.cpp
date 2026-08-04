@@ -49,6 +49,7 @@ namespace
   constexpr long MaxPaddingLegnth = 1024 * 1024;
 
   constexpr char LastBlockFlag = '\x80';
+  constexpr unsigned int MAX_FLAC_METADATA_BLOCK_COUNT = 50000;
 }  // namespace
 
 class FLAC::File::FilePrivate
@@ -627,7 +628,14 @@ void FLAC::File::scan()
   nextBlockOffset += 4;
   d->flacStart = nextBlockOffset;
 
+  unsigned int blockCount = 0;
   while(true) {
+
+    if(blockCount++ >= MAX_FLAC_METADATA_BLOCK_COUNT) {
+      debug("FLAC::File::scan() -- Maximum metadata block count exceeded");
+      setValid(false);
+      return;
+    }
 
     seek(nextBlockOffset);
     const ByteVector header = readBlock(4);
