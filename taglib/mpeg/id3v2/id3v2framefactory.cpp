@@ -370,12 +370,13 @@ void FrameFactory::rebuildAggregateFrames(ID3v2::Tag *tag) const
     if(auto tipl =
            dynamic_cast<TextIdentificationFrame *>(tag->frameList("TIPL").front())) {
       if(StringList tiplValues = tipl->toStringList(); tiplValues.size() % 2 == 0) {
-        static StringList tiplKeys;
-        if(tiplKeys.isEmpty()) {
+        static const StringList tiplKeys = [] {
+          StringList keys;
           for(const auto &kv : TextIdentificationFrame::involvedPeopleMap()) {
-            tiplKeys.append(kv.second);
+            keys.append(kv.second);
           }
-        }
+          return keys;
+        }();
         StringList tmclValues;
         for(auto it = tiplValues.begin(); it != tiplValues.end();) {
           const String involvement = *it;

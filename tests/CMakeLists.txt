@@ -179,5 +179,15 @@ IF(BUILD_BINDINGS)
 ENDIF()
 
 ADD_TEST(test_runner test_runner)
+
+# Thread safety tests cover state which is lazily initialized once per process,
+# so they have to run before anything else has touched it
+ADD_EXECUTABLE(test_threadsafety main.cpp test_threadsafety.cpp)
+TARGET_LINK_LIBRARIES(test_threadsafety tag ${CPPUNIT_LIBRARIES})
+FIND_PACKAGE(Threads REQUIRED)
+TARGET_LINK_LIBRARIES(test_threadsafety Threads::Threads)
+
+ADD_TEST(test_threadsafety test_threadsafety)
+
 ADD_CUSTOM_TARGET(check COMMAND ${CMAKE_CTEST_COMMAND} -V
-                  DEPENDS test_runner)
+                  DEPENDS test_runner test_threadsafety)

@@ -160,11 +160,12 @@ namespace
 
 const KeyConversionMap &TextIdentificationFrame::involvedPeopleMap() // static
 {
-  static KeyConversionMap m;
-  if(m.isEmpty()) {
+  static const KeyConversionMap m = [] {
+    KeyConversionMap map;
     for(const auto &[o, t] : involvedPeople)
-      m.insert(t, o);
-  }
+      map.insert(t, o);
+    return map;
+  }();
   return m;
 }
 

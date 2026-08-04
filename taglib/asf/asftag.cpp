@@ -341,12 +341,13 @@ void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, String> reverseKeyMap;
-  if(reverseKeyMap.isEmpty()) {
+  static const Map<String, String> reverseKeyMap = [] {
+    Map<String, String> map;
     for(const auto &[k, t] : keyTranslation) {
-      reverseKeyMap[t] = k;
+      map[t] = k;
     }
-  }
+    return map;
+  }();
 
   const PropertyMap origProps = properties();
   for(const auto &[prop, _] : origProps) {
