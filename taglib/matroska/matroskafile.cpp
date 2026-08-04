@@ -381,13 +381,15 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
     head->skipData(*this);
   }
 
-  // Find the Matroska segment in the file.  The bound is the whole file because
-  // Element::factory() rejects any element whose declared data size runs past its
-  // bound, and a Segment spans practically the whole file.  How much of the segment
-  // is scanned is the read style's business, applied in readLimited() below.
+  offset_t maxScanOffset = fileLength;
+  if(readStyle == Properties::ReadStyle::Fast && maxScanOffset > FAST_SCAN_LIMIT) {
+    maxScanOffset = FAST_SCAN_LIMIT;
+  }
+
+  // Find the Matroska segment in the file.
   const std::unique_ptr<EBML::MkSegment> segment(
     EBML::element_cast<EBML::Element::Id::MkSegment>(
-      EBML::findElement(*this, EBML::Element::Id::MkSegment, fileLength)
+      EBML::findElement(*this, EBML::Element::Id::MkSegment, fileLength, maxScanOffset)
     )
   );
   if(!segment) {
@@ -398,11 +400,11 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   // Read the segment into memory from file
   d->segment = segment->parseSegment();
-  offset_t maxOffset = segment->getDataSize();
-  if (readStyle == Properties::ReadStyle::Fast && maxOffset > FAST_SCAN_LIMIT) {
-    maxOffset = FAST_SCAN_LIMIT;
+  offset_t scanLimit = segment->getDataSize();
+  if(readStyle == Properties::ReadStyle::Fast && scanLimit > FAST_SCAN_LIMIT) {
+    scanLimit = FAST_SCAN_LIMIT;
   }
-  if(!segment->readLimited(*this, maxOffset)) {
+  if(!segment->readLimited(*this, scanLimit)) {
     debug("Failed to read segment");
     setValid(false);
     return;
