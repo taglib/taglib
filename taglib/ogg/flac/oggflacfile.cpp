@@ -32,6 +32,10 @@
 using namespace TagLib;
 using TagLib::FLAC::Properties;
 
+namespace {
+  constexpr int MAX_OGG_FLAC_METADATA_BLOCK_COUNT = 1024;
+}
+
 class Ogg::FLAC::File::FilePrivate
 {
 public:
@@ -223,6 +227,7 @@ void Ogg::FLAC::File::scan()
     return;
 
   int ipacket = 0;
+  int blockCount = 1;
   offset_t overhead = 0;
 
   ByteVector metadataHeader = packet(ipacket);
@@ -287,6 +292,10 @@ void Ogg::FLAC::File::scan()
   // Search through the remaining metadata
 
   while(!lastBlock) {
+    if(blockCount++ >= MAX_OGG_FLAC_METADATA_BLOCK_COUNT) {
+      debug("Ogg::FLAC::File::scan() -- Maximum metadata block count exceeded");
+      return;
+    }
     metadataHeader = packet(++ipacket);
     header = metadataHeader.mid(0, 4);
     if(header.size() != 4) {
