@@ -32,6 +32,7 @@
 #include "oggfile.h"
 #include "vorbisfile.h"
 #include "oggpageheader.h"
+#include "plainfile.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -47,6 +48,7 @@ class TestOGG : public CppUnit::TestFixture
   CPPUNIT_TEST(testDictInterface1);
   CPPUNIT_TEST(testDictInterface2);
   CPPUNIT_TEST(testAudioProperties);
+  CPPUNIT_TEST(testMultiplexed);
   CPPUNIT_TEST(testPageChecksum);
   CPPUNIT_TEST(testPageGranulePosition);
   CPPUNIT_TEST_SUITE_END();
@@ -198,6 +200,45 @@ public:
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMaximum());
     CPPUNIT_ASSERT_EQUAL(112000, f.audioProperties()->bitrateNominal());
     CPPUNIT_ASSERT_EQUAL(0, f.audioProperties()->bitrateMinimum());
+  }
+
+  void testMultiplexed()
+  {
+    // A multiplexed Ogg stream where the Vorbis logical bitstream is not the
+    // first one (it is preceded by a Theora video stream). The Vorbis comment
+    // and audio properties must still be read from the Vorbis stream.
+    ScopedFileCopy copy("multiplex", ".ogg");
+    string filename = copy.fileName();
+    {
+      Vorbis::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag());
+      CPPUNIT_ASSERT_EQUAL(String("Paper Lights"), f.tag()->title());
+      CPPUNIT_ASSERT(f.audioProperties());
+      CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+      CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+
+      f.tag()->setTitle("Changed Title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Vorbis::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("Changed Title"), f.tag()->title());
+
+      f.tag()->setTitle("Paper Lights");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Vorbis::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("Paper Lights"), f.tag()->title());
+    }
+
+    // Check if the modified file is byte for byte equal to the original file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("multiplex.ogg")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
   }
 
   void testPageChecksum()

@@ -105,6 +105,20 @@ namespace TagLib {
        */
       File(IOStream *stream);
 
+      /*!
+       * Restricts packet parsing to the first logical bitstream whose first
+       * packet begins with \a magic.  This is needed for multiplexed Ogg
+       * streams, such as an Ogg Vorbis stream muxed with an Ogg Theora video
+       * stream carrying cover art, where packets of the individual logical
+       * bitstreams are interleaved.  Must be called before any packet is
+       * requested.
+       *
+       * Returns \c true if a matching logical bitstream was found and selected.
+       * If no match is found, the file falls back to the first logical
+       * bitstream in the file.
+       */
+      bool selectStream(const ByteVector &magic);
+
     private:
       /*!
        * Reads the pages from the beginning of the file until enough to compose
