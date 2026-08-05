@@ -52,6 +52,8 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultiplePictures);
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testPropertiesAllSupported);
+  CPPUNIT_TEST(testPropertiesRealFile);
+  CPPUNIT_TEST(testCaseInsensitiveAttributeNames);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
@@ -389,6 +391,55 @@ public:
         CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
       }
       CPPUNIT_ASSERT(tags == properties);
+    }
+  }
+
+  void testPropertiesRealFile()
+  {
+    ASF::File f(TEST_FILE_PATH_C("real_example.wma"));
+
+    PropertyMap tags = f.properties();
+
+    CPPUNIT_ASSERT_EQUAL(StringList("Wake Up, Get Up, Get Out There"), tags["TITLE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Shoji Meguro"), tags["ARTIST"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Persona 5: Sounds of Rebellion"), tags["ALBUM"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("-8.27 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("1.000000"), tags["REPLAYGAIN_TRACK_PEAK"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("131452413620000000"), tags["ENCODINGTIME"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("{D1607DBC-E323-4BE2-86A1-48A42A28441E}"),
+                         tags["MEDIAPRIMARYCLASSID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("32673"), tags["PEAKVALUE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("8315"), tags["AVERAGELEVEL"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["ISVBR"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("12.0.15063.332"), tags["WMFSDKVERSION"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("0.0.0.0000"), tags["WMFSDKNEEDED"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("User Feedback"), tags["PROVIDER"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("L1"), tags["DEVICECONFORMANCETEMPLATE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("2.112"), tags["MEDIAFOUNDATIONVERSION"]);
+  }
+
+  void testCaseInsensitiveAttributeNames()
+  {
+    ScopedFileCopy copy("silence-1", ".wma");
+    {
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->setAttribute("REPLAYGAIN_TRACK_GAIN", String("-6.00 dB"));
+      f.save();
+    }
+    {
+      ASF::File f(copy.fileName().c_str());
+      PropertyMap tags = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("-6.00 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
+
+      // Replacing the value must not leave a second, differently cased
+      // attribute behind.
+      tags["REPLAYGAIN_TRACK_GAIN"] = StringList("-7.00 dB");
+      f.setProperties(tags);
+      CPPUNIT_ASSERT(!f.tag()->contains("REPLAYGAIN_TRACK_GAIN"));
+      CPPUNIT_ASSERT_EQUAL(String("-7.00 dB"),
+        f.tag()->attribute("replaygain_track_gain").front().toString());
+      tags = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("-7.00 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
     }
   }
 

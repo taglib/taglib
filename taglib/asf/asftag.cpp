@@ -26,6 +26,7 @@
 #include "asftag.h"
 
 #include <array>
+#include <string>
 #include <utility>
 
 #include "tpropertymap.h"
@@ -282,16 +283,58 @@ namespace
     std::pair("MusicIP/PUID", "MUSICIP_PUID"),
     std::pair("Acoustid/Id", "ACOUSTID_ID"),
     std::pair("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT"),
+    std::pair("replaygain_track_gain", "REPLAYGAIN_TRACK_GAIN"),
+    std::pair("replaygain_track_peak", "REPLAYGAIN_TRACK_PEAK"),
+    std::pair("replaygain_album_gain", "REPLAYGAIN_ALBUM_GAIN"),
+    std::pair("replaygain_album_peak", "REPLAYGAIN_ALBUM_PEAK"),
+    std::pair("WM/MediaPrimaryClassID", "MEDIAPRIMARYCLASSID"),
+    std::pair("WM/Provider", "PROVIDER"),
+    std::pair("WM/UniqueFileIdentifier", "UNIQUEFILEIDENTIFIER"),
+    std::pair("WMFSDKVersion", "WMFSDKVERSION"),
+    std::pair("WMFSDKNeeded", "WMFSDKNEEDED"),
+    std::pair("DeviceConformanceTemplate", "DEVICECONFORMANCETEMPLATE"),
+    std::pair("MediaFoundationVersion", "MEDIAFOUNDATIONVERSION"),
+    std::pair("IsVBR", "ISVBR"),
+    std::pair("PeakValue", "PEAKVALUE"),
+    std::pair("AverageLevel", "AVERAGELEVEL"),
   };
 
+  // Attribute names are matched case-insensitively; taggers disagree on the
+  // casing of names not defined by Windows Media (e.g. replaygain_track_gain).
   String translateKey(const String &key)
   {
+    const String upperKey = key.upper();
     for(const auto &[k, t] : keyTranslation) {
-      if(key == k)
+      if(upperKey == String(k).upper())
         return t;
     }
 
     return String();
+  }
+
+  void eraseAttribute(ASF::AttributeListMap &attributeListMap, const String &name)
+  {
+    const String upperName = name.upper();
+    StringList keys;
+    for(const auto &[k, attributes] : std::as_const(attributeListMap)) {
+      if(k.upper() == upperName)
+        keys.append(k);
+    }
+    for(const auto &k : keys)
+      attributeListMap.erase(k);
+  }
+
+  String attributeToString(const ASF::Attribute &attr)
+  {
+    switch(attr.type()) {
+    case ASF::Attribute::WordType:
+    case ASF::Attribute::DWordType:
+    case ASF::Attribute::QWordType:
+    case ASF::Attribute::BoolType:
+      return String(std::to_string(attr.toULongLong()));
+    default:
+      return attr.toString();
+    }
   }
 }  // namespace
 
@@ -315,14 +358,12 @@ PropertyMap ASF::Tag::properties() const
   for(const auto &[k, attributes] : std::as_const(d->attributeListMap)) {
     if(const String key = translateKey(k); !key.isEmpty()) {
       for(const auto &attr : attributes) {
-        if(key == "TRACKNUMBER") {
-          if(attr.type() == ASF::Attribute::DWordType)
-            props.insert(key, String::number(attr.toUInt()));
-          else
-            props.insert(key, attr.toString());
-        }
-        else {
-          props.insert(key, attr.toString());
+        // The same attribute can occur in both the extended content
+        // description object and the metadata (library) object, skip exact
+        // duplicates (e.g. a second identical IsVBR).
+        if(const String value = attributeToString(attr);
+           !props.value(key).contains(value)) {
+          props.insert(key, value);
         }
       }
     }
@@ -365,7 +406,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
         d->copyright.clear();
       }
       else {
-        d->attributeListMap.erase(reverseKeyMap[prop]);
+        eraseAttribute(d->attributeListMap, reverseKeyMap[prop]);
       }
     }
   }
@@ -374,7 +415,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   for(const auto &[prop, attributes] : props) {
     if(reverseKeyMap.contains(prop)) {
       String name = reverseKeyMap[prop];
-      removeItem(name);
+      eraseAttribute(d->attributeListMap, name);
       for(const auto &attr : attributes) {
         addAttribute(name, attr);
       }
