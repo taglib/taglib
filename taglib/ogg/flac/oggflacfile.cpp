@@ -294,7 +294,6 @@ void Ogg::FLAC::File::scan()
   while(!lastBlock) {
     if(blockCount++ >= MAX_OGG_FLAC_METADATA_BLOCK_COUNT) {
       debug("Ogg::FLAC::File::scan() -- Maximum metadata block count exceeded");
-      setValid(false);
       return;
     }
     metadataHeader = packet(++ipacket);
