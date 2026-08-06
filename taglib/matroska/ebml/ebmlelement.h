@@ -139,6 +139,7 @@ namespace TagLib
     class MasterElement;
     class UIntElement;
     class BinaryElement;
+    class DeferredBinaryElement;
     class FloatElement;
     class MkSegment;
     class MkInfo;
@@ -201,7 +202,9 @@ namespace TagLib
     template <> struct GetElementTypeById<Element::Id::MkCueCodecState> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkCueRefTime> { using type = UIntElement; };
     template <> struct GetElementTypeById<Element::Id::MkTagsLanguageDefault> { using type = UIntElement; };
-    template <> struct GetElementTypeById<Element::Id::MkAttachedFileData> { using type = BinaryElement; };
+    // The data of an attached file is only loaded when it is requested,
+    // see Matroska::File::attachments().
+    template <> struct GetElementTypeById<Element::Id::MkAttachedFileData> { using type = DeferredBinaryElement; };
     template <> struct GetElementTypeById<Element::Id::MkSeekID> { using type = BinaryElement; };
     template <> struct GetElementTypeById<Element::Id::MkTagBinary> { using type = BinaryElement; };
     template <> struct GetElementTypeById<Element::Id::MkCodecState> { using type = BinaryElement; };

@@ -248,6 +248,7 @@ if(WITH_MATROSKA)
   )
   set(tag_PRIVATE_HDRS ${tag_PRIVATE_HDRS}
     matroska/ebml/ebmlbinaryelement.h
+    matroska/ebml/ebmldeferredbinaryelement.h
     matroska/ebml/ebmlelement.h
     matroska/ebml/ebmlmasterelement.h
     matroska/ebml/ebmlmkattachments.h
@@ -481,6 +482,7 @@ if(WITH_MATROSKA)
 
   set(ebml_SRCS
     matroska/ebml/ebmlbinaryelement.cpp
+    matroska/ebml/ebmldeferredbinaryelement.cpp
     matroska/ebml/ebmlelement.cpp
     matroska/ebml/ebmlmasterelement.cpp
     matroska/ebml/ebmlmkattachments.cpp

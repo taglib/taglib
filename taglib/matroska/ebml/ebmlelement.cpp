@@ -22,6 +22,7 @@
 #include "ebmlvoidelement.h"
 #include "ebmlmasterelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmldeferredbinaryelement.h"
 #include "ebmlfloatelement.h"
 #include "ebmlmkseekhead.h"
 #include "ebmlmksegment.h"
