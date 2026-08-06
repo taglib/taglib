@@ -22,6 +22,7 @@
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmldeferredbinaryelement.h"
 #include "matroskaattachments.h"
 #include "matroskaattachedfile.h"
 
@@ -55,14 +56,14 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
     const String *filename = nullptr;
     const String *description = nullptr;
     const String *mediaType = nullptr;
-    const ByteVector *data = nullptr;
+    const DeferredBinaryElement *data = nullptr;
     Matroska::AttachedFile::UID uid = 0;
     const auto attachedFile = element_cast<Id::MkAttachedFile>(element);
     for(const auto &attachedFileChild : *attachedFile) {
       if(const Id id = attachedFileChild->getId(); id == Id::MkAttachedFileName)
         filename = &element_cast<Id::MkAttachedFileName>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileData)
-        data = &element_cast<Id::MkAttachedFileData>(attachedFileChild)->getValue();
+        data = element_cast<Id::MkAttachedFileData>(attachedFileChild);
       else if(id == Id::MkAttachedFileDescription)
         description = &element_cast<Id::MkAttachedFileDescription>(attachedFileChild)->getValue();
       else if(id == Id::MkAttachedFileMediaType)
@@ -73,9 +74,19 @@ std::unique_ptr<Matroska::Attachments> EBML::MkAttachments::parse() const
     if(!(filename && data))
       continue;
 
-    attachments->addAttachedFile(Matroska::AttachedFile(
-      *data, *filename, mediaType ? *mediaType : String(),
-      uid, description ? *description : String()));
+    const String mediaTypeValue = mediaType ? *mediaType : String();
+    const String descriptionValue = description ? *description : String();
+    if(data->isDeferred()) {
+      // The data has been left in the file, it is loaded when the attachments
+      // are requested, see Matroska::File::attachments().
+      attachments->addAttachedFile(Matroska::AttachedFile(
+        data->getDataOffset(), data->getDataSize(), *filename, mediaTypeValue,
+        uid, descriptionValue));
+    }
+    else {
+      attachments->addAttachedFile(Matroska::AttachedFile(
+        data->getValue(), *filename, mediaTypeValue, uid, descriptionValue));
+    }
   }
   return attachments;
 }

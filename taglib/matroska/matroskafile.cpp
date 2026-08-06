@@ -47,12 +47,15 @@ using namespace TagLib;
 class Matroska::File::FilePrivate
 {
 public:
-  FilePrivate() = default;
+  explicit FilePrivate(TagLib::File *file) : file(file) {}
   ~FilePrivate() = default;
 
   FilePrivate(const FilePrivate &) = delete;
   FilePrivate &operator=(const FilePrivate &) = delete;
 
+  // The file the elements have been read from, used to load the data of
+  // attached files on demand.
+  TagLib::File *file;
   std::unique_ptr<Tag> tag;
   std::unique_ptr<Attachments> attachments;
   std::unique_ptr<Chapters> chapters;
@@ -79,7 +82,7 @@ bool Matroska::File::isSupported(IOStream *stream)
 Matroska::File::File(FileName file, bool readProperties,
                      Properties::ReadStyle readStyle) :
   TagLib::File(file),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(this))
 {
   if(!isOpen()) {
     debug("Failed to open matroska file");
@@ -92,7 +95,7 @@ Matroska::File::File(FileName file, bool readProperties,
 Matroska::File::File(IOStream *stream, bool readProperties,
                      Properties::ReadStyle readStyle) :
   TagLib::File(stream),
-  d(std::make_unique<FilePrivate>())
+  d(std::make_unique<FilePrivate>(this))
 {
   if(!isOpen()) {
     debug("Failed to open matroska file");
@@ -246,6 +249,7 @@ List<VariantMap> Matroska::File::complexProperties(const String &key) const
     }
   }
   if(d->attachments) {
+    loadAttachedFileData();
     const auto &attachedFiles = d->attachments->attachedFileList();
     for(const auto &attachedFile : attachedFiles) {
       if(keyMatchesAttachedFile(key, attachedFile)) {
@@ -352,6 +356,7 @@ Matroska::Attachments *Matroska::File::attachments(bool create) const
 {
   if(!d->attachments && create)
     d->attachments = std::make_unique<Attachments>();
+  loadAttachedFileData();
   return d->attachments.get();
 }
 
@@ -360,6 +365,42 @@ Matroska::Chapters *Matroska::File::chapters(bool create) const
   if(!d->chapters && create)
     d->chapters = std::make_unique<Chapters>();
   return d->chapters.get();
+}
+
+void Matroska::File::loadAttachedFileData() const
+{
+  if(!d->attachments)
+    return;
+
+  // Check with the const list first, getting the mutable list would mark the
+  // attachments as to be rendered again.
+  const auto &files = d->attachments->attachedFileList();
+  if(std::none_of(files.begin(), files.end(),
+                  [](const AttachedFile &file) { return file.isDataDeferred(); }))
+    return;
+
+  bool positionSaved = false;
+  offset_t position = 0;
+  for(auto &attachedFile : d->attachments->attachedFiles()) {
+    if(!attachedFile.isDataDeferred())
+      continue;
+    if(!positionSaved) {
+      position = d->file->tell();
+      positionSaved = true;
+    }
+    const auto dataSize = attachedFile.deferredDataSize();
+    d->file->seek(attachedFile.deferredDataOffset());
+    ByteVector data = d->file->readBlock(dataSize);
+    if(static_cast<offset_t>(data.size()) != dataSize) {
+      debug("Failed to read data of attached file");
+    }
+    // Mark the data as loaded even if it is incomplete, retrying would fail
+    // just the same and the file position is no longer known afterwards.
+    attachedFile.setLoadedData(data);
+  }
+  if(positionSaved) {
+    d->file->seek(position);
+  }
 }
 
 void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
@@ -381,15 +422,15 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
     head->skipData(*this);
   }
 
-  offset_t maxOffset = fileLength;
-  if (readStyle == Properties::ReadStyle::Fast && maxOffset > FAST_SCAN_LIMIT) {
-    maxOffset = FAST_SCAN_LIMIT;
+  offset_t maxScanOffset = fileLength;
+  if(readStyle == Properties::ReadStyle::Fast && maxScanOffset > FAST_SCAN_LIMIT) {
+    maxScanOffset = FAST_SCAN_LIMIT;
   }
 
-  // Find the Matroska segment in the file
+  // Find the Matroska segment in the file.
   const std::unique_ptr<EBML::MkSegment> segment(
     EBML::element_cast<EBML::Element::Id::MkSegment>(
-      EBML::findElement(*this, EBML::Element::Id::MkSegment, maxOffset)
+      EBML::findElement(*this, EBML::Element::Id::MkSegment, fileLength, maxScanOffset)
     )
   );
   if(!segment) {
@@ -400,11 +441,11 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
   // Read the segment into memory from file
   d->segment = segment->parseSegment();
-  maxOffset = segment->getDataSize();
-  if (readStyle == Properties::ReadStyle::Fast && maxOffset > FAST_SCAN_LIMIT) {
-    maxOffset = FAST_SCAN_LIMIT;
+  offset_t scanLimit = segment->getDataSize();
+  if(readStyle == Properties::ReadStyle::Fast && scanLimit > FAST_SCAN_LIMIT) {
+    scanLimit = FAST_SCAN_LIMIT;
   }
-  if(!segment->readLimited(*this, maxOffset)) {
+  if(!segment->readLimited(*this, scanLimit)) {
     debug("Failed to read segment");
     setValid(false);
     return;
@@ -462,6 +503,11 @@ bool Matroska::File::save(WriteStyle writeStyle)
     debug("Matroska::File::save() -- File is not valid.");
     return false;
   }
+
+  // The attachments are rendered from the attached files, so the data of
+  // attached files which have not been requested has to be loaded now, before
+  // the file is modified, otherwise it would be lost.
+  loadAttachedFileData();
 
   // Do not create new attachments, chapters or tags and corresponding
   // seek head entries if only empty objects were created.

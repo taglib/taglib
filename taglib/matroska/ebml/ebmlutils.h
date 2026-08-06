@@ -31,8 +31,22 @@ namespace TagLib {
   class ByteVector;
 
   namespace EBML {
-    std::unique_ptr<Element> findElement(File &file, Element::Id id, offset_t maxOffset);
-    std::unique_ptr<Element> findNextElement(File &file, offset_t maxOffset);
+    /*!
+     * Find element with \a id in \a file starting at current file offset.
+     * The end of the element must be before \a maxOffset.
+     * The begin of the element must not be after \a maxScanOffset
+     * (\a maxOffset if not given).
+     */
+    std::unique_ptr<Element> findElement(
+      File &file, Element::Id id, offset_t maxOffset, offset_t maxScanOffset = -1);
+    /*!
+     * Find element in \a file at current file offset.
+     * The end of the element must be before \a maxOffset.
+     * The begin of the element must not be after \a maxScanOffset
+     * (\a maxOffset if not given).
+     */
+    std::unique_ptr<Element> findNextElement(
+      File &file, offset_t maxOffset, offset_t maxScanOffset = -1);
 
     template <int maxSizeLength>
     unsigned int VINTSizeLength(uint8_t firstByte);

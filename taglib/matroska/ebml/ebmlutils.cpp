@@ -30,10 +30,13 @@
 
 using namespace TagLib;
 
-std::unique_ptr<EBML::Element> EBML::findElement(File &file, Element::Id id, offset_t maxOffset)
+std::unique_ptr<EBML::Element> EBML::findElement(
+  File &file, Element::Id id, offset_t maxOffset, offset_t maxScanOffset)
 {
+  if(maxScanOffset < 0)
+    maxScanOffset = maxOffset;
   std::unique_ptr<Element> element;
-  while(file.tell() < maxOffset) {
+  while(file.tell() < maxScanOffset) {
     element = Element::factory(file, maxOffset);
     if(!element || element->getId() == id)
       return element;
@@ -43,9 +46,12 @@ std::unique_ptr<EBML::Element> EBML::findElement(File &file, Element::Id id, off
   return element;
 }
 
-std::unique_ptr<EBML::Element> EBML::findNextElement(File &file, offset_t maxOffset)
+std::unique_ptr<EBML::Element> EBML::findNextElement(
+  File &file, offset_t maxOffset, offset_t maxScanOffset)
 {
-  return file.tell() < maxOffset ? Element::factory(file, maxOffset) : nullptr;
+  if(maxScanOffset < 0)
+    maxScanOffset = maxOffset;
+  return file.tell() < maxScanOffset ? Element::factory(file, maxOffset) : nullptr;
 }
 
 template <int maxSizeLength>
