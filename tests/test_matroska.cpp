@@ -135,11 +135,32 @@
 #include "matroskachapters.h"
 #include "matroskasimpletag.h"
 #include "plainfile.h"
+#include "tfilestream.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
 using namespace std;
 using namespace TagLib;
+
+namespace {
+
+  //! File stream counting the number of bytes read from the file.
+  class CountingFileStream : public FileStream
+  {
+  public:
+    explicit CountingFileStream(FileName name) : FileStream(name, true) {}
+
+    ByteVector readBlock(size_t length) override
+    {
+      ByteVector data = FileStream::readBlock(length);
+      bytesRead += data.size();
+      return data;
+    }
+
+    size_t bytesRead = 0;
+  };
+
+}
 
 class TestMatroska : public CppUnit::TestFixture
 {
@@ -162,6 +183,8 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveTypesReclaimVoid);
   CPPUNIT_TEST(testUnknownSizeSegment);
   CPPUNIT_TEST(testFastReadStyleLargeSegment);
+  CPPUNIT_TEST(testAttachedFileDataReadOnDemand);
+  CPPUNIT_TEST(testSaveUnrequestedAttachedFileData);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1813,6 +1836,75 @@ public:
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT(f.tag(false));
       CPPUNIT_ASSERT_EQUAL(String("handbrake"), f.tag()->title());
+    }
+  }
+
+  void testAttachedFileDataReadOnDemand()
+  {
+    ScopedFileCopy copy("no-tags", ".mka");
+    string newname = copy.fileName();
+
+    // The number of bytes read stays the same for any size of attached file.
+    for(const unsigned int dataSize : {64U * 1024U, 512U * 1024U}) {
+      const ByteVector attachmentData(dataSize, 'x');
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        auto attachments = f.attachments(true);
+        attachments->clear();
+        attachments->addAttachedFile(Matroska::AttachedFile(
+          attachmentData, "cover.jpg", "image/jpeg", 0xa7ac, "Cover"));
+        CPPUNIT_ASSERT(f.save());
+      }
+
+      CountingFileStream stream(newname.c_str());
+      Matroska::File f(&stream, true, AudioProperties::Fast);
+      CPPUNIT_ASSERT(f.isValid());
+      // Only the elements around the data of the attached file were read.
+      CPPUNIT_ASSERT(stream.bytesRead < 4096);
+
+      const size_t bytesReadWithoutData = stream.bytesRead;
+      auto attachments = f.attachments(false);
+      CPPUNIT_ASSERT(attachments);
+      const auto &attachedFiles = attachments->attachedFileList();
+      CPPUNIT_ASSERT_EQUAL(1U, attachedFiles.size());
+      CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), attachedFiles.front().fileName());
+      CPPUNIT_ASSERT_EQUAL(String("Cover"), attachedFiles.front().description());
+      CPPUNIT_ASSERT_EQUAL(0xa7acULL, attachedFiles.front().uid());
+      CPPUNIT_ASSERT_EQUAL(attachmentData, attachedFiles.front().data());
+      CPPUNIT_ASSERT(stream.bytesRead >= bytesReadWithoutData + dataSize);
+    }
+  }
+
+  void testSaveUnrequestedAttachedFileData()
+  {
+    ScopedFileCopy copy("no-tags", ".mka");
+    string newname = copy.fileName();
+    const ByteVector attachmentData(64 * 1024, 'x');
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.attachments(true)->addAttachedFile(Matroska::AttachedFile(
+        attachmentData, "cover.jpg", "image/jpeg", 0xa7ac, "Cover"));
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      // Save without ever requesting the attachments.
+      Matroska::File f(newname.c_str(), true, AudioProperties::Fast);
+      CPPUNIT_ASSERT(f.isValid());
+      f.tag(true)->setTitle("Test title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("Test title"), f.tag(true)->title());
+      auto attachments = f.attachments(false);
+      CPPUNIT_ASSERT(attachments);
+      const auto &attachedFiles = attachments->attachedFileList();
+      CPPUNIT_ASSERT_EQUAL(1U, attachedFiles.size());
+      CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), attachedFiles.front().fileName());
+      CPPUNIT_ASSERT_EQUAL(attachmentData, attachedFiles.front().data());
     }
   }
 

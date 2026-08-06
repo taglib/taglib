@@ -30,12 +30,21 @@ public:
     const String &mediaType, UID uid, const String &description) :
     fileName(fileName), description(description), mediaType(mediaType),
     data(data), uid(uid) {}
+  AttachedFilePrivate(offset_t dataOffset, offset_t dataSize,
+    const String &fileName, const String &mediaType, UID uid,
+    const String &description) :
+    fileName(fileName), description(description), mediaType(mediaType),
+    uid(uid), dataOffset(dataOffset), dataSize(dataSize), dataDeferred(true) {}
   ~AttachedFilePrivate() = default;
   String fileName;
   String description;
   String mediaType;
   ByteVector data;
   UID uid = 0;
+  // Position of the data in the file, valid while dataDeferred is true.
+  offset_t dataOffset = 0;
+  offset_t dataSize = 0;
+  bool dataDeferred = false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -46,6 +55,14 @@ Matroska::AttachedFile::AttachedFile(const ByteVector &data,
   const String &fileName, const String &mediaType, UID uid,
   const String &description) :
   d(std::make_unique<AttachedFilePrivate>(data, fileName, mediaType, uid, description))
+{
+}
+
+Matroska::AttachedFile::AttachedFile(offset_t dataOffset, offset_t dataSize,
+  const String &fileName, const String &mediaType, UID uid,
+  const String &description) :
+  d(std::make_unique<AttachedFilePrivate>(dataOffset, dataSize, fileName,
+                                          mediaType, uid, description))
 {
 }
 
@@ -96,4 +113,31 @@ const ByteVector &Matroska::AttachedFile::data() const
 Matroska::AttachedFile::UID Matroska::AttachedFile::uid() const
 {
   return d->uid;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// private members
+////////////////////////////////////////////////////////////////////////////////
+
+bool Matroska::AttachedFile::isDataDeferred() const
+{
+  return d->dataDeferred;
+}
+
+offset_t Matroska::AttachedFile::deferredDataOffset() const
+{
+  return d->dataOffset;
+}
+
+offset_t Matroska::AttachedFile::deferredDataSize() const
+{
+  return d->dataSize;
+}
+
+void Matroska::AttachedFile::setLoadedData(const ByteVector &data)
+{
+  d->data = data;
+  d->dataDeferred = false;
+  d->dataOffset = 0;
+  d->dataSize = 0;
 }

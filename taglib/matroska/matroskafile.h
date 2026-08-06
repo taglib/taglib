@@ -160,6 +160,11 @@ namespace TagLib::Matroska {
      * attachments.
      * If \a create is \c true it will create attachments if none exist and
      * returns a valid pointer.
+     *
+     * The data of the attached files is read from the file here, reading the
+     * file itself only registers where the data is stored.  Applications
+     * which are not interested in the attached files therefore do not have to
+     * pay for reading them.
      */
     Attachments *attachments(bool create = false) const;
 
@@ -184,6 +189,13 @@ namespace TagLib::Matroska {
 
   private:
     void read(bool readProperties, Properties::ReadStyle readStyle);
+    /*!
+     * Read the data of the attached files which has been left in the file
+     * while reading, see EBML::DeferredBinaryElement.  This is done when the
+     * attachments are requested and before saving, so that an attachment
+     * which has never been requested is not lost when the file is written.
+     */
+    void loadAttachedFileData() const;
     class FilePrivate;
     friend class Properties;
     TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
