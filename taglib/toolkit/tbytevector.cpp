@@ -432,8 +432,7 @@ int ByteVector::rfind(const ByteVector &pattern, unsigned int offset, int byteAl
 
 bool ByteVector::containsAt(const ByteVector &pattern, unsigned int offset, unsigned int patternOffset, unsigned int patternLength) const
 {
-  if(pattern.size() < patternLength)
-    patternLength = pattern.size();
+  patternLength = std::min(pattern.size(), patternLength);
 
   // do some sanity checking -- all of these things are needed for the search to be valid
   const unsigned int compareLength = patternLength - patternOffset;
