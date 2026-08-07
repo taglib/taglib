@@ -218,12 +218,13 @@ void RIFF::Info::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap RIFF::Info::Tag::setProperties(const PropertyMap &props)
 {
-  static Map<String, ByteVector> idForPropertyKey;
-  if(idForPropertyKey.isEmpty()) {
+  static const Map<String, ByteVector> idForPropertyKey = [] {
+    Map<String, ByteVector> map;
     for(const auto &[id, key] : propertyKeyForId) {
-      idForPropertyKey[key] = id;
+      map[key] = id;
     }
-  }
+    return map;
+  }();
 
   const PropertyMap origProps = properties();
   for(const auto &[key, _] : origProps) {
