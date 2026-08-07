@@ -40,6 +40,7 @@
 #include "mpegfile.h"
 #include "tbytevector.h"
 #include "tbytevectorstream.h"
+#include "tstringlist.h"
 #include "textidentificationframe.h"
 #include "tpropertymap.h"
 
@@ -112,19 +113,32 @@ public:
 
   static ByteVector id3v23TagWithIpls()
   {
-    const ByteVector involvements(
-      "\x00"                          // Latin-1 text encoding
-      "Guitar\x00Artist 1\x00"
-      "Drums\x00Artist 2\x00"
-      "Producer\x00Artist 3\x00"
-      "Engineer\x00Artist 4", 67);
+    // Involvement/involvee pairs. "Producer" and "Engineer" are supported by
+    // the TIPL property map, "Guitar" and "Drums" are not, so
+    // rebuildAggregateFrames() moves the latter pairs into a new TMCL frame.
+    // Assembled rather than written as one escaped literal: in "\x00Artist",
+    // the escape would swallow the 'A' as a third hex digit.
+    const StringList involvements {
+      "Guitar", "Artist 1",
+      "Drums", "Artist 2",
+      "Producer", "Artist 3",
+      "Engineer", "Artist 4"
+    };
+
+    ByteVector fields(1, '\0');   // Latin-1 text encoding
+    for(unsigned int i = 0; i < involvements.size(); ++i) {
+      if(i > 0) {
+        fields.append('\0');      // NUL separated, no trailing NUL
+      }
+      fields.append(involvements[i].data(String::Latin1));
+    }
 
     const ByteVector frame = ByteVector("IPLS")
-      + ByteVector::fromUInt(involvements.size())
-      + ByteVector("\x00\x00", 2)
-      + involvements;
+      + ByteVector::fromUInt(fields.size())
+      + ByteVector(2, '\0')       // frame flags
+      + fields;
 
-    return ByteVector("ID3\x03\x00\x00", 6)
+    return ByteVector("ID3") + ByteVector(1, '\x03') + ByteVector(2, '\0')
       + ID3v2::SynchData::fromUInt(frame.size())
       + frame;
   }
