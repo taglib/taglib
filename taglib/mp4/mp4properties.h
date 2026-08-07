@@ -27,6 +27,7 @@
 #define TAGLIB_MP4PROPERTIES_H
 
 #include "taglib_export.h"
+#include "tstring.h"
 #include "audioproperties.h"
 
 namespace TagLib {
@@ -41,7 +42,12 @@ namespace TagLib {
       enum Codec {
         Unknown = 0,
         AAC,
-        ALAC
+        ALAC,
+        AC3,
+        EAC3,
+        FLAC,
+        DTS,
+        Opus
       };
 
       Properties(File *file, const Atoms *atoms, ReadStyle style = Average);
@@ -86,6 +92,13 @@ namespace TagLib {
        * Returns the codec used in the file.
        */
       Codec codec() const;
+
+      /*!
+       * Returns the four character code identifying the codec, as found in the
+       * sample description atom (e.g. "mp4a", "alac", "ec-3").  This is useful
+       * for codecs which are not represented by a value of the Codec enum.
+       */
+      String codecId() const;
 
     private:
       void read(File *file, const Atoms *atoms);

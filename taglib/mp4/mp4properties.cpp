@@ -27,6 +27,7 @@
 
 #include "tdebug.h"
 #include "tstring.h"
+#include "tmap.h"
 #include "mp4file.h"
 #include "mp4atom.h"
 
@@ -63,6 +64,7 @@ public:
   int bitsPerSample { 0 };
   bool encrypted { false };
   Codec codec { MP4::Properties::Unknown };
+  String codecId;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -118,6 +120,12 @@ MP4::Properties::Codec
 MP4::Properties::codec() const
 {
   return d->codec;
+}
+
+String
+MP4::Properties::codecId() const
+{
+  return d->codecId;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -205,6 +213,12 @@ MP4::Properties::read(File *file, const Atoms *atoms)
 
   file->seek(atom->offset());
   data = file->readBlock(atom->length());
+
+  // The four character code of the first sample entry identifies the codec and
+  // is exposed directly, also for codecs not represented by the Codec enum.
+  if(data.size() >= 24)
+    d->codecId = String(data.mid(20, 4));
+
   if(data.containsAt("mp4a", 20)) {
     d->codec         = AAC;
     d->channels      = data.toShort(40U);
@@ -248,6 +262,53 @@ MP4::Properties::read(File *file, const Atoms *atoms)
         d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
       }
     }
+  }
+  else if(data.size() >= 50) {
+    // Other audio codecs use the same AudioSampleEntry layout as above, so the
+    // basic properties can be read from the same offsets.  The nominal bitrate
+    // is not parsed from the codec specific configuration box; it is estimated
+    // from the audio data size and the duration.
+    static const Map<ByteVector, Codec> codecMap {
+      {"ac-3", AC3},
+      {"ec-3", EAC3},
+      {"fLaC", FLAC},
+      {"Opus", Opus},
+      {"dtsc", DTS},
+      {"dtse", DTS},
+      {"dtsh", DTS},
+      {"dtsl", DTS}
+    };
+    d->codec         = codecMap.value(data.mid(20, 4), Unknown);
+    d->channels      = data.toShort(40U);
+    d->bitsPerSample = data.toShort(42U);
+    d->sampleRate    = data.toUInt(46U);
+
+    if(d->codec == FLAC) {
+      // The AudioSampleEntry sample rate field is only 16 bits wide, so read
+      // the exact values from the FLAC STREAMINFO metadata block in the 'dfLa'
+      // box. This is required for high resolution files (e.g. 96 kHz, 24 bit).
+      const auto dflaPos = data.find("dfLa");
+      if(const auto dflaOffset = static_cast<unsigned int>(dflaPos);
+         dflaPos >= 0 && data.size() >= dflaOffset + 26 &&
+         (static_cast<unsigned char>(data.at(dflaOffset + 8)) & 0x7f) == 0) {
+        const auto streamInfo = data.toUInt(dflaOffset + 22);
+        if(const auto sampleRate = streamInfo >> 12; sampleRate != 0)
+          d->sampleRate = sampleRate;
+        d->channels      = ((streamInfo >> 9) & 0x7) + 1;
+        d->bitsPerSample = ((streamInfo >> 4) & 0x1f) + 1;
+      }
+    }
+    else if(d->codec == EAC3) {
+      // The 'dec3' box (EC3SpecificBox) starts with the nominal data rate in
+      // kbit/s as a 13 bit value.
+      const auto dec3Pos = data.find("dec3");
+      if(const auto dec3Offset = static_cast<unsigned int>(dec3Pos);
+         dec3Pos >= 0 && data.size() >= dec3Offset + 6)
+        d->bitrate = data.toUShort(dec3Offset + 4) >> 3;
+    }
+
+    if(d->bitrate == 0 && d->length > 0)
+      d->bitrate = static_cast<int>(calculateMdatLength(atoms->atoms()) * 8 / d->length);
   }
 
   if(atom->find("drms")) {
