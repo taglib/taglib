@@ -95,13 +95,13 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
   MasterElement *pendingPaddingTarget = nullptr;
   offset_t accumulatedPadding = 0;
   std::unique_ptr<Element> element;
-  while((element = findNextElement(file, maxScanOffset))) {
+  while((element = findNextElement(file, maxOffset, maxScanOffset))) {
     if(const Id id = element->getId(); id == Id::MkSeekHead) {
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
       if(!seekHead->read(file))
         return false;
       // We have a seek head, let's use it for faster access to the other elements
-      if(const auto elementAfterSeekHead = findNextElement(file, maxScanOffset);
+      if(const auto elementAfterSeekHead = findNextElement(file, maxOffset, maxScanOffset);
          elementAfterSeekHead && elementAfterSeekHead->getId() == Id::VoidElement)
         seekHead->setPadding(elementAfterSeekHead->getSize());
       const offset_t segDataOffset = segmentDataOffset();

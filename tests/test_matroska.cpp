@@ -161,6 +161,7 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveTypesNoTrailingVoid);
   CPPUNIT_TEST(testSaveTypesReclaimVoid);
   CPPUNIT_TEST(testUnknownSizeSegment);
+  CPPUNIT_TEST(testFastReadStyleLargeSegment);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1775,6 +1776,43 @@ public:
 
       // All styles must accommodate the larger data: file must be larger than round1
       CPPUNIT_ASSERT(sizeAfterRound4 > sizeAfterRound1);
+    }
+  }
+
+  void testFastReadStyleLargeSegment()
+  {
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    string newname = copy.fileName();
+
+    // Grow the segment past FAST_SCAN_LIMIT, as every real world file is.
+    {
+      PlainFile file(newname.c_str());
+      ByteVector fileData = file.readAll();
+      CPPUNIT_ASSERT_EQUAL(3412U, fileData.size());
+
+      // Void element, appended to the segment so the existing seek positions still hold.
+      const unsigned int voidDataSize = 1024 * 1024;
+      ByteVector voidElement("\xec", 1);
+      voidElement.append(ByteVector::fromULongLong(0x0100000000000000ULL | voidDataSize));
+      voidElement.append(ByteVector(voidDataSize, '\0'));
+
+      // Segment: 4 byte ID at 0x28, 8 byte size VINT at 0x2c, data from 0x34 to EOF.
+      ByteVector newData = fileData.mid(0, 0x2c);
+      newData.append(ByteVector::fromULongLong(
+        0x0100000000000000ULL | (fileData.size() - 0x34 + voidElement.size())));
+      newData.append(fileData.mid(0x34));
+      newData.append(voidElement);
+
+      file.seek(0);
+      file.writeBlock(newData);
+    }
+
+    for(auto readStyle : {AudioProperties::Fast, AudioProperties::Average,
+                          AudioProperties::Accurate}) {
+      Matroska::File f(newname.c_str(), true, readStyle);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT_EQUAL(String("handbrake"), f.tag()->title());
     }
   }
 
