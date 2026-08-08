@@ -55,6 +55,23 @@ using namespace ID3v2;
 
 namespace
 {
+  constexpr unsigned int MAX_EMBEDDED_FRAME_DEPTH = 64;
+  thread_local unsigned int embeddedFrameDepth = 0;
+
+  class EmbeddedFrameDepth
+  {
+  public:
+    EmbeddedFrameDepth()
+    {
+      ++embeddedFrameDepth;
+    }
+
+    ~EmbeddedFrameDepth()
+    {
+      --embeddedFrameDepth;
+    }
+  };
+
   void updateGenre(TextIdentificationFrame *frame)
   {
     StringList fields = frame->fieldList();
@@ -188,6 +205,18 @@ Frame *FrameFactory::createFrame(const ByteVector &origData,
     return header ? new UnknownFrame(data, header) : nullptr;
   }
   return createFrame(data, header, tagHeader);
+}
+
+Frame *FrameFactory::createEmbeddedFrame(const ByteVector &origData,
+                                         const Header *tagHeader)
+{
+  if(embeddedFrameDepth >= MAX_EMBEDDED_FRAME_DEPTH) {
+    debug("ID3v2: Maximum embedded frame nesting depth exceeded");
+    return nullptr;
+  }
+
+  EmbeddedFrameDepth depth;
+  return FrameFactory::instance()->createFrame(origData, tagHeader);
 }
 
 Frame *FrameFactory::createFrame(const ByteVector &data, Frame::Header *header,

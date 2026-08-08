@@ -30,6 +30,7 @@
 #include "tbytevectorlist.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
+#include "id3v2framefactory.h"
 #include "unknownframe.h"
 
 using namespace TagLib;
@@ -254,7 +255,7 @@ void ChapterFrame::parseFields(const ByteVector &data)
     return;
 
   while(embPos < size - header()->size()) {
-    Frame *frame = FrameFactory::instance()->createFrame(data.mid(pos + embPos), d->tagHeader);
+    Frame *frame = FrameFactory::createEmbeddedFrame(data.mid(pos + embPos), d->tagHeader);
 
     if(!frame)
       return;
