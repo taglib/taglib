@@ -52,6 +52,8 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveMultiplePictures);
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testPropertiesAllSupported);
+  CPPUNIT_TEST(testPropertiesRealFile);
+  CPPUNIT_TEST(testCaseInsensitiveAttributeNames);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
 
@@ -331,7 +333,7 @@ public:
     tags["DISCSUBTITLE"] = StringList("Disc Subtitle");
     tags["ENCODEDBY"] = StringList("Encoded by");
     tags["ENCODING"] = StringList("Encoding");
-    tags["ENCODINGTIME"] = StringList("2021-01-03 11:52:19");
+    tags["ENCODINGTIME"] = StringList("131452413620000000");
     tags["FILEWEBPAGE"] = StringList("File Webpage");
     tags["GENRE"] = StringList("Genre");
     tags["WORK"] = StringList("Grouping");
@@ -366,6 +368,30 @@ public:
     tags["TITLE"] = StringList("Title");
     tags["TITLESORT"] = StringList("Title Sort");
     tags["TRACKNUMBER"] = StringList("2/4");
+    tags["REPLAYGAIN_TRACK_GAIN"] = StringList("-4.25 dB");
+    tags["REPLAYGAIN_TRACK_PEAK"] = StringList("0.985412");
+    tags["REPLAYGAIN_ALBUM_GAIN"] = StringList("-3.80 dB");
+    tags["REPLAYGAIN_ALBUM_PEAK"] = StringList("0.998201");
+    tags["MEDIACLASSPRIMARYID"] = StringList("D1607DBC-E323-4BE2-86A1-48A42A28441E");
+    tags["MEDIACLASSSECONDARYID"] = StringList("F24FF731-96FC-4D0F-A2F5-5A3483682B1A");
+    tags["COLLECTIONGROUPID"] = StringList("A81F04B3-2B1B-4B52-8700-6F8091DF3B41");
+    tags["COLLECTIONID"] = StringList("3F2504E0-4F89-11D3-9A0C-0305E82C3301");
+    tags["CONTENTID"] = StringList("6B29FC40-CA47-1067-B31D-00DD010662DA");
+    tags["CONTENTDISTRIBUTOR"] = StringList("Universal Music Group");
+    tags["PARENTALRATING"] = StringList("Explicit");
+    tags["PERIOD"] = StringList("Baroque");
+    tags["PROMOTIONURL"] = StringList("https://www.artistwebsite.com/store/album-special-edition");
+    tags["TOOLNAME"] = StringList("Windows Media Encoder");
+    tags["TOOLVERSION"] = StringList("9.00.00.2980");
+    tags["PROVIDER"] = StringList("AMG");
+    tags["UNIQUEFILEIDENTIFIER"] = StringList("AMGI_0000000000012345");
+    tags["WMFSDKVERSION"] = StringList("12.0.19041.1");
+    tags["WMFSDKNEEDED"] = StringList("9.0.0.4503");
+    tags["DEVICECONFORMANCETEMPLATE"] = StringList("L1");
+    tags["MEDIAFOUNDATIONVERSION"] = StringList("2.0");
+    tags["ISVBR"] = StringList("1");
+    tags["PEAKVALUE"] = StringList("32104");
+    tags["AVERAGELEVEL"] = StringList("2450");
 
     ScopedFileCopy copy("silence-1", ".wma");
     {
@@ -385,10 +411,168 @@ public:
     {
       const ASF::File f(copy.fileName().c_str());
       PropertyMap properties = f.properties();
-      if (tags != properties) {
+      if(tags != properties) {
         CPPUNIT_ASSERT_EQUAL(tags.toString(), properties.toString());
       }
       CPPUNIT_ASSERT(tags == properties);
+
+      const ASF::Tag *asfTag = f.tag();
+      CPPUNIT_ASSERT(asfTag);
+      std::map<String, ASF::Attribute::AttributeTypes> expected = {
+        {"ASIN", ASF::Attribute::UnicodeType},
+        {"Acoustid/Fingerprint", ASF::Attribute::UnicodeType},
+        {"Acoustid/Id", ASF::Attribute::UnicodeType},
+        {"AverageLevel", ASF::Attribute::DWordType},
+        {"DeviceConformanceTemplate", ASF::Attribute::UnicodeType},
+        {"IsVBR", ASF::Attribute::BoolType},
+        {"MediaFoundationVersion", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Album Artist Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Album Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Album Release Country", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Album Status", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Album Type", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Artist Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Release Group Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Release Track Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Track Id", ASF::Attribute::UnicodeType},
+        {"MusicBrainz/Work Id", ASF::Attribute::UnicodeType},
+        {"MusicIP/PUID", ASF::Attribute::UnicodeType},
+        {"PeakValue", ASF::Attribute::DWordType},
+        {"WM/ARTISTS", ASF::Attribute::UnicodeType},
+        {"WM/AlbumArtist", ASF::Attribute::UnicodeType},
+        {"WM/AlbumArtistSortOrder", ASF::Attribute::UnicodeType},
+        {"WM/AlbumSortOrder", ASF::Attribute::UnicodeType},
+        {"WM/AlbumTitle", ASF::Attribute::UnicodeType},
+        {"WM/ArtistSortOrder", ASF::Attribute::UnicodeType},
+        {"WM/AudioFileURL", ASF::Attribute::UnicodeType},
+        {"WM/AuthorURL", ASF::Attribute::UnicodeType},
+        {"WM/Barcode", ASF::Attribute::UnicodeType},
+        {"WM/BeatsPerMinute", ASF::Attribute::UnicodeType},
+        {"WM/CatalogNo", ASF::Attribute::UnicodeType},
+        {"WM/Composer", ASF::Attribute::UnicodeType},
+        {"WM/Conductor", ASF::Attribute::UnicodeType},
+        {"WM/ContentDistributor", ASF::Attribute::UnicodeType},
+        {"WM/ContentGroupDescription", ASF::Attribute::UnicodeType},
+        {"WM/EncodedBy", ASF::Attribute::UnicodeType},
+        {"WM/EncodingSettings", ASF::Attribute::UnicodeType},
+        {"WM/EncodingTime", ASF::Attribute::QWordType},
+        {"WM/Genre", ASF::Attribute::UnicodeType},
+        {"WM/ISRC", ASF::Attribute::UnicodeType},
+        {"WM/InitialKey", ASF::Attribute::UnicodeType},
+        {"WM/Language", ASF::Attribute::UnicodeType},
+        {"WM/Lyrics", ASF::Attribute::UnicodeType},
+        {"WM/Media", ASF::Attribute::UnicodeType},
+        {"WM/MediaClassPrimaryID", ASF::Attribute::GuidType},
+        {"WM/MediaClassSecondaryID", ASF::Attribute::GuidType},
+        {"WM/ModifiedBy", ASF::Attribute::UnicodeType},
+        {"WM/Mood", ASF::Attribute::UnicodeType},
+        {"WM/OriginalAlbumTitle", ASF::Attribute::UnicodeType},
+        {"WM/OriginalArtist", ASF::Attribute::UnicodeType},
+        {"WM/OriginalFilename", ASF::Attribute::UnicodeType},
+        {"WM/OriginalLyricist", ASF::Attribute::UnicodeType},
+        {"WM/OriginalReleaseYear", ASF::Attribute::UnicodeType},
+        {"WM/ParentalRating", ASF::Attribute::UnicodeType},
+        {"WM/PartOfSet", ASF::Attribute::UnicodeType},
+        {"WM/Period", ASF::Attribute::UnicodeType},
+        {"WM/Producer", ASF::Attribute::UnicodeType},
+        {"WM/PromotionURL", ASF::Attribute::UnicodeType},
+        {"WM/Provider", ASF::Attribute::UnicodeType},
+        {"WM/Publisher", ASF::Attribute::UnicodeType},
+        {"WM/Script", ASF::Attribute::UnicodeType},
+        {"WM/SetSubTitle", ASF::Attribute::UnicodeType},
+        {"WM/SubTitle", ASF::Attribute::UnicodeType},
+        {"WM/TitleSortOrder", ASF::Attribute::UnicodeType},
+        {"WM/ToolName", ASF::Attribute::UnicodeType},
+        {"WM/ToolVersion", ASF::Attribute::UnicodeType},
+        {"WM/TrackNumber", ASF::Attribute::UnicodeType},
+        {"WM/UniqueFileIdentifier", ASF::Attribute::UnicodeType},
+        {"WM/WMCollectionGroupID", ASF::Attribute::GuidType},
+        {"WM/WMCollectionID", ASF::Attribute::GuidType},
+        {"WM/WMContentID", ASF::Attribute::GuidType},
+        {"WM/Writer", ASF::Attribute::UnicodeType},
+        {"WM/Year", ASF::Attribute::UnicodeType},
+        {"WMFSDKNeeded", ASF::Attribute::UnicodeType},
+        {"WMFSDKVersion", ASF::Attribute::UnicodeType},
+        {"replaygain_album_gain", ASF::Attribute::UnicodeType},
+        {"replaygain_album_peak", ASF::Attribute::UnicodeType},
+        {"replaygain_track_gain", ASF::Attribute::UnicodeType},
+        {"replaygain_track_peak", ASF::Attribute::UnicodeType},
+      };
+      std::map<String, ASF::Attribute::AttributeTypes> actual;
+      for(const auto &[name, attr] : asfTag->attributeListMap()) {
+        if(!attr.isEmpty()) {
+          actual[name] = attr[0].type();
+        }
+      }
+      if(expected != actual) {
+        auto mapToStrings = [](const std::map<String, ASF::Attribute::AttributeTypes> &map){
+          StringList result;
+          for(const auto &[name, attr] : map) {
+            result.append(name + ":" + String::number(attr));
+          }
+          return result;
+        };
+        const StringList expectedStrs = mapToStrings(expected);
+        const StringList actualStrs = mapToStrings(actual);
+        CPPUNIT_ASSERT_EQUAL(expectedStrs, actualStrs);
+      }
+      CPPUNIT_ASSERT(expected == actual);
+    }
+  }
+
+  void testPropertiesRealFile()
+  {
+    ASF::File f(TEST_FILE_PATH_C("real_example.wma"));
+
+    PropertyMap tags = f.properties();
+
+    CPPUNIT_ASSERT_EQUAL(StringList("Wake Up, Get Up, Get Out There"), tags["TITLE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Shoji Meguro"), tags["ARTIST"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Persona 5: Sounds of Rebellion"), tags["ALBUM"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("-8.27 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("1.000000"), tags["REPLAYGAIN_TRACK_PEAK"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("131452413620000000"), tags["ENCODINGTIME"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("32673"), tags["PEAKVALUE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("8315"), tags["AVERAGELEVEL"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("0"), tags["ISVBR"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("12.0.15063.332"), tags["WMFSDKVERSION"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("0.0.0.0000"), tags["WMFSDKNEEDED"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("User Feedback"), tags["PROVIDER"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("L1"), tags["DEVICECONFORMANCETEMPLATE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("2.112"), tags["MEDIAFOUNDATIONVERSION"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("1"), tags["TRACKNUMBER"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Alternative"), tags["GENRE"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("Shoji Meguro"), tags["ALBUMARTIST"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("00000000-0000-0000-0000-000000000000"), tags["COLLECTIONGROUPID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("00000000-0000-0000-0000-000000000000"), tags["COLLECTIONID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("00000000-0000-0000-0000-000000000000"), tags["CONTENTID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("BC7D60D1-23E3-E24B-86A1-48A42A28441E"), tags["MEDIACLASSPRIMARYID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList("00000000-0000-0000-0000-000000000000"), tags["MEDIACLASSSECONDARYID"]);
+    CPPUNIT_ASSERT_EQUAL(StringList(";"), tags["UNIQUEFILEIDENTIFIER"]);
+  }
+
+  void testCaseInsensitiveAttributeNames()
+  {
+    ScopedFileCopy copy("silence-1", ".wma");
+    {
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->setAttribute("REPLAYGAIN_TRACK_GAIN", String("-6.00 dB"));
+      f.save();
+    }
+    {
+      ASF::File f(copy.fileName().c_str());
+      PropertyMap tags = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("-6.00 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
+
+      // Replacing the value must not leave a second, differently cased
+      // attribute behind.
+      tags["REPLAYGAIN_TRACK_GAIN"] = StringList("-7.00 dB");
+      f.setProperties(tags);
+      CPPUNIT_ASSERT(!f.tag()->contains("REPLAYGAIN_TRACK_GAIN"));
+      CPPUNIT_ASSERT_EQUAL(String("-7.00 dB"),
+        f.tag()->attribute("replaygain_track_gain").front().toString());
+      tags = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("-7.00 dB"), tags["REPLAYGAIN_TRACK_GAIN"]);
     }
   }
 

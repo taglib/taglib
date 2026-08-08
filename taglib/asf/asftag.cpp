@@ -26,6 +26,7 @@
 #include "asftag.h"
 
 #include <array>
+#include <string>
 #include <utility>
 
 #include "tpropertymap.h"
@@ -228,70 +229,138 @@ bool ASF::Tag::isEmpty() const
 namespace
 {
   constexpr std::array keyTranslation {
-    std::pair("WM/AlbumTitle", "ALBUM"),
-    std::pair("WM/AlbumArtist", "ALBUMARTIST"),
-    std::pair("WM/AuthorURL", "ARTISTWEBPAGE"),
-    std::pair("WM/Composer", "COMPOSER"),
-    std::pair("WM/Writer", "LYRICIST"),
-    std::pair("WM/Conductor", "CONDUCTOR"),
-    std::pair("WM/ModifiedBy", "REMIXER"),
-    std::pair("WM/Year", "DATE"),
-    std::pair("WM/OriginalAlbumTitle", "ORIGINALALBUM"),
-    std::pair("WM/OriginalArtist", "ORIGINALARTIST"),
-    std::pair("WM/OriginalFilename", "ORIGINALFILENAME"),
-    std::pair("WM/OriginalLyricist", "ORIGINALLYRICIST"),
-    std::pair("WM/OriginalReleaseYear", "ORIGINALDATE"),
-    std::pair("WM/Producer", "PRODUCER"),
-    std::pair("WM/ContentGroupDescription", "WORK"),
-    std::pair("WM/SubTitle", "SUBTITLE"),
-    std::pair("WM/SetSubTitle", "DISCSUBTITLE"),
-    std::pair("WM/TrackNumber", "TRACKNUMBER"),
-    std::pair("WM/PartOfSet", "DISCNUMBER"),
-    std::pair("WM/Genre", "GENRE"),
-    std::pair("WM/BeatsPerMinute", "BPM"),
-    std::pair("WM/Mood", "MOOD"),
-    std::pair("WM/InitialKey", "INITIALKEY"),
-    std::pair("WM/ISRC", "ISRC"),
-    std::pair("WM/Lyrics", "LYRICS"),
-    std::pair("WM/Media", "MEDIA"),
-    std::pair("WM/Publisher", "LABEL"),
-    std::pair("WM/CatalogNo", "CATALOGNUMBER"),
-    std::pair("WM/Barcode", "BARCODE"),
-    std::pair("WM/EncodedBy", "ENCODEDBY"),
-    std::pair("WM/EncodingSettings", "ENCODING"),
-    std::pair("WM/EncodingTime", "ENCODINGTIME"),
-    std::pair("WM/AudioFileURL", "FILEWEBPAGE"),
-    std::pair("WM/AlbumSortOrder", "ALBUMSORT"),
-    std::pair("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT"),
-    std::pair("WM/ArtistSortOrder", "ARTISTSORT"),
-    std::pair("WM/TitleSortOrder", "TITLESORT"),
-    std::pair("WM/Script", "SCRIPT"),
-    std::pair("WM/Language", "LANGUAGE"),
-    std::pair("WM/ARTISTS", "ARTISTS"),
-    std::pair("ASIN", "ASIN"),
-    std::pair("MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID"),
-    std::pair("MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID"),
-    std::pair("MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID"),
-    std::pair("MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID"),
-    std::pair("MusicBrainz/Album Release Country", "RELEASECOUNTRY"),
-    std::pair("MusicBrainz/Album Status", "RELEASESTATUS"),
-    std::pair("MusicBrainz/Album Type", "RELEASETYPE"),
-    std::pair("MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID"),
-    std::pair("MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID"),
-    std::pair("MusicBrainz/Work Id", "MUSICBRAINZ_WORKID"),
-    std::pair("MusicIP/PUID", "MUSICIP_PUID"),
-    std::pair("Acoustid/Id", "ACOUSTID_ID"),
-    std::pair("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT"),
+    std::tuple("WM/AlbumTitle", "ALBUM", ASF::Attribute::UnicodeType),
+    std::tuple("WM/AlbumArtist", "ALBUMARTIST", ASF::Attribute::UnicodeType),
+    std::tuple("WM/AuthorURL", "ARTISTWEBPAGE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Composer", "COMPOSER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Writer", "LYRICIST", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Conductor", "CONDUCTOR", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ModifiedBy", "REMIXER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Year", "DATE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/OriginalAlbumTitle", "ORIGINALALBUM", ASF::Attribute::UnicodeType),
+    std::tuple("WM/OriginalArtist", "ORIGINALARTIST", ASF::Attribute::UnicodeType),
+    std::tuple("WM/OriginalFilename", "ORIGINALFILENAME", ASF::Attribute::UnicodeType),
+    std::tuple("WM/OriginalLyricist", "ORIGINALLYRICIST", ASF::Attribute::UnicodeType),
+    std::tuple("WM/OriginalReleaseYear", "ORIGINALDATE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Producer", "PRODUCER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ContentGroupDescription", "WORK", ASF::Attribute::UnicodeType),
+    std::tuple("WM/SubTitle", "SUBTITLE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/SetSubTitle", "DISCSUBTITLE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/TrackNumber", "TRACKNUMBER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/PartOfSet", "DISCNUMBER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Genre", "GENRE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/BeatsPerMinute", "BPM", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Mood", "MOOD", ASF::Attribute::UnicodeType),
+    std::tuple("WM/InitialKey", "INITIALKEY", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ISRC", "ISRC", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Lyrics", "LYRICS", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Media", "MEDIA", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Publisher", "LABEL", ASF::Attribute::UnicodeType),
+    std::tuple("WM/CatalogNo", "CATALOGNUMBER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Barcode", "BARCODE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/EncodedBy", "ENCODEDBY", ASF::Attribute::UnicodeType),
+    std::tuple("WM/EncodingSettings", "ENCODING", ASF::Attribute::UnicodeType),
+    std::tuple("WM/EncodingTime", "ENCODINGTIME", ASF::Attribute::QWordType),
+    std::tuple("WM/AudioFileURL", "FILEWEBPAGE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/AlbumSortOrder", "ALBUMSORT", ASF::Attribute::UnicodeType),
+    std::tuple("WM/AlbumArtistSortOrder", "ALBUMARTISTSORT", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ArtistSortOrder", "ARTISTSORT", ASF::Attribute::UnicodeType),
+    std::tuple("WM/TitleSortOrder", "TITLESORT", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Script", "SCRIPT", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Language", "LANGUAGE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ARTISTS", "ARTISTS", ASF::Attribute::UnicodeType),
+    std::tuple("ASIN", "ASIN", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Track Id", "MUSICBRAINZ_TRACKID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Artist Id", "MUSICBRAINZ_ARTISTID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Album Id", "MUSICBRAINZ_ALBUMID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Album Artist Id", "MUSICBRAINZ_ALBUMARTISTID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Album Release Country", "RELEASECOUNTRY", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Album Status", "RELEASESTATUS", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Album Type", "RELEASETYPE", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Release Group Id", "MUSICBRAINZ_RELEASEGROUPID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Release Track Id", "MUSICBRAINZ_RELEASETRACKID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicBrainz/Work Id", "MUSICBRAINZ_WORKID", ASF::Attribute::UnicodeType),
+    std::tuple("MusicIP/PUID", "MUSICIP_PUID", ASF::Attribute::UnicodeType),
+    std::tuple("Acoustid/Id", "ACOUSTID_ID", ASF::Attribute::UnicodeType),
+    std::tuple("Acoustid/Fingerprint", "ACOUSTID_FINGERPRINT", ASF::Attribute::UnicodeType),
+    std::tuple("replaygain_track_gain", "REPLAYGAIN_TRACK_GAIN", ASF::Attribute::UnicodeType),
+    std::tuple("replaygain_track_peak", "REPLAYGAIN_TRACK_PEAK", ASF::Attribute::UnicodeType),
+    std::tuple("replaygain_album_gain", "REPLAYGAIN_ALBUM_GAIN", ASF::Attribute::UnicodeType),
+    std::tuple("replaygain_album_peak", "REPLAYGAIN_ALBUM_PEAK", ASF::Attribute::UnicodeType),
+    std::tuple("WM/MediaClassPrimaryID", "MEDIACLASSPRIMARYID", ASF::Attribute::GuidType),
+    std::tuple("WM/MediaClassSecondaryID", "MEDIACLASSSECONDARYID", ASF::Attribute::GuidType),
+    std::tuple("WM/WMCollectionGroupID", "COLLECTIONGROUPID", ASF::Attribute::GuidType),
+    std::tuple("WM/WMCollectionID", "COLLECTIONID", ASF::Attribute::GuidType),
+    std::tuple("WM/WMContentID", "CONTENTID", ASF::Attribute::GuidType),
+    std::tuple("WM/ContentDistributor", "CONTENTDISTRIBUTOR", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ParentalRating", "PARENTALRATING", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Period", "PERIOD", ASF::Attribute::UnicodeType),
+    std::tuple("WM/PromotionURL", "PROMOTIONURL", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ToolName", "TOOLNAME", ASF::Attribute::UnicodeType),
+    std::tuple("WM/ToolVersion", "TOOLVERSION", ASF::Attribute::UnicodeType),
+    std::tuple("WM/Provider", "PROVIDER", ASF::Attribute::UnicodeType),
+    std::tuple("WM/UniqueFileIdentifier", "UNIQUEFILEIDENTIFIER", ASF::Attribute::UnicodeType),
+    std::tuple("WMFSDKVersion", "WMFSDKVERSION", ASF::Attribute::UnicodeType),
+    std::tuple("WMFSDKNeeded", "WMFSDKNEEDED", ASF::Attribute::UnicodeType),
+    std::tuple("DeviceConformanceTemplate", "DEVICECONFORMANCETEMPLATE", ASF::Attribute::UnicodeType),
+    std::tuple("MediaFoundationVersion", "MEDIAFOUNDATIONVERSION", ASF::Attribute::UnicodeType),
+    std::tuple("IsVBR", "ISVBR", ASF::Attribute::BoolType),
+    std::tuple("PeakValue", "PEAKVALUE", ASF::Attribute::DWordType),
+    std::tuple("AverageLevel", "AVERAGELEVEL", ASF::Attribute::DWordType),
   };
 
+  // Attribute names are matched case-insensitively; taggers disagree on the
+  // casing of names not defined by Windows Media (e.g. replaygain_track_gain).
   String translateKey(const String &key)
   {
-    for(const auto &[k, t] : keyTranslation) {
-      if(key == k)
-        return t;
+    const String upperKey = key.upper();
+    for(const auto &[k, v, t] : keyTranslation) {
+      if(upperKey == String(k).upper())
+        return v;
     }
 
     return String();
+  }
+
+  void eraseAttribute(ASF::AttributeListMap &attributeListMap, const String &name)
+  {
+    const String upperName = name.upper();
+    StringList keys;
+    for(const auto &[k, attributes] : std::as_const(attributeListMap)) {
+      if(k.upper() == upperName)
+        keys.append(k);
+    }
+    for(const auto &k : keys)
+      attributeListMap.erase(k);
+  }
+
+  String attributeToString(const ASF::Attribute &attr)
+  {
+    switch(attr.type()) {
+    case ASF::Attribute::WordType:
+    case ASF::Attribute::DWordType:
+    case ASF::Attribute::QWordType:
+    case ASF::Attribute::BoolType:
+      return String(std::to_string(attr.toULongLong()));
+    case ASF::Attribute::GuidType:
+      if(const ByteVector data = attr.toByteVector(); data.size() == 16) {
+        String str;
+        for(int i = 0; i < 16; ++i) {
+          if(i == 4 || i == 6 || i == 8 || i == 10) {
+            str += '-';
+          }
+          const auto c = static_cast<unsigned char>(data[i]);
+          unsigned char d = c >> 4;
+          str += static_cast<char>(d >= 10 ? d - 10 + 'A' : d + '0');
+          d = c & 0x0f;
+          str += static_cast<char>(d >= 10 ? d - 10 + 'A' : d + '0');
+        }
+        return str;
+      }
+      return {};
+    default:
+      return attr.toString();
+    }
   }
 }  // namespace
 
@@ -315,14 +384,12 @@ PropertyMap ASF::Tag::properties() const
   for(const auto &[k, attributes] : std::as_const(d->attributeListMap)) {
     if(const String key = translateKey(k); !key.isEmpty()) {
       for(const auto &attr : attributes) {
-        if(key == "TRACKNUMBER") {
-          if(attr.type() == ASF::Attribute::DWordType)
-            props.insert(key, String::number(attr.toUInt()));
-          else
-            props.insert(key, attr.toString());
-        }
-        else {
-          props.insert(key, attr.toString());
+        // The same attribute can occur in both the extended content
+        // description object and the metadata (library) object, skip exact
+        // duplicates (e.g. a second identical IsVBR).
+        if(const String value = attributeToString(attr);
+           !props.value(key).contains(value)) {
+          props.insert(key, value);
         }
       }
     }
@@ -341,10 +408,10 @@ void ASF::Tag::removeUnsupportedProperties(const StringList &props)
 
 PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
 {
-  static const Map<String, String> reverseKeyMap = [] {
-    Map<String, String> map;
-    for(const auto &[k, t] : keyTranslation) {
-      map[t] = k;
+  static const Map<String, std::pair<String, Attribute::AttributeTypes>> reverseKeyMap = [] {
+    Map<String, std::pair<String, Attribute::AttributeTypes>> map;
+    for(const auto &[k, v, t] : keyTranslation) {
+      map[v] = {k, t};
     }
     return map;
   }();
@@ -365,7 +432,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
         d->copyright.clear();
       }
       else {
-        d->attributeListMap.erase(reverseKeyMap[prop]);
+        eraseAttribute(d->attributeListMap, reverseKeyMap[prop].first);
       }
     }
   }
@@ -373,10 +440,51 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   PropertyMap ignoredProps;
   for(const auto &[prop, attributes] : props) {
     if(reverseKeyMap.contains(prop)) {
-      String name = reverseKeyMap[prop];
-      removeItem(name);
-      for(const auto &attr : attributes) {
-        addAttribute(name, attr);
+      const auto &[name, type] = reverseKeyMap[prop];
+      eraseAttribute(d->attributeListMap, name);
+      for(const auto &str : attributes) {
+        switch(type) {
+        case Attribute::WordType:
+          addAttribute(name, static_cast<unsigned short>(str.toULongLong()));
+          break;
+        case Attribute::DWordType:
+          addAttribute(name, static_cast<unsigned int>(str.toULongLong()));
+          break;
+        case Attribute::QWordType:
+          addAttribute(name, str.toULongLong());
+          break;
+        case Attribute::BoolType:
+          addAttribute(name, !str.isEmpty() && str != "0" && str.upper() != "TRUE");
+          break;
+        case Attribute::GuidType: {
+          ByteVector data;
+          String hexStr;
+          for(wchar_t c : str) {
+            if(c >= 'a' && c <= 'f') {
+              hexStr += static_cast<wchar_t>(c + 'A' - 'a');
+            } else if((c >= 'A' && c <= 'F') || (c >= '0' && c <= '9')) {
+              hexStr += c;
+            }
+          }
+          if(hexStr.length() == 32) {
+            unsigned char buf[16];
+            unsigned char* bufPtr = buf;
+            for(int i = 0; i < 32;) {
+              auto h = static_cast<unsigned char>(hexStr[i++]);
+              auto l = static_cast<unsigned char>(hexStr[i++]);
+              *bufPtr++ = static_cast<unsigned char>(
+                ((h >= 'A' ? h + 10 - 'A' : h - '0') << 4) |
+                 (l >= 'A' ? l + 10 - 'A' : l - '0'));
+            }
+            data = ByteVector(reinterpret_cast<char*>(buf), 16);
+          }
+          addAttribute(name, Attribute::fromGuid(data));
+          break;
+        }
+        default:
+          addAttribute(name, str);
+          break;
+        }
       }
     }
     else if(prop == "TITLE") {
