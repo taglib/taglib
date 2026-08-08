@@ -162,6 +162,13 @@ ASF::Picture ASF::Attribute::toPicture() const
   return d->pictureValue;
 }
 
+ASF::Attribute ASF::Attribute::fromGuid(const ByteVector& guid)
+{
+  Attribute attr(guid);
+  attr.d->type = GuidType;
+  return attr;
+}
+
 String ASF::Attribute::parse(ASF::File &file, int kind)
 {
   unsigned int size, nameLength;

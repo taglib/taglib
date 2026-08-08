@@ -224,6 +224,7 @@ class TestFileRefDetectByContent : public CppUnit::TestFixture
 
 #ifdef TAGLIB_WITH_ASF
   CPPUNIT_TEST(testLosslessWma);
+  CPPUNIT_TEST(testRealExampleWma);
   CPPUNIT_TEST(testSilence1Wma);
 #endif
 
