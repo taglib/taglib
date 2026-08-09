@@ -166,6 +166,11 @@ namespace TagLib
       Picture toPicture() const;
 
       /*!
+       * Create an attribute holding a Guid.
+       */
+      static Attribute fromGuid(const ByteVector &guid);
+
+      /*!
        * Returns the language number, or 0 is no stream number was set.
        */
       int language() const;
