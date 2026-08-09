@@ -36,6 +36,8 @@ namespace TagLib {
   namespace ID3v2 {
 
     class TextIdentificationFrame;
+    class ChapterFrame;
+    class TableOfContentsFrame;
 
     //! A factory for creating ID3v2 frames during parsing
 
@@ -176,6 +178,12 @@ namespace TagLib {
                                  const Header *tagHeader) const;
 
     private:
+      static Frame *createEmbeddedFrame(const ByteVector &origData,
+                                        const Header *tagHeader);
+
+      friend class ChapterFrame;
+      friend class TableOfContentsFrame;
+
       static FrameFactory factory;
 
       class FrameFactoryPrivate;
