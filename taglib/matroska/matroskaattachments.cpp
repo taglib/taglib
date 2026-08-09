@@ -27,6 +27,7 @@
 #include "ebmlmasterelement.h"
 #include "ebmlstringelement.h"
 #include "ebmlbinaryelement.h"
+#include "ebmldeferredbinaryelement.h"
 #include "ebmluintelement.h"
 #include "ebmlutils.h"
 #include "tlist.h"
