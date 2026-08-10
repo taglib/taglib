@@ -170,6 +170,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
   CPPUNIT_TEST(testQTChapterListNoOrphanedMdat);
+  CPPUNIT_TEST(testQTChapterListSharedTref);
   CPPUNIT_TEST(testQTChapterListSharedMdatPreservesAudio);
   CPPUNIT_TEST(testQTChapterListUnicodeTitles);
   CPPUNIT_TEST(testChapterListUnicodeTitles);
@@ -1438,6 +1439,128 @@ public:
     CPPUNIT_ASSERT_EQUAL(baseMdatTagLib, countMdatTagLib());
   }
 
+  // A trak may hold at most one tref, so a chapter reference has to join the atom
+  // already there rather than add a second one.  Parsers differ on a track carrying
+  // two: the lenient ones ignore the surplus atom, the strict ones discard the whole
+  // track rather than just the reference.  The file therefore still reads correctly
+  // here while presenting as having no audio elsewhere, and a remux driven by such a
+  // parser writes that loss back to disk.
+  //
+  // A pre-existing tref is usual in camera recordings, whose audio track references
+  // a timecode track.  No file in tests/data carries one, so it is injected here.
+  void testQTChapterListSharedTref()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    // The reference types inside each tref of the first audio trak, grouped per
+    // tref so that two atoms are distinguishable from one merged atom.
+    auto audioTrefs = [&]() {
+      std::vector<std::vector<String>> result;
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      MP4::Atom *moov = atoms.find("moov");
+      if(!moov)
+        return result;
+
+      for(auto *trak : moov->findall("trak")) {
+        const MP4::Atom *hdlr = trak->find("mdia", "hdlr");
+        if(!hdlr)
+          continue;
+        pf.seek(hdlr->offset());
+        if(!pf.readBlock(hdlr->length()).containsAt("soun", 16))
+          continue;
+
+        for(const auto *child : trak->children()) {
+          if(child->name() != "tref")
+            continue;
+
+          std::vector<String> refs;
+          const offset_t trefEnd = child->offset() + child->length();
+          pf.seek(child->offset() + 8);
+
+          while(pf.tell() + 8 <= trefEnd) {
+            const offset_t boxStart = pf.tell();
+            const ByteVector header = pf.readBlock(8);
+            if(header.size() < 8)
+              break;
+            const unsigned int boxSize = header.toUInt();
+            if(boxSize < 8)
+              break;
+            refs.push_back(String(header.mid(4, 4)));
+            pf.seek(boxStart + boxSize);
+          }
+          result.push_back(refs);
+        }
+        break;
+      }
+      return result;
+    };
+
+    // Give the audio track a timecode reference of its own.  moov follows mdat in
+    // this file, so the insertion shifts no chunk offset.
+    {
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      MP4::Atom *moov = atoms.find("moov");
+      CPPUNIT_ASSERT(moov);
+      const MP4::AtomList traks = moov->findall("trak");
+      CPPUNIT_ASSERT(!traks.isEmpty());
+      const MP4::Atom *trak = traks.front();
+
+      const ByteVector tmcd = ByteVector::fromUInt(12) + ByteVector("tmcd") +
+                              ByteVector::fromUInt(3);
+      const ByteVector tref = ByteVector::fromUInt(8 + tmcd.size()) +
+                              ByteVector("tref") + tmcd;
+
+      pf.insert(tref, trak->offset() + trak->length(), 0);
+
+      pf.seek(trak->offset());
+      const unsigned int trakSize = pf.readBlock(4).toUInt();
+      pf.seek(trak->offset());
+      pf.writeBlock(ByteVector::fromUInt(trakSize + tref.size()));
+
+      pf.seek(moov->offset());
+      const unsigned int moovSize = pf.readBlock(4).toUInt();
+      pf.seek(moov->offset());
+      pf.writeBlock(ByteVector::fromUInt(moovSize + tref.size()));
+    }
+
+    const std::vector<std::vector<String>> before = audioTrefs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), before.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), before[0].size());
+    CPPUNIT_ASSERT_EQUAL(String("tmcd"), before[0][0]);
+
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("Chapter 1", 0),
+        MP4::Chapter("Chapter 2", 10000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // One tref still, now carrying both references.
+    const std::vector<std::vector<String>> written = audioTrefs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), written.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), written[0].size());
+    CPPUNIT_ASSERT_EQUAL(String("tmcd"), written[0][0]);
+    CPPUNIT_ASSERT_EQUAL(String("chap"), written[0][1]);
+
+    {
+      MP4::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(2), f.qtChapters().size());
+      f.setQtChapters(MP4::ChapterList());
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // Removal takes the chapter reference back out and leaves the timecode one.
+    const std::vector<std::vector<String>> removed = audioTrefs();
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), removed.size());
+    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), removed[0].size());
+    CPPUNIT_ASSERT_EQUAL(String("tmcd"), removed[0][0]);
+  }
+
   // Regression test for the data-loss bug reported in PR #1343 by ufleisch.
   // Audiobook-style files co-locate chapter text samples inside the main
   // audio mdat.  In that case the chapter track's stco[0] does NOT mark a
@@ -1493,7 +1616,7 @@ public:
     {
       PlainFile pf(filename.c_str());
       MP4::Atoms atoms(&pf);
-      const MP4::Atom *moov = atoms.find("moov");
+      MP4::Atom *moov = atoms.find("moov");
       CPPUNIT_ASSERT(moov);
       const MP4::AtomList traks = moov->findall("trak");
       CPPUNIT_ASSERT(traks.size() >= 2);

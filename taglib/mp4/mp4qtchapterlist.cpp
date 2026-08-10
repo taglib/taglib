@@ -690,13 +690,68 @@ namespace
 
   // -- tref / chap builder --------------------------------------------------
 
-  //! Builds a tref atom containing a chap reference to the given track ID.
-  ByteVector buildTref(unsigned int chapterTrackId)
+  //! Builds a chap reference box pointing at the given track ID.
+  ByteVector buildChap(unsigned int chapterTrackId)
   {
     ByteVector chapData;
     chapData.append(ByteVector::fromUInt(chapterTrackId));
-    const ByteVector chap = renderAtom("chap", chapData);
-    return renderAtom("tref", chap);
+    return renderAtom("chap", chapData);
+  }
+
+  //! Builds a tref atom containing a chap reference to the given track ID.
+  ByteVector buildTref(unsigned int chapterTrackId)
+  {
+    return renderAtom("tref", buildChap(chapterTrackId));
+  }
+
+  //! The track's tref atom, or null when it has none.
+  //!
+  //! A trak carries at most one tref; a second one makes AVFoundation discard the
+  //! whole track, so a chapter reference has to join the existing atom rather than
+  //! bring its own.
+  MP4::Atom *findTrefAtom(const MP4::Atom *trak)
+  {
+    if(!trak)
+      return nullptr;
+
+    for(const auto &child : trak->children()) {
+      if(child->name() == "tref")
+        return child;
+    }
+    return nullptr;
+  }
+
+  //! Locates a reference box of the given type inside a tref.
+  //!
+  //! \return true when found, setting \a boxOffset and \a boxLength.
+  bool findTrefEntry(TagLib::File *file, const MP4::Atom *tref,
+                     const ByteVector &type, offset_t &boxOffset,
+                     offset_t &boxLength)
+  {
+    if(!tref)
+      return false;
+
+    const offset_t trefEnd = tref->offset() + tref->length();
+    file->seek(tref->offset() + 8);
+
+    while(file->tell() + 8 <= trefEnd) {
+      const offset_t boxStart = file->tell();
+      const ByteVector header = file->readBlock(8);
+      if(header.size() < 8)
+        break;
+
+      const unsigned int boxSize = header.toUInt();
+      if(boxSize < 8)
+        break;
+
+      if(header.mid(4, 4) == type) {
+        boxOffset = boxStart;
+        boxLength = static_cast<offset_t>(boxSize);
+        return true;
+      }
+      file->seek(boxStart + boxSize);
+    }
+    return false;
   }
 
   // -- Reading helpers ------------------------------------------------------
@@ -923,27 +978,63 @@ namespace
   //! Removes the tref atom from the audio track.
   //! Updates trak size, parent sizes, and chunk offsets.
   //! audioTrak's in-memory children list is NOT modified (caller re-parses if needed).
-  void removeAudioTref(TagLib::File *file, const MP4::Atoms *atoms, const MP4::Atom *audioTrak)
+  //! Removes the chapter reference from the audio track.
+  //!
+  //! The chap box can share the track's single tref with references to other tracks
+  //! -- a timecode track, for instance -- so only chap is removed in that case.
+  //! The tref itself goes only when chap was its sole child.
+  //!
+  //! \a removedOffset and \a removedLength report what was cut, which the caller
+  //! needs to locate atoms that sat after it.
+  void removeAudioTref(TagLib::File *file, const MP4::Atoms *atoms,
+                       const MP4::Atom *audioTrak, offset_t &removedOffset,
+                       offset_t &removedLength)
   {
+    removedOffset = -1;
+    removedLength = 0;
+
     for(const auto &child : audioTrak->children()) {
       if(child->name() != "tref")
+        continue;
+
+      offset_t chapOff = 0;
+      offset_t chapLen = 0;
+      if(!findTrefEntry(file, child, "chap", chapOff, chapLen))
         continue;
 
       const offset_t trefOff = child->offset();
       const offset_t trefLen = child->length();
 
-      file->removeBlock(trefOff, trefLen);
+      // chap alone in the tref means the tref has nothing left to hold.
+      const bool trefHoldsOnlyChap = (chapLen + 8 == trefLen);
+      const offset_t cutOff = trefHoldsOnlyChap ? trefOff : chapOff;
+      const offset_t cutLen = trefHoldsOnlyChap ? trefLen : chapLen;
+
+      file->removeBlock(cutOff, cutLen);
+
+      // Shrink the surviving tref. Its own offset precedes the cut, so it is
+      // still where the atom tree says it is.
+      if(!trefHoldsOnlyChap) {
+        file->seek(trefOff);
+        const unsigned int trefSize = file->readBlock(4).toUInt();
+        file->seek(trefOff);
+        file->writeBlock(ByteVector::fromUInt(
+          static_cast<unsigned int>(trefSize - cutLen)));
+      }
 
       // Fix audio trak size on disk
       file->seek(audioTrak->offset());
       const unsigned int trakSize = file->readBlock(4).toUInt();
       file->seek(audioTrak->offset());
       file->writeBlock(ByteVector::fromUInt(
-        static_cast<unsigned int>(trakSize - trefLen)));
+        static_cast<unsigned int>(trakSize - cutLen)));
 
       const MP4::AtomList moovPath = atoms->path("moov");
-      updateParentSizes(file, moovPath, -trefLen);
-      updateChunkOffsets(file, atoms, -trefLen, trefOff);
+      updateParentSizes(file, moovPath, -cutLen);
+      updateChunkOffsets(file, atoms, -cutLen, cutOff);
+
+      removedOffset = cutOff;
+      removedLength = cutLen;
       return;
     }
   }
@@ -1042,17 +1133,6 @@ namespace
       }
     }
 
-    // Capture tref/chapter trak locations for mdat offset fix-up below.
-    offset_t trefOff = -1;
-    offset_t trefLen = 0;
-    for(const auto &child : audioTrak->children()) {
-      if(child->name() == "tref") {
-        trefOff = child->offset();
-        trefLen = child->length();
-        break;
-      }
-    }
-
     // Remove chapter trak FIRST (higher offset in file).
     const offset_t chapterOff = chapterTrak->offset();
     const offset_t chapterLen = chapterTrak->length();
@@ -1067,8 +1147,11 @@ namespace
     updateParentSizes(file, moovPath, -chapterLen);
     updateChunkOffsets(file, atoms, -chapterLen, chapterOff);
 
-    // Remove tref from audio trak (lower offset, still valid after chapter trak removal).
-    removeAudioTref(file, atoms, audioTrak);
+    // Remove the chapter reference from the audio trak (lower offset, still valid
+    // after chapter trak removal). Only the chap box goes when the tref is shared.
+    offset_t trefOff = -1;
+    offset_t trefLen = 0;
+    removeAudioTref(file, atoms, audioTrak, trefOff, trefLen);
 
     // Decide whether the chapter mdat is safe to delete.
     if(chapterMdatOffset < 0)
@@ -1236,14 +1319,21 @@ bool MP4::QtChapterList::write(TagLib::File *file)
   constexpr unsigned int timescale = 1000;
   const std::vector<unsigned int> sampleSizes = calculateSampleSizes(workingChapters);
 
-  // Build tref/chap atom for audio track
-  const ByteVector trefAtom = buildTref(chapterTrackId);
+  // The chapter reference joins the audio track's existing tref when it has one --
+  // a second tref in the same trak makes AVFoundation discard the entire track,
+  // silently, while more permissive parsers still read it.
+  const Atom *existingTref = findTrefAtom(audio.trak);
+  const ByteVector refPayload = existingTref ? buildChap(chapterTrackId)
+                                             : buildTref(chapterTrackId);
+  const offset_t refInsertOffset = existingTref
+    ? existingTref->offset() + existingTref->length()
+    : audio.trak->offset() + audio.trak->length();
 
   // Two-pass build for chapter trak: first to measure size, then with correct stco offsets.
   const ByteVector trakMeasure = buildChapterTrak(
     chapterTrackId, timescale, durationMs, workingChapters, sampleSizes, 0,
     movieInfo.duration);
-  const auto totalInsert = static_cast<offset_t>(trefAtom.size() + trakMeasure.size());
+  const auto totalInsert = static_cast<offset_t>(refPayload.size() + trakMeasure.size());
   // Text samples go inside an mdat atom at EOF.  stco offsets point past the 8-byte mdat header.
   const offset_t textDataOffset = file->length() + totalInsert + 8;
 
@@ -1252,30 +1342,41 @@ bool MP4::QtChapterList::write(TagLib::File *file)
     chapterTrackId, timescale, durationMs, workingChapters, sampleSizes, textDataOffset,
     movieInfo.duration);
 
-  // Combined payload: tref (goes inside audio trak) + chapter trak (moov sibling)
-  ByteVector combinedPayload = trefAtom;
-  combinedPayload.append(trakAtom);
+  // The chapter trak is a moov sibling placed after the audio trak; the reference
+  // goes inside the audio trak, at or before that boundary. Insert the higher offset
+  // first so the lower one is still where the atom tree says it is.
+  const offset_t trakInsertOffset = audio.trak->offset() + audio.trak->length();
 
-  // Insert at the end of the audio trak boundary.
-  // tref is logically inside audio trak; chapter trak is logically after it.
-  const offset_t insertOffset = audio.trak->offset() + audio.trak->length();
+  // The atom tree is corrected once per insertion, because each shifts only what
+  // follows it. A single combined delta would move the stco atoms lying between the
+  // two -- the audio track's own -- further than the file actually moved them, and
+  // the next seek would write chunk offsets into the following trak.
+  file->insert(trakAtom, trakInsertOffset, 0);
+  updateChunkOffsets(file, activeAtoms, static_cast<offset_t>(trakAtom.size()),
+                     trakInsertOffset);
 
-  file->insert(combinedPayload, insertOffset, 0);
+  file->insert(refPayload, refInsertOffset, 0);
+  updateChunkOffsets(file, activeAtoms, static_cast<offset_t>(refPayload.size()),
+                     refInsertOffset);
 
-  // Fix audio trak size on disk -- only tref goes inside
+  // Grow the shared tref by the chap box it now carries.
+  if(existingTref) {
+    file->seek(existingTref->offset());
+    const unsigned int trefSize = file->readBlock(4).toUInt();
+    file->seek(existingTref->offset());
+    file->writeBlock(ByteVector::fromUInt(trefSize + refPayload.size()));
+  }
+
+  // Fix audio trak size on disk -- only the reference goes inside
   file->seek(audio.trak->offset());
   const unsigned int audioTrakSize = file->readBlock(4).toUInt();
-  const unsigned int newAudioTrakSize = audioTrakSize + trefAtom.size();
+  const unsigned int newAudioTrakSize = audioTrakSize + refPayload.size();
   file->seek(audio.trak->offset());
   file->writeBlock(ByteVector::fromUInt(newAudioTrakSize));
 
-  // Fix moov size -- both tref and chapter trak are inside moov
+  // Fix moov size -- both the reference and the chapter trak are inside moov
   const AtomList moovPath = activeAtoms->path("moov");
-  updateParentSizes(file, moovPath, combinedPayload.size());
-
-  // Fix existing chunk offsets -- only the ORIGINAL atom tree is iterated,
-  // so the new chapter trak's stco (which already has correct offsets) is untouched.
-  updateChunkOffsets(file, activeAtoms, combinedPayload.size(), insertOffset);
+  updateParentSizes(file, moovPath, totalInsert);
 
   // ---- Phase 4: Append text samples in mdat at EOF ----
 
@@ -1290,7 +1391,7 @@ bool MP4::QtChapterList::write(TagLib::File *file)
   file->writeBlock(mdatAtom);
 
   // ---- Phase 5: Update mvhd next_track_ID ----
-  // mvhd is before insertOffset, so its offset is unchanged.
+  // mvhd precedes both insertions, so its offset is unchanged.
 
   if(const unsigned int currentNextId = getNextTrackId(file, activeAtoms);
      chapterTrackId >= currentNextId) {
