@@ -56,6 +56,7 @@ namespace
 
   constexpr long MinPaddingSize = 1024;
   constexpr long MaxPaddingSize = 1024 * 1024;
+  constexpr unsigned int MAX_ID3V2_FRAME_COUNT = 50000;
 
   /*!
    * Downgrade ID3v2.4 text \a encoding to value supported by ID3v2.3.
@@ -834,6 +835,7 @@ void ID3v2::Tag::parse(const ByteVector &origData)
 
   unsigned int frameDataPosition = 0;
   unsigned int frameDataLength = data.size();
+  unsigned int frameCount = 0;
 
   // check for extended header
 
@@ -868,6 +870,11 @@ void ID3v2::Tag::parse(const ByteVector &origData)
         debug("Padding *and* a footer found.  This is not allowed by the spec.");
       }
 
+      break;
+    }
+
+    if(frameCount++ >= MAX_ID3V2_FRAME_COUNT) {
+      debug("ID3v2::Tag::parse() -- Maximum frame count exceeded");
       break;
     }
 
