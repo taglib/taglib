@@ -25,6 +25,7 @@
 
 #include "oggfile.h"
 
+#include <limits>
 #include <utility>
 
 #include "tdebug.h"
@@ -77,16 +78,26 @@ Ogg::File::~File() = default;
 
 ByteVector Ogg::File::packet(unsigned int i)
 {
+  return packet(i, std::numeric_limits<unsigned int>::max());
+}
+
+ByteVector Ogg::File::packet(unsigned int i, unsigned int maxSize)
+{
   // Check to see if we're called setPacket() for this packet since the last
   // save:
 
-  if(d->dirtyPackets.contains(i))
+  if(d->dirtyPackets.contains(i)) {
+    if(d->dirtyPackets[i].size() > maxSize) {
+      debug("Ogg::File::packet() -- Maximum packet size exceeded");
+      return ByteVector();
+    }
     return d->dirtyPackets[i];
+  }
 
   // If we haven't indexed the page where the packet we're interested in starts,
   // begin reading pages until we have.
 
-  if(!readPages(i)) {
+  if(!readPages(i, maxSize)) {
     debug("Ogg::File::packet() -- Could not find the requested packet.");
     return ByteVector();
   }
@@ -108,7 +119,12 @@ ByteVector Ogg::File::packet(unsigned int i)
 
   while(nextPacketIndex(*it) <= i) {
     ++it;
-    packet.append((*it)->packets().front());
+    const ByteVector packetPart = (*it)->packets().front();
+    if(packetPart.size() > maxSize - packet.size()) {
+      debug("Ogg::File::packet() -- Maximum packet size exceeded");
+      return ByteVector();
+    }
+    packet.append(packetPart);
   }
 
   return packet;
@@ -219,6 +235,39 @@ bool Ogg::File::selectStream(const ByteVector &magic)
 
 bool Ogg::File::readPages(unsigned int i)
 {
+  return readPages(i, std::numeric_limits<unsigned int>::max());
+}
+
+bool Ogg::File::readPages(unsigned int i, unsigned int maxSize)
+{
+  const bool limitPacketSize = maxSize != std::numeric_limits<unsigned int>::max();
+  unsigned int packetSize = 0;
+  const auto addPacketPartSize = [&](const Page *page) {
+    if(page->containsPacket(i) == Page::DoesNotContainPacket)
+      return true;
+
+    const ByteVectorList packets = page->packets();
+    const unsigned int packetPartIndex = i - page->firstPacketIndex();
+    if(packetPartIndex >= packets.size())
+      return false;
+
+    const unsigned int packetPartSize = packets[packetPartIndex].size();
+    if(packetPartSize > maxSize - packetSize)
+      return false;
+
+    packetSize += packetPartSize;
+    return true;
+  };
+
+  if(limitPacketSize) {
+    for(const auto &page : std::as_const(d->pages)) {
+      if(!addPacketPartSize(page)) {
+        debug("Ogg::File::readPages() -- Maximum packet size exceeded");
+        return false;
+      }
+    }
+  }
+
   while(true) {
 
     // If we've already indexed the page containing packet i, we're done.
@@ -268,6 +317,11 @@ bool Ogg::File::readPages(unsigned int i)
       = d->pages.isEmpty() ? 0 : nextPacketIndex(d->pages.back());
 
     nextPage->setFirstPacketIndex(packetIndex);
+    if(limitPacketSize && !addPacketPartSize(nextPage)) {
+      debug("Ogg::File::readPages() -- Maximum packet size exceeded");
+      delete nextPage;
+      return false;
+    }
     d->pages.append(nextPage);
   }
 }
