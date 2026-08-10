@@ -297,3 +297,8 @@ void EBML::MkSegment::parseTracks(Matroska::Properties *properties) const
     tracks->parse(properties);
   }
 }
+
+String EBML::MkSegment::parseSegmentTitle() const
+{
+  return info ? info->parseTitle() : String();
+}

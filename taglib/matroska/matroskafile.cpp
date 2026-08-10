@@ -63,6 +63,9 @@ public:
   std::unique_ptr<Cues> cues;
   std::unique_ptr<Segment> segment;
   std::unique_ptr<Properties> properties;
+  // Matroska::Tag::title() falls back to this when the file has no TITLE simple
+  // tag, so it is read even when the audio properties are not.
+  String segmentTitle;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -121,9 +124,7 @@ Matroska::Tag *Matroska::File::tag(bool create) const
 {
   if(!d->tag && create) {
     d->tag = std::make_unique<Tag>();
-    if(d->properties) {
-      d->tag->setSegmentTitle(d->properties->title());
-    }
+    d->tag->setSegmentTitle(d->segmentTitle);
   }
   return d->tag.get();
 }
@@ -474,9 +475,14 @@ void Matroska::File::read(bool readProperties, Properties::ReadStyle readStyle)
 
     segment->parseInfo(d->properties.get());
     segment->parseTracks(d->properties.get());
-    if(d->tag) {
-      d->tag->setSegmentTitle(d->properties->title());
-    }
+    d->segmentTitle = d->properties->title();
+  }
+  else {
+    // The Info element is already in memory, so this costs no additional I/O.
+    d->segmentTitle = segment->parseSegmentTitle();
+  }
+  if(d->tag) {
+    d->tag->setSegmentTitle(d->segmentTitle);
   }
 
   if(readStyle == AudioProperties::Accurate &&

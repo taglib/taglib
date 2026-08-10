@@ -185,6 +185,7 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testFastReadStyleLargeSegment);
   CPPUNIT_TEST(testAttachedFileDataReadOnDemand);
   CPPUNIT_TEST(testSaveUnrequestedAttachedFileData);
+  CPPUNIT_TEST(testSegmentTitleWithoutAudioProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1906,6 +1907,24 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), attachedFiles.front().fileName());
       CPPUNIT_ASSERT_EQUAL(attachmentData, attachedFiles.front().data());
     }
+  }
+
+  void testSegmentTitleWithoutAudioProperties()
+  {
+    // optimized.mkv keeps its title in \Segment\Info\Title and has no TITLE
+    // simple tag, so Tag::title() falls back to the segment title. That fallback
+    // must not depend on whether the audio properties were read.
+    for(const bool readProperties : {true, false}) {
+      Matroska::File f(TEST_FILE_PATH_C("optimized.mkv"), readProperties);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(readProperties, f.audioProperties() != nullptr);
+      CPPUNIT_ASSERT_EQUAL(String("handbrake"), f.tag()->title());
+    }
+
+    // A file without a segment title still reports an empty title.
+    Matroska::File noTitle(TEST_FILE_PATH_C("no-tags.mka"), false);
+    CPPUNIT_ASSERT(noTitle.isValid());
+    CPPUNIT_ASSERT_EQUAL(String(""), noTitle.tag()->title());
   }
 
   void testUnknownSizeSegment()
