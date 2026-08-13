@@ -85,6 +85,12 @@ namespace TagLib {
 
     protected:
       /*!
+       * Returns the packet contents for the i-th packet if its size does not
+       * exceed the requested maximum.
+       */
+      ByteVector packet(unsigned int i, unsigned int maxSize);
+
+      /*!
        * Constructs an Ogg file from \a file.
        *
        * \note This constructor is protected since Ogg::File shouldn't be
@@ -125,6 +131,12 @@ namespace TagLib {
        * the requested packet.
        */
       bool readPages(unsigned int i);
+
+      /*!
+       * Reads the pages needed to compose the requested packet while limiting
+       * its total size.
+       */
+      bool readPages(unsigned int i, unsigned int maxSize);
 
       /*!
        * Writes the requested packet to the file.
