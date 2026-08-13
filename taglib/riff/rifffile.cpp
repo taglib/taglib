@@ -43,7 +43,8 @@ struct Chunk
 {
   ByteVector   name;
   offset_t offset;
-  unsigned int size;
+  //! May exceed 32 bits for the "data" chunk of an RF64/BW64 file.
+  offset_t size;
   unsigned int padding;
 };
 
@@ -59,6 +60,13 @@ public:
 
   unsigned int size { 0 };
   offset_t sizeOffset { 0 };
+
+  //! An RF64 or BW64 file: the 32-bit size fields hold a 0xffffffff sentinel and
+  //! the real sizes live in a leading "ds64" chunk.
+  bool isLongForm { false };
+  //! Offset of the "ds64" chunk data, or 0 if the file has none.
+  offset_t ds64Offset { 0 };
+  offset_t dataSize64 { 0 };
 
   std::vector<Chunk> chunks;
 };
@@ -101,8 +109,13 @@ unsigned int RIFF::File::chunkCount() const
 
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
+  return static_cast<unsigned int>(std::min<offset_t>(chunkDataSize64(i), 0xffffffff));
+}
+
+offset_t RIFF::File::chunkDataSize64(unsigned int i) const
+{
   if(i >= d->chunks.size()) {
-    debug("RIFF::File::chunkDataSize() - Index out of range. Returning 0.");
+    debug("RIFF::File::chunkDataSize64() - Index out of range. Returning 0.");
     return 0;
   }
 
@@ -147,7 +160,10 @@ ByteVector RIFF::File::chunkData(unsigned int i)
   }
 
   seek(d->chunks[i].offset);
-  return readBlock(d->chunks[i].size);
+
+  // A ByteVector is limited to 32 bits. The only chunk that can be larger is the
+  // "data" chunk of an RF64 file, which no caller reads through this API.
+  return readBlock(static_cast<size_t>(std::min<offset_t>(d->chunks[i].size, 0xffffffff)));
 }
 
 void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
@@ -259,8 +275,8 @@ void RIFF::File::removeChunk(unsigned int i)
   auto it = d->chunks.begin();
   std::advance(it, i);
 
-  const unsigned int removeSize = it->size + it->padding + 8;
-  removeBlock(it->offset - 8, removeSize);
+  const offset_t removeSize = it->size + it->padding + 8;
+  removeBlock(it->offset - 8, static_cast<size_t>(removeSize));
   it = d->chunks.erase(it);
 
   while(it != d->chunks.end()) {
@@ -291,6 +307,15 @@ void RIFF::File::read()
 
   offset_t offset = tell();
 
+  // RF64 and BW64 are the long forms of WAVE, used past 4 GB: the 32-bit size fields
+  // hold a 0xffffffff sentinel and a leading "ds64" chunk carries the real sizes.
+  // Both are little-endian, so AIFF never takes this path.
+  if(!bigEndian) {
+    seek(offset);
+    const ByteVector magic = readBlock(4);
+    d->isLongForm = magic == "RF64" || magic == "BW64";
+  }
+
   offset += 4;
   d->sizeOffset = offset;
 
@@ -310,20 +335,36 @@ void RIFF::File::read()
 
     seek(offset);
     const ByteVector   chnkName = readBlock(4);
-    unsigned int chunkSize = readBlock(4).toUInt(bigEndian);
+    const unsigned int declaredSize = readBlock(4).toUInt(bigEndian);
 
     if(!isValidChunkName(chnkName)) {
       debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid ID");
       break;
     }
 
-    if(static_cast<long long>(offset) + 8 + chunkSize > length()) {
+    // "ds64" is required to be the first chunk, so its sizes are known by the time
+    // the "data" chunk is reached. Only the four fixed fields are read; the table of
+    // additional oversized chunks that may follow them is not parsed, and any chunk
+    // listed there stays on the clamping path below.
+    if(d->isLongForm && chnkName == "ds64" && d->chunks.empty() && declaredSize >= 28) {
+      seek(offset + 8);
+      const ByteVector ds64 = readBlock(28);
+      d->ds64Offset = offset + 8;
+      d->dataSize64 = static_cast<offset_t>(ds64.toULongLong(8, bigEndian));
+    }
+
+    offset_t chunkSize = declaredSize;
+
+    if(d->isLongForm && chnkName == "data" && declaredSize == 0xffffffff && d->dataSize64 > 0)
+      chunkSize = d->dataSize64;
+
+    if(offset + 8 + chunkSize > length()) {
       // Clamp to available bytes rather than rejecting the chunk outright.
       // Some encoders write a correct data chunk but with a slightly too-large
       // declared size, or place the data chunk outside the declared RIFF boundary.
       // Lenient parsers (ffmpeg, QuickTime) handle this by clamping; we do the same.
       debug("RIFF::File::read() -- Chunk '" + chnkName + "' is truncated; clamping size to available bytes.");
-      chunkSize = static_cast<unsigned int>(length() - offset - 8);
+      chunkSize = length() - offset - 8;
     }
 
     Chunk chunk;
@@ -381,7 +422,26 @@ void RIFF::File::updateGlobalSize()
 
   const Chunk first = d->chunks.front();
   const Chunk last  = d->chunks.back();
-  d->size = static_cast<unsigned int>(last.offset + last.size + last.padding - first.offset + 12);
+  const offset_t totalSize = last.offset + last.size + last.padding - first.offset + 12;
+
+  if(d->isLongForm) {
+    // A long-form file always carries the sentinel here and its real size in "ds64"; any other
+    // value is malformed. Writing it unconditionally also repairs a file whose sentinel an
+    // older writer replaced with a real total, which past 4 GB is a truncated value that makes
+    // readers stop consulting "ds64" and believe it instead.
+    d->size = 0xffffffff;
+    insert(ByteVector::fromUInt(d->size, d->endianness == BigEndian), d->sizeOffset, 4);
+
+    // The "data" chunk's own size and "ds64"'s copy of it are left alone because no write path
+    // here changes the audio.
+    if(d->ds64Offset > 0)
+      insert(ByteVector::fromULongLong(totalSize, d->endianness == BigEndian),
+             d->ds64Offset, 8);
+
+    return;
+  }
+
+  d->size = static_cast<unsigned int>(totalSize);
 
   const ByteVector data = ByteVector::fromUInt(d->size, d->endianness == BigEndian);
   insert(data, d->sizeOffset, 4);
