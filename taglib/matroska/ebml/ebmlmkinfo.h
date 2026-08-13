@@ -44,6 +44,13 @@ namespace TagLib {
       MkInfo();
 
       void parse(Matroska::Properties * properties) const;
+
+      /*!
+       * Returns the segment title, without requiring a Properties instance.
+       * Used when the file is read without audio properties, where the title
+       * is still needed for Matroska::Tag::title().
+       */
+      String parseTitle() const;
     };
   }
 }

@@ -60,6 +60,7 @@ namespace TagLib {
       std::unique_ptr<Matroska::Segment> parseSegment() const;
       void parseInfo(Matroska::Properties *properties) const;
       void parseTracks(Matroska::Properties *properties) const;
+      String parseSegmentTitle() const;
 
     private:
       std::unique_ptr<MkTags> tags;
