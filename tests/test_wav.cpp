@@ -60,6 +60,10 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST(testWaveFormatExtensible);
   CPPUNIT_TEST(testInvalidChunk);
+  CPPUNIT_TEST(testRF64IsSupported);
+  CPPUNIT_TEST(testRF64Properties);
+  CPPUNIT_TEST(testRF64Save);
+  CPPUNIT_TEST(testRF64SaveRepairsClobberedSize);
   CPPUNIT_TEST(testRIFFInfoProperties);
   CPPUNIT_TEST(testBEXTTag);
   CPPUNIT_TEST(testBEXTTagWithOtherTags);
@@ -405,6 +409,144 @@ public:
     {
       RIFF::WAV::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(!f.hasID3v2Tag());
+    }
+  }
+
+  // rf64.wav is a 50 ms RF64: 0xffffffff sentinels in the 32-bit size fields at offset 4 and
+  // in the "data" chunk header, with the real sizes in a leading "ds64" chunk. That is what a
+  // WAVE file becomes past 4 GB; the sentinels behave the same at any size, so the fixture is
+  // small.
+
+  static void setMagic(const std::string &fileName, const ByteVector &magic)
+  {
+    FileStream stream(fileName.c_str());
+    stream.seek(0);
+    stream.writeBlock(magic);
+  }
+
+  void testRF64IsSupported()
+  {
+    ScopedFileCopy copy("rf64", ".wav");
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      CPPUNIT_ASSERT(RIFF::WAV::File::isSupported(&stream));
+    }
+    setMagic(copy.fileName(), "BW64");
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      CPPUNIT_ASSERT(RIFF::WAV::File::isSupported(&stream));
+    }
+    setMagic(copy.fileName(), "XX64");
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      CPPUNIT_ASSERT(!RIFF::WAV::File::isSupported(&stream));
+    }
+  }
+
+  void testRF64Properties()
+  {
+    ScopedFileCopy copy("rf64", ".wav");
+
+    // Bytes past the audio, so that clamping the sentinel to what is available gives a
+    // different answer from "ds64" and the test can tell which one was used.
+    {
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(0, IOStream::End);
+      stream.writeBlock(ByteVector("junk", 4) + ByteVector::fromUInt(1000, false) +
+                        ByteVector(1000, '\0'));
+    }
+
+    RIFF::WAV::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT_EQUAL(50, f.audioProperties()->lengthInMilliseconds());
+    CPPUNIT_ASSERT_EQUAL(48000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(2, f.audioProperties()->channels());
+  }
+
+  void testRF64Save()
+  {
+    ScopedFileCopy copy("rf64", ".wav");
+
+    offset_t originalLength = 0;
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      originalLength = stream.length();
+    }
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      PropertyMap properties;
+      properties["TITLE"] = StringList("Title");
+      properties["ARTIST"] = StringList("Artist");
+      CPPUNIT_ASSERT(f.setProperties(properties).isEmpty());
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      const PropertyMap properties = f.properties();
+      CPPUNIT_ASSERT(properties.contains("TITLE"));
+      CPPUNIT_ASSERT(properties.contains("ARTIST"));
+      CPPUNIT_ASSERT_EQUAL(String("Title"), properties["TITLE"].front());
+      CPPUNIT_ASSERT_EQUAL(String("Artist"), properties["ARTIST"].front());
+      CPPUNIT_ASSERT_EQUAL(50, f.audioProperties()->lengthInMilliseconds());
+    }
+
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      const offset_t length = stream.length();
+      CPPUNIT_ASSERT(length > originalLength);
+
+      // The 32-bit field has to stay a sentinel: a real number there makes readers stop
+      // consulting "ds64", which past 4 GB is the only place the size fits.
+      stream.seek(4);
+      CPPUNIT_ASSERT_EQUAL(0xffffffffU, stream.readBlock(4).toUInt(false));
+
+      // "ds64" carries the real size, so it is what has to track the file's growth.
+      stream.seek(20);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned long long>(length - 8),
+                           stream.readBlock(8).toULongLong(false));
+
+      // The audio's own extent is untouched.
+      stream.seek(28);
+      CPPUNIT_ASSERT_EQUAL(9600ULL, stream.readBlock(8).toULongLong(false));
+    }
+  }
+
+  void testRF64SaveRepairsClobberedSize()
+  {
+    ScopedFileCopy copy("rf64", ".wav");
+
+    // A real total where the sentinel belongs, as an earlier version of this code left it. The
+    // value is malformed in a long-form file at any size, and past 4 GB it is also truncated,
+    // which is what makes readers report milliseconds for hours of audio.
+    {
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(4);
+      stream.writeBlock(ByteVector::fromUInt(5230, false));
+    }
+
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.InfoTag()->setTitle("Title");
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    {
+      FileStream stream(copy.fileName().c_str(), true);
+      const offset_t length = stream.length();
+
+      stream.seek(4);
+      CPPUNIT_ASSERT_EQUAL(0xffffffffU, stream.readBlock(4).toUInt(false));
+
+      stream.seek(20);
+      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned long long>(length - 8),
+                           stream.readBlock(8).toULongLong(false));
+
+      stream.seek(28);
+      CPPUNIT_ASSERT_EQUAL(9600ULL, stream.readBlock(8).toULongLong(false));
     }
   }
 

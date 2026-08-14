@@ -77,9 +77,17 @@ namespace TagLib {
       offset_t chunkOffset(unsigned int i) const;
 
       /*!
-       * \return The size of the chunk data.
+       * \return The size of the chunk data, saturated at 0xffffffff.
+       *
+       * \note The "data" chunk of an RF64 or BW64 file can be larger than this can
+       * express; use chunkDataSize64() where that matters.
        */
       unsigned int chunkDataSize(unsigned int i) const;
+
+      /*!
+       * \return The size of the chunk data, without a 32-bit limit.
+       */
+      offset_t chunkDataSize64(unsigned int i) const;
 
       /*!
        * \return The size of the padding after the chunk (can be either 0 or 1).

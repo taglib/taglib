@@ -25,6 +25,8 @@
 
 #include "wavproperties.h"
 
+#include <algorithm>
+
 #include "tdebug.h"
 #include "wavfile.h"
 
@@ -108,7 +110,8 @@ int RIFF::WAV::Properties::format() const
 void RIFF::WAV::Properties::read(File *file)
 {
   ByteVector data;
-  unsigned int streamLength = 0;
+  // 64-bit: an RF64 "data" chunk does not fit in 32.
+  offset_t streamLength = 0;
   unsigned int totalSamples = 0;
 
   for(unsigned int i = 0; i < file->chunkCount(); ++i) {
@@ -120,7 +123,7 @@ void RIFF::WAV::Properties::read(File *file)
     }
     else if(name == "data") {
       if(streamLength == 0)
-        streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
+        streamLength = file->chunkDataSize64(i) + file->chunkPadding(i);
       else
         debug("RIFF::WAV::Properties::read() - Duplicate 'data' chunk found.");
     }
@@ -162,17 +165,19 @@ void RIFF::WAV::Properties::read(File *file)
 
   if(d->format != FORMAT_PCM && (d->format != FORMAT_IEEE_FLOAT || totalSamples != 0))
     d->sampleFrames = totalSamples;
-  else if(d->channels > 0 && d->bitsPerSample > 0)
-    d->sampleFrames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
+  else if(d->channels > 0 && d->bitsPerSample > 0) {
+    const offset_t frames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
+    d->sampleFrames = static_cast<unsigned int>(std::min<offset_t>(frames, 0xffffffff));
+  }
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+    d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
   }
   else {
     if(const unsigned int byteRate = data.toUInt(8, false); byteRate > 0) {
-      d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
+      d->length  = static_cast<int>(static_cast<double>(streamLength) * 1000.0 / byteRate + 0.5);
       d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
     }
   }
