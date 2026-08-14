@@ -49,6 +49,7 @@ namespace
 {
   constexpr unsigned int MinKeyLength = 2;
   constexpr unsigned int MaxKeyLength = 255;
+  constexpr unsigned int MAX_APE_ITEM_COUNT = 50000;
 
   const String FRONT_COVER("COVER ART (FRONT)");
   const String BACK_COVER("COVER ART (BACK)");
@@ -470,6 +471,11 @@ void APE::Tag::parse(const ByteVector &data)
   unsigned int pos = 0;
 
   for(unsigned int i = 0; i < d->footer.itemCount() && pos <= data.size() - 11; i++) {
+
+    if(i >= MAX_APE_ITEM_COUNT) {
+      debug("APE::Tag::parse() - Maximum item count exceeded. Stopped parsing.");
+      return;
+    }
 
     const int nullPos = data.find('\0', pos + 8);
     if(nullPos < 0) {
