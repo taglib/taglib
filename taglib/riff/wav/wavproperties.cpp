@@ -173,11 +173,11 @@ void RIFF::WAV::Properties::read(File *file)
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
     d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+    d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
   }
   else {
     if(const unsigned int byteRate = data.toUInt(8, false); byteRate > 0) {
-      d->length  = static_cast<int>(streamLength * 1000.0 / byteRate + 0.5);
+      d->length  = static_cast<int>(static_cast<double>(streamLength) * 1000.0 / byteRate + 0.5);
       d->bitrate = static_cast<int>(byteRate * 8.0 / 1000.0 + 0.5);
     }
   }
