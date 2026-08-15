@@ -25,6 +25,8 @@
 
 #include "mpegproperties.h"
 
+#include <limits>
+
 #include "taglib_config.h"
 #include "tdebug.h"
 #include "mpegfile.h"
@@ -163,8 +165,18 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
     const double timePerFrame = firstHeader.samplesPerFrame() * 1000.0 / firstHeader.sampleRate();
     const double length = timePerFrame * d->xingHeader->totalFrames();
 
-    d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(d->xingHeader->totalSize() * 8.0 / length + 0.5);
+    // Both the frame count and the byte count come straight from the Xing
+    // header, so the millisecond length can land outside int, and a single
+    // declared frame does the same to the bitrate. Converting a double the
+    // destination type cannot represent is undefined, so leave the field at
+    // its default instead.
+    if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+      d->length = static_cast<int>(length + 0.5);
+
+      const double bitrate = d->xingHeader->totalSize() * 8.0 / length;
+      if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+        d->bitrate = static_cast<int>(bitrate + 0.5);
+    }
   }
   else {
     int bitRate = firstHeader.bitrate();
@@ -239,8 +251,14 @@ void MPEG::Properties::read(File *file, ReadStyle readStyle)
       {
         const Header lastHeader(file, lastFrameOffset, false);
         if(const offset_t streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
-           streamLength > 0)
-          d->length = static_cast<int>(static_cast<double>(streamLength) * 8.0 / d->bitrate + 0.5);
+           streamLength > 0) {
+          // Same shape as the Xing path above, but bounded by the real stream
+          // length rather than a declared count, so it needs a very large file
+          // rather than a crafted header. Guarded for consistency.
+          const double length = static_cast<double>(streamLength) * 8.0 / d->bitrate;
+          if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max()))
+            d->length = static_cast<int>(length + 0.5);
+        }
       }
     }
   }
