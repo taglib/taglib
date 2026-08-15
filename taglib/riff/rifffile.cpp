@@ -66,7 +66,7 @@ public:
   bool isLongForm { false };
   //! Offset of the "ds64" chunk data, or 0 if the file has none.
   offset_t ds64Offset { 0 };
-  offset_t dataSize64 { 0 };
+  unsigned long long dataSize64 { 0 };
 
   std::vector<Chunk> chunks;
 };
@@ -324,8 +324,10 @@ void RIFF::File::read()
 
   offset += 8;
 
-  // + 8: chunk header at least, fix for additional junk bytes
-  while(offset + 8 <= length()) {
+  // A chunk header must fit in the remaining file. Use subtraction here so that
+  // malformed offsets cannot overflow while checking the bound.
+  const offset_t fileLength = length();
+  while(offset >= 0 && offset <= fileLength && fileLength - offset >= 8) {
 
     if(d->chunks.size() >= MAX_RIFF_CHUNK_COUNT) {
       debug("RIFF::File::read() -- Maximum chunk count exceeded");
@@ -349,16 +351,25 @@ void RIFF::File::read()
     if(d->isLongForm && chnkName == "ds64" && d->chunks.empty() && declaredSize >= 28) {
       seek(offset + 8);
       const ByteVector ds64 = readBlock(28);
-      d->ds64Offset = offset + 8;
-      d->dataSize64 = static_cast<offset_t>(ds64.toULongLong(8, bigEndian));
+      if(ds64.size() == 28) {
+        d->ds64Offset = offset + 8;
+        d->dataSize64 = ds64.toULongLong(8, bigEndian);
+      }
     }
 
+    const offset_t available = fileLength - offset - 8;
     offset_t chunkSize = declaredSize;
 
-    if(d->isLongForm && chnkName == "data" && declaredSize == 0xffffffff && d->dataSize64 > 0)
-      chunkSize = d->dataSize64;
+    if(d->isLongForm && chnkName == "data" && declaredSize == 0xffffffff && d->dataSize64 > 0) {
+      // ds64 stores an unsigned 64-bit size, while the I/O API uses signed
+      // offsets. Clamp before converting so a crafted value cannot become a
+      // negative offset or overflow the chunk extent arithmetic below.
+      chunkSize = d->dataSize64 > static_cast<unsigned long long>(available)
+        ? available
+        : static_cast<offset_t>(d->dataSize64);
+    }
 
-    if(offset + 8 + chunkSize > length()) {
+    if(chunkSize > available) {
       // Clamp to available bytes rather than rejecting the chunk outright.
       // Some encoders write a correct data chunk but with a slightly too-large
       // declared size, or place the data chunk outside the declared RIFF boundary.
