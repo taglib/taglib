@@ -25,6 +25,8 @@
 
 #include "dsdiffproperties.h"
 
+#include <limits>
+
 #include "tstring.h"
 
 using namespace TagLib;
@@ -57,9 +59,17 @@ DSDIFF::Properties::Properties(unsigned int sampleRate,
   d->sampleWidth = 1;
   d->sampleRate = sampleRate;
   d->bitrate = bitrate;
-  d->length = d->sampleRate > 0
-    ? static_cast<int>(static_cast<double>(d->sampleCount) * 1000.0 / d->sampleRate + 0.5)
-    : 0;
+  // sampleCount is derived from a chunk size in the file and sampleRate is read from
+  // it, so the millisecond count can land outside int, and converting a double the
+  // destination type cannot represent is undefined. Report an unknown length instead,
+  // which is what a zero sample rate already does.
+  d->length = 0;
+  if(d->sampleRate > 0 && d->sampleCount > 0) {
+    const double milliseconds =
+      static_cast<double>(d->sampleCount) * 1000.0 / d->sampleRate + 0.5;
+    if(milliseconds < static_cast<double>(std::numeric_limits<int>::max()))
+      d->length = static_cast<int>(milliseconds);
+  }
 }
 
 DSDIFF::Properties::~Properties() = default;
