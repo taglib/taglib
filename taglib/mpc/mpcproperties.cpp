@@ -240,9 +240,18 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
 
       if(const auto frameCount = d->sampleFrames - begSilence;
          frameCount > 0 && d->sampleRate > 0) {
+        // frameCount comes from counts in the file, so the millisecond figure can land
+        // outside int, and converting a double the destination type cannot represent is
+        // undefined. Leave the fields at their defaults rather than converting.
         const auto length = static_cast<double>(frameCount) * 1000.0 / d->sampleRate;
-        d->length  = static_cast<int>(length + 0.5);
-        d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
+
+        if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+          d->length = static_cast<int>(length + 0.5);
+
+          const double bitrate = static_cast<double>(streamLength) * 8.0 / length;
+          if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+            d->bitrate = static_cast<int>(bitrate + 0.5);
+        }
       }
     }
     else if (packetType == "RG") {
