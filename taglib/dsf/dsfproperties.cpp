@@ -26,6 +26,8 @@
 
 #include "dsfproperties.h"
 
+#include <limits>
+
 using namespace TagLib;
 
 class DSF::Properties::PropertiesPrivate
@@ -128,7 +130,16 @@ void DSF::Properties::read(const ByteVector &data)
 
   d->bitrate = static_cast<unsigned int>(
       d->samplingFrequency * d->bitsPerSample * d->channelNum / 1000.0 + 0.5);
-  d->length = d->samplingFrequency > 0
-      ? static_cast<unsigned int>(static_cast<double>(d->sampleCount) * 1000.0 / d->samplingFrequency + 0.5)
-      : 0;
+
+  // sampleCount and samplingFrequency both come straight from the file, so the
+  // millisecond count can land outside unsigned int, and converting a double that
+  // does not fit the destination type is undefined. Report an unknown length rather
+  // than converting, which is what a zero sampling frequency already does.
+  d->length = 0;
+  if(d->samplingFrequency > 0 && d->sampleCount > 0) {
+    const double milliseconds =
+      static_cast<double>(d->sampleCount) * 1000.0 / d->samplingFrequency + 0.5;
+    if(milliseconds < static_cast<double>(std::numeric_limits<unsigned int>::max()))
+      d->length = static_cast<unsigned int>(milliseconds);
+  }
 }
