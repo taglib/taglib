@@ -32,6 +32,25 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace
+{
+  /*!
+   * Returns the channel type denoted by \a c, the channel byte of an RVA2
+   * channel record, or Other if it denotes nothing.
+   *
+   * The byte comes from the file, and the range of the enumeration is only
+   * 0..15, so the value cannot simply be cast.
+   */
+  RelativeVolumeFrame::ChannelType channelTypeFromByte(char c)
+  {
+    if(const auto value = static_cast<unsigned char>(c);
+       value <= RelativeVolumeFrame::Subwoofer)
+      return static_cast<RelativeVolumeFrame::ChannelType>(value);
+
+    return RelativeVolumeFrame::Other;
+  }
+} // namespace
+
 struct ChannelData
 {
   RelativeVolumeFrame::ChannelType channelType { RelativeVolumeFrame::Other };
@@ -133,7 +152,7 @@ void RelativeVolumeFrame::parseFields(const ByteVector &data)
 
   while(pos <= static_cast<int>(data.size()) - 4) {
 
-    auto type = static_cast<ChannelType>(data[pos]);
+    auto type = channelTypeFromByte(data[pos]);
     pos += 1;
 
     ChannelData &channel = d->channels[type];
