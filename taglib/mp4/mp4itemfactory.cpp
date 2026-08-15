@@ -41,6 +41,21 @@ namespace {
 
 constexpr char freeFormPrefix[] = "----:com.apple.iTunes:";
 
+/*!
+ * Returns the atom data type denoted by \a flags, the type field of an
+ * iTunes metadata atom, or TypeUndefined if it cannot be represented.
+ *
+ * The field is 32 bits wide and comes from the file, while the range of the
+ * enumeration is 0..255, so it cannot simply be cast.
+ */
+MP4::AtomDataType atomDataTypeFromFlags(int flags)
+{
+  if(flags >= MP4::TypeImplicit && flags <= MP4::TypeUndefined)
+    return static_cast<MP4::AtomDataType>(flags);
+
+  return MP4::TypeUndefined;
+}
+
 MP4::CoverArt::Format detectImageFormat(const ByteVector &payload)
 {
   const unsigned int size = payload.size();
@@ -452,7 +467,7 @@ MP4::AtomDataList ItemFactory::parseData2(
         debug("MP4: Unexpected atom \"" + name + "\", expecting \"name\"");
         return result;
       }
-      result.append(AtomData(static_cast<AtomDataType>(flags),
+      result.append(AtomData(atomDataTypeFromFlags(flags),
                     data.mid(pos + 12, length - 12)));
     }
     else {
@@ -461,7 +476,7 @@ MP4::AtomDataList ItemFactory::parseData2(
         return result;
       }
       if(expectedFlags == -1 || flags == expectedFlags) {
-        result.append(AtomData(static_cast<AtomDataType>(flags),
+        result.append(AtomData(atomDataTypeFromFlags(flags),
                       data.mid(pos + 16, length - 16)));
       }
     }
