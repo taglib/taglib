@@ -221,19 +221,29 @@ namespace
       // handler_type is at offset 16 from atom start (8 header + 4 version/flags + 4 pre_defined)
       if(ByteVector data = file->readBlock(hdlr->length());
          data.containsAt("soun", 16)) {
-        info.trak = trak;
         // Read track_id from tkhd
-        if(const MP4::Atom *tkhd = trak->find("tkhd")) {
-          file->seek(tkhd->offset());
-          ByteVector tkhdData = file->readBlock(tkhd->length());
-          if(const auto version = static_cast<unsigned char>(tkhdData[8]);
-             version == 1 && tkhdData.size() >= 8 + 20 + 4) {
-            info.trackId = tkhdData.toUInt(28U);
-          }
-          else if(tkhdData.size() >= 8 + 12 + 4) {
-            info.trackId = tkhdData.toUInt(20U);
-          }
+        const MP4::Atom *tkhd = trak->find("tkhd");
+        if(!tkhd)
+          continue;
+
+        file->seek(tkhd->offset());
+        ByteVector tkhdData = file->readBlock(tkhd->length());
+        if(tkhdData.size() < 9)
+          continue;
+
+        const auto version = static_cast<unsigned char>(tkhdData[8]);
+        if(version == 1) {
+          if(tkhdData.size() < 8 + 20 + 4)
+            continue;
+          info.trackId = tkhdData.toUInt(28U);
         }
+        else {
+          if(tkhdData.size() < 8 + 12 + 4)
+            continue;
+          info.trackId = tkhdData.toUInt(20U);
+        }
+
+        info.trak = trak;
         return info;
       }
     }
@@ -251,6 +261,8 @@ namespace
 
     file->seek(mvhd->offset());
     ByteVector data = file->readBlock(mvhd->length());
+    if(data.size() < 9)
+      return 0;
     const auto version = static_cast<unsigned char>(data[8]);
 
     // next_track_ID is the last 4 bytes of mvhd
@@ -276,6 +288,8 @@ namespace
 
     file->seek(mvhd->offset());
     ByteVector data = file->readBlock(mvhd->length());
+    if(data.size() < 9)
+      return;
     const auto version = static_cast<unsigned char>(data[8]);
 
     if(const unsigned int nextTrackIdOffset = version == 1 ? 120 - 4 : 108 - 4;
@@ -312,6 +326,8 @@ namespace
 
           const unsigned int boxSize = header.toUInt();
           if(boxSize < 8)
+            break;
+          if(static_cast<offset_t>(boxSize) > trefEnd - boxStart)
             break;
 
           if(ByteVector boxName = header.mid(4, 4);
@@ -743,8 +759,10 @@ namespace
       const unsigned int boxSize = header.toUInt();
       if(boxSize < 8)
         break;
+      if(static_cast<offset_t>(boxSize) > trefEnd - boxStart)
+        break;
 
-      if(header.mid(4, 4) == type) {
+      if(header.mid(4, 4) == type && boxSize >= 12) {
         boxOffset = boxStart;
         boxLength = static_cast<offset_t>(boxSize);
         return true;
@@ -1010,21 +1028,29 @@ namespace
       const offset_t cutOff = trefHoldsOnlyChap ? trefOff : chapOff;
       const offset_t cutLen = trefHoldsOnlyChap ? trefLen : chapLen;
 
+      // The update below only supports ordinary 32-bit atom sizes. Verify
+      // the on-disk headers before removing anything so malformed or
+      // extended-size atoms cannot underflow the size fields.
+      file->seek(trefOff);
+      const unsigned int trefSize = file->readBlock(4).toUInt();
+      file->seek(audioTrak->offset());
+      const unsigned int trakSize = file->readBlock(4).toUInt();
+      if(static_cast<offset_t>(trefSize) != trefLen
+         || static_cast<offset_t>(trakSize) != audioTrak->length()
+         || trefSize < cutLen || trakSize < cutLen)
+        return;
+
       file->removeBlock(cutOff, cutLen);
 
       // Shrink the surviving tref. Its own offset precedes the cut, so it is
       // still where the atom tree says it is.
       if(!trefHoldsOnlyChap) {
         file->seek(trefOff);
-        const unsigned int trefSize = file->readBlock(4).toUInt();
-        file->seek(trefOff);
         file->writeBlock(ByteVector::fromUInt(
           static_cast<unsigned int>(trefSize - cutLen)));
       }
 
       // Fix audio trak size on disk
-      file->seek(audioTrak->offset());
-      const unsigned int trakSize = file->readBlock(4).toUInt();
       file->seek(audioTrak->offset());
       file->writeBlock(ByteVector::fromUInt(
         static_cast<unsigned int>(trakSize - cutLen)));
