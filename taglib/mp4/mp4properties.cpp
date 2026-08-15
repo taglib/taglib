@@ -25,6 +25,8 @@
 
 #include "mp4properties.h"
 
+#include <limits>
+
 #include "tdebug.h"
 #include "tstring.h"
 #include "tmap.h"
@@ -203,8 +205,15 @@ MP4::Properties::read(File *file, const Atoms *atoms)
       }
     }
   }
-  if(unit > 0 && length > 0)
-    d->length = static_cast<int>(static_cast<double>(length) * 1000.0 / static_cast<double>(unit) + 0.5);
+  // The mdhd duration is a signed 64 bit field in version 1 and the timescale
+  // beside it may be as low as 1, so the millisecond length can land outside
+  // int. Converting a double the destination type cannot represent is
+  // undefined, so leave the field at its default instead.
+  if(unit > 0 && length > 0) {
+    const double lengthMs = static_cast<double>(length) * 1000.0 / static_cast<double>(unit);
+    if(lengthMs > 0.0 && lengthMs < static_cast<double>(std::numeric_limits<int>::max()))
+      d->length = static_cast<int>(lengthMs + 0.5);
+  }
 
   MP4::Atom *atom = trak->find("mdia", "minf", "stbl", "stsd");
   if(!atom) {
