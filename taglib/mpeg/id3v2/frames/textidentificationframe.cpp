@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "textidentificationframe.h"
+#include "tutils.h"
 
 #include <algorithm>
 #include <array>
@@ -218,7 +219,7 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
 
   // read the string data type (the first byte of the field data)
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   // split the byte array into chunks based on the string type (two byte delimiter
   // for unicode encodings)

@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "synchronizedlyricsframe.h"
+#include "tutils.h"
 
 #include <utility>
 
@@ -146,7 +147,7 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   d->language = data.mid(1, 3);
   d->timestampFormat = static_cast<TimestampFormat>(data[4]);
   d->type = static_cast<Type>(data[5]);

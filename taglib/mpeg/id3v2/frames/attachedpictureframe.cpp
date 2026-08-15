@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include "attachedpictureframe.h"
+#include "tutils.h"
 
 #include "tstringlist.h"
 #include "tdebug.h"
@@ -132,7 +133,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   int pos = 1;
 
@@ -188,7 +189,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   int pos = 1;
 
