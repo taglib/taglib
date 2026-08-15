@@ -25,6 +25,8 @@
 
 #include "flacproperties.h"
 
+#include <limits>
+
 #include "tstring.h"
 #include "tdebug.h"
 
@@ -131,10 +133,19 @@ void FLAC::Properties::read(const ByteVector &data, offset_t streamLength)
 
   d->sampleFrames = (hi << 32) | lo;
 
+  // The frame count is a 36 bit field and the sample rate a 20 bit one, so the
+  // millisecond length can land outside int, and a short stream at a high rate
+  // does the same to the bitrate. Converting a double the destination type
+  // cannot represent is undefined, so leave the field at its default instead.
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
-    d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
+    if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+      d->length = static_cast<int>(length + 0.5);
+
+      const double bitrate = static_cast<double>(streamLength) * 8.0 / length;
+      if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+        d->bitrate = static_cast<int>(bitrate + 0.5);
+    }
   }
 
   if(data.size() >= pos + 16)
