@@ -25,6 +25,8 @@
 
 #include "asffile.h"
 
+#include <limits>
+
 #include <utility>
 
 #include "tdebug.h"
@@ -236,8 +238,14 @@ void ASF::File::FilePrivate::FilePropertiesObject::parse(ASF::File *file, long l
 
   const long long duration = data.toLongLong(40, false);
   const long long preroll  = data.toLongLong(56, false);
-  file->d->properties->setLengthInMilliseconds(
-    static_cast<int>(static_cast<double>(duration) / 10000.0 - static_cast<double>(preroll) + 0.5));
+  // duration and preroll are both read from the file, so the result can land outside
+  // int, and converting a double the destination type cannot represent is undefined.
+  const double milliseconds =
+    static_cast<double>(duration) / 10000.0 - static_cast<double>(preroll) + 0.5;
+
+  if(milliseconds > static_cast<double>(std::numeric_limits<int>::min()) &&
+     milliseconds < static_cast<double>(std::numeric_limits<int>::max()))
+    file->d->properties->setLengthInMilliseconds(static_cast<int>(milliseconds));
 }
 
 ByteVector ASF::File::FilePrivate::StreamPropertiesObject::guid() const
