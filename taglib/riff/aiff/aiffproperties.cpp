@@ -25,6 +25,8 @@
 
 #include "aiffproperties.h"
 
+#include <limits>
+
 #include "tdebug.h"
 #include "aifffile.h"
 
@@ -140,14 +142,23 @@ void RIFF::AIFF::Properties::read(File *file)
   d->sampleFrames  = data.toUInt(2U);
   d->bitsPerSample = data.toShort(6U);
 
+  // The sample rate is an 80 bit float read from the file and the frame count is a
+  // 32 bit count from it, so all three of these can be handed a value int cannot
+  // represent, and converting a double the destination type cannot represent is
+  // undefined. Leave the field at its default rather than converting.
   const long double smplRate = data.toFloat80BE(8);
-  if(smplRate >= 1.0)
+  if(smplRate >= 1.0 && smplRate < static_cast<long double>(std::numeric_limits<int>::max()))
     d->sampleRate = static_cast<int>(smplRate + 0.5);
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / smplRate;
-    d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
+    if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+      d->length = static_cast<int>(length + 0.5);
+
+      const double bitrate = streamLength * 8.0 / static_cast<double>(length);
+      if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+        d->bitrate = static_cast<int>(bitrate + 0.5);
+    }
   }
 
   if(data.size() >= 23) {
