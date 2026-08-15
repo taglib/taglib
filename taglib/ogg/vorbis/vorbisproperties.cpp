@@ -25,6 +25,8 @@
 
 #include "vorbisproperties.h"
 
+#include <limits>
+
 #include "tstring.h"
 #include "tdebug.h"
 #include "oggpageheader.h"
@@ -165,8 +167,18 @@ void Vorbis::Properties::read(File *file)
         for (unsigned int i = 0; i < 3; ++i) {
           fileLengthWithoutOverhead -= file->packet(i).size();
         }
-        d->length  = static_cast<int>(length + 0.5);
-        d->bitrate = static_cast<int>(static_cast<double>(fileLengthWithoutOverhead) * 8.0 / length + 0.5);
+        // The granule positions are 64 bit and the sample rate is read from the
+        // file, so the millisecond length can land outside int, and a short
+        // stream at a high rate does the same to the bitrate. Converting a
+        // double the destination type cannot represent is undefined, so leave
+        // the field at its default instead.
+        if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+          d->length = static_cast<int>(length + 0.5);
+
+          const double bitrate = static_cast<double>(fileLengthWithoutOverhead) * 8.0 / length;
+          if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+            d->bitrate = static_cast<int>(bitrate + 0.5);
+        }
       }
     }
     else {
