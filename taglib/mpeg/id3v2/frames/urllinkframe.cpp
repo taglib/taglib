@@ -30,6 +30,7 @@
 
 #include <utility>
 
+#include "tutils.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "tpropertymap.h"
@@ -196,7 +197,7 @@ void UserUrlLinkFrame::parseFields(const ByteVector &data)
 
   int pos = 0;
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   pos += 1;
 
   if(d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8) {

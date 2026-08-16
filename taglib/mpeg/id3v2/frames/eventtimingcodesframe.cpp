@@ -34,6 +34,23 @@
 using namespace TagLib;
 using namespace ID3v2;
 
+namespace
+{
+  /*!
+   * Returns the timestamp format denoted by \a c, or Unknown if it denotes
+   * nothing. The range of the enumeration is only 0..3, so the byte read from
+   * the file cannot simply be cast.
+   */
+  EventTimingCodesFrame::TimestampFormat timestampFormatFromByte(char c)
+  {
+    if(const auto value = static_cast<unsigned char>(c);
+       value <= EventTimingCodesFrame::AbsoluteMilliseconds)
+      return static_cast<EventTimingCodesFrame::TimestampFormat>(value);
+
+    return EventTimingCodesFrame::Unknown;
+  }
+} // namespace
+
 class EventTimingCodesFrame::EventTimingCodesFramePrivate
 {
 public:
@@ -101,7 +118,7 @@ void EventTimingCodesFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->timestampFormat = static_cast<TimestampFormat>(data[0]);
+  d->timestampFormat = timestampFormatFromByte(data[0]);
 
   int pos = 1;
   d->synchedEvents.clear();

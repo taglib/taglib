@@ -28,6 +28,7 @@
 
 #include "generalencapsulatedobjectframe.h"
 
+#include "tutils.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 
@@ -142,7 +143,7 @@ void GeneralEncapsulatedObjectFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   int pos = 1;
 

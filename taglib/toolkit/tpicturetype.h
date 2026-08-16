@@ -96,6 +96,15 @@ static TagLib::String typeToString(name type) {               \
 static name typeFromString(const TagLib::String &str) {       \
   return static_cast<name>(                                   \
     TagLib::Utils::pictureTypeFromString(str));               \
+}                                                             \
+static name typeFromUInt(unsigned int value) {                \
+  return static_cast<name>(                                   \
+    TagLib::Utils::pictureTypeFromUInt(value));               \
+}                                                             \
+static name typeFromByte(char value) {                        \
+  return static_cast<name>(                                   \
+    TagLib::Utils::pictureTypeFromUInt(                       \
+      static_cast<unsigned char>(value)));                    \
 }
 
 namespace TagLib {
@@ -113,6 +122,16 @@ namespace TagLib {
      * Get picture type from string representation.
      */
     int TAGLIB_EXPORT pictureTypeFromString(const String& str);
+
+    /*!
+     * Get picture type from the \a value read from a file, or Other if it
+     * denotes no picture type.
+     *
+     * The value cannot simply be cast: loading an enumeration object whose
+     * value is outside the range of the enumeration is undefined, and the
+     * range here is only 0..31.
+     */
+    int TAGLIB_EXPORT pictureTypeFromUInt(unsigned int value);
 
   }  // namespace Utils
 }  // namespace TagLib

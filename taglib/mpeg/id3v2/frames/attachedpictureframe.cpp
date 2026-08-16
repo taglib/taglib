@@ -26,6 +26,7 @@
 #include "attachedpictureframe.h"
 
 #include "tstringlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 
 using namespace TagLib;
@@ -132,7 +133,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   int pos = 1;
 
@@ -143,7 +144,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->type = static_cast<TagLib::ID3v2::AttachedPictureFrame::Type>(data[pos++]);
+  d->type = typeFromByte(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);
@@ -188,7 +189,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
 
   int pos = 1;
 
@@ -204,7 +205,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     d->mimeType = "image/" + fixedString;
   }
 
-  d->type = static_cast<TagLib::ID3v2::AttachedPictureFrame::Type>(data[pos++]);
+  d->type = typeFromByte(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);

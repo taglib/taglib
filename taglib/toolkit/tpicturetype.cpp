@@ -74,3 +74,11 @@ int Utils::pictureTypeFromString(const String& str)
   }
   return 0;
 }
+
+int Utils::pictureTypeFromUInt(unsigned int value)
+{
+  if(value < std::size(typeStrs))
+    return static_cast<int>(value);
+
+  return 0;
+}

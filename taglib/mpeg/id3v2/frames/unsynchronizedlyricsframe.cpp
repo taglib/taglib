@@ -31,6 +31,7 @@
 #include <utility>
 
 #include "tbytevectorlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "id3v2tag.h"
@@ -144,7 +145,7 @@ void UnsynchronizedLyricsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   d->language = data.mid(1, 3);
 
   int byteAlign

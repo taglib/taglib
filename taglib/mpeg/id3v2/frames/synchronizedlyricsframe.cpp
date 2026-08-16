@@ -28,12 +28,43 @@
 #include <utility>
 
 #include "tbytevectorlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "id3v2tag.h"
 
 using namespace TagLib;
 using namespace ID3v2;
+
+namespace
+{
+  /*!
+   * Returns the timestamp format denoted by \a c, or Unknown if it denotes
+   * nothing. The range of the enumeration is only 0..3, so the byte read from
+   * the file cannot simply be cast.
+   */
+  SynchronizedLyricsFrame::TimestampFormat timestampFormatFromByte(char c)
+  {
+    if(const auto value = static_cast<unsigned char>(c);
+       value <= SynchronizedLyricsFrame::AbsoluteMilliseconds)
+      return static_cast<SynchronizedLyricsFrame::TimestampFormat>(value);
+
+    return SynchronizedLyricsFrame::Unknown;
+  }
+
+  /*!
+   * Returns the content type denoted by \a c, or Other if it denotes nothing.
+   * The range of the enumeration is only 0..15.
+   */
+  SynchronizedLyricsFrame::Type contentTypeFromByte(char c)
+  {
+    if(const auto value = static_cast<unsigned char>(c);
+       value <= SynchronizedLyricsFrame::ImageUrls)
+      return static_cast<SynchronizedLyricsFrame::Type>(value);
+
+    return SynchronizedLyricsFrame::Other;
+  }
+} // namespace
 
 class SynchronizedLyricsFrame::SynchronizedLyricsFramePrivate
 {
@@ -146,10 +177,10 @@ void SynchronizedLyricsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   d->language = data.mid(1, 3);
-  d->timestampFormat = static_cast<TimestampFormat>(data[4]);
-  d->type = static_cast<Type>(data[5]);
+  d->timestampFormat = timestampFormatFromByte(data[4]);
+  d->type = contentTypeFromByte(data[5]);
 
   int pos = 6;
 

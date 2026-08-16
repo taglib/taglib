@@ -28,6 +28,7 @@
 #include <utility>
 
 #include "tbytevectorlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "tpropertymap.h"
@@ -143,7 +144,7 @@ void CommentsFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   d->language = data.mid(1, 3);
 
   int byteAlign = d->textEncoding == String::Latin1 || d->textEncoding == String::UTF8 ? 1 : 2;

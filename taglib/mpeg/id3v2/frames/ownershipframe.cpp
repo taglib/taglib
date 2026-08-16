@@ -25,6 +25,7 @@
 
 #include "ownershipframe.h"
 
+#include "tutils.h"
 #include "tstringlist.h"
 #include "id3v2tag.h"
 
@@ -124,7 +125,7 @@ void OwnershipFrame::parseFields(const ByteVector &data)
   }
 
   // Get the text encoding
-  d->textEncoding = static_cast<String::Type>(data[0]);
+  d->textEncoding = Utils::textEncodingFromByte(data[0]);
   pos += 1;
 
   // Read the price paid, this is a null terminated string
