@@ -24,12 +24,12 @@
  ***************************************************************************/
 
 #include "textidentificationframe.h"
-#include "tutils.h"
 
 #include <algorithm>
 #include <array>
 #include <utility>
 
+#include "tutils.h"
 #include "tpropertymap.h"
 #include "id3v1genres.h"
 #include "id3v2tag.h"

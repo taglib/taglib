@@ -24,11 +24,11 @@
  ***************************************************************************/
 
 #include "id3v2framefactory.h"
-#include "tutils.h"
 
 #include <array>
 #include <utility>
 
+#include "tutils.h"
 #include "tdebug.h"
 #include "tzlib.h"
 #include "id3v2synchdata.h"

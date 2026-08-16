@@ -97,9 +97,14 @@ static name typeFromString(const TagLib::String &str) {       \
   return static_cast<name>(                                   \
     TagLib::Utils::pictureTypeFromString(str));               \
 }                                                             \
-static name typeFromByte(unsigned int value) {                \
+static name typeFromUInt(unsigned int value) {                \
   return static_cast<name>(                                   \
-    TagLib::Utils::pictureTypeFromByte(value));               \
+    TagLib::Utils::pictureTypeFromUInt(value));               \
+}                                                             \
+static name typeFromByte(char value) {                        \
+  return static_cast<name>(                                   \
+    TagLib::Utils::pictureTypeFromUInt(                       \
+      static_cast<unsigned char>(value)));                    \
 }
 
 namespace TagLib {
@@ -126,7 +131,7 @@ namespace TagLib {
      * value is outside the range of the enumeration is undefined, and the
      * range here is only 0..31.
      */
-    int TAGLIB_EXPORT pictureTypeFromByte(unsigned int value);
+    int TAGLIB_EXPORT pictureTypeFromUInt(unsigned int value);
 
   }  // namespace Utils
 }  // namespace TagLib

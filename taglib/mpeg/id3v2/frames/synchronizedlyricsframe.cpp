@@ -24,11 +24,11 @@
  ***************************************************************************/
 
 #include "synchronizedlyricsframe.h"
-#include "tutils.h"
 
 #include <utility>
 
 #include "tbytevectorlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "id3v2tag.h"

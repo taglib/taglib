@@ -24,8 +24,8 @@
  ***************************************************************************/
 
 #include "ownershipframe.h"
-#include "tutils.h"
 
+#include "tutils.h"
 #include "tstringlist.h"
 #include "id3v2tag.h"
 

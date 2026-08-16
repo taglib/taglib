@@ -27,8 +27,8 @@
  ***************************************************************************/
 
 #include "generalencapsulatedobjectframe.h"
-#include "tutils.h"
 
+#include "tutils.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 

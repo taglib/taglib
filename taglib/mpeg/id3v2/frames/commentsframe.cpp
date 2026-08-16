@@ -24,11 +24,11 @@
  ***************************************************************************/
 
 #include "commentsframe.h"
-#include "tutils.h"
 
 #include <utility>
 
 #include "tbytevectorlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 #include "tstringlist.h"
 #include "tpropertymap.h"

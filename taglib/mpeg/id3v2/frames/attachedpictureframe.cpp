@@ -24,9 +24,9 @@
  ***************************************************************************/
 
 #include "attachedpictureframe.h"
-#include "tutils.h"
 
 #include "tstringlist.h"
+#include "tutils.h"
 #include "tdebug.h"
 
 using namespace TagLib;
@@ -144,7 +144,7 @@ void AttachedPictureFrame::parseFields(const ByteVector &data)
     return;
   }
 
-  d->type = typeFromByte(static_cast<unsigned char>(data[pos++]));
+  d->type = typeFromByte(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);
@@ -205,7 +205,7 @@ void AttachedPictureFrameV22::parseFields(const ByteVector &data)
     d->mimeType = "image/" + fixedString;
   }
 
-  d->type = typeFromByte(static_cast<unsigned char>(data[pos++]));
+  d->type = typeFromByte(data[pos++]);
   d->description = readStringField(data, d->textEncoding, &pos);
 
   d->data = data.mid(pos);
