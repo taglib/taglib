@@ -245,11 +245,13 @@ void MPC::Properties::readSV8(File *file, offset_t streamLength)
         // undefined. Leave the fields at their defaults rather than converting.
         const auto length = static_cast<double>(frameCount) * 1000.0 / d->sampleRate;
 
-        if(length > 0.0 && length < static_cast<double>(std::numeric_limits<int>::max())) {
+        if(length > 0.0 &&
+           length + 0.5 <= static_cast<double>(std::numeric_limits<int>::max())) {
           d->length = static_cast<int>(length + 0.5);
 
           const double bitrate = static_cast<double>(streamLength) * 8.0 / length;
-          if(bitrate >= 0.0 && bitrate < static_cast<double>(std::numeric_limits<int>::max()))
+          if(bitrate >= 0.0 &&
+             bitrate + 0.5 <= static_cast<double>(std::numeric_limits<int>::max()))
             d->bitrate = static_cast<int>(bitrate + 0.5);
         }
       }
@@ -350,9 +352,14 @@ void MPC::Properties::readSV7(const ByteVector &data, offset_t streamLength)
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
-    d->length = static_cast<int>(length + 0.5);
+    if(length + 0.5 <= static_cast<double>(std::numeric_limits<int>::max())) {
+      d->length = static_cast<int>(length + 0.5);
 
-    if(d->bitrate == 0)
-      d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
+      if(d->bitrate == 0) {
+        const double bitrate = static_cast<double>(streamLength) * 8.0 / length;
+        if(bitrate + 0.5 <= static_cast<double>(std::numeric_limits<int>::max()))
+          d->bitrate = static_cast<int>(bitrate + 0.5);
+      }
+    }
   }
 }
