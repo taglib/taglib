@@ -40,6 +40,7 @@ namespace {
     "stbl", "minf", "moof", "traf", "trak",
     "stsd", "stem"
   };
+  constexpr int MAX_MP4_ATOM_COUNT = 50000;
   constexpr int MAX_MP4_ATOM_COUNT_PER_LEVEL = 50000;
 } // namespace
 
@@ -56,6 +57,25 @@ public:
 MP4::Atom::Atom(File *file, int depth)
   : d(std::make_unique<AtomPrivate>(file->tell()))
 {
+  unsigned int atomCount = 0;
+  read(file, depth, atomCount);
+}
+
+MP4::Atom::Atom(File *file, int depth, unsigned int &atomCount)
+  : d(std::make_unique<AtomPrivate>(file->tell()))
+{
+  read(file, depth, atomCount);
+}
+
+void MP4::Atom::read(File *file, int depth, unsigned int &atomCount)
+{
+  if(++atomCount > MAX_MP4_ATOM_COUNT) {
+    debug("MP4: Maximum atom count exceeded");
+    d->length = 0;
+    file->seek(0, File::End);
+    return;
+  }
+
   d->children.setAutoDelete(true);
 
   ByteVector header = file->readBlock(8);
@@ -124,7 +144,7 @@ MP4::Atom::Atom(File *file, int depth)
           file->seek(0, File::End);
           return;
         }
-        auto child = new MP4::Atom(file, depth + 1);
+        auto child = new MP4::Atom(file, depth + 1, atomCount);
         d->children.append(child);
         if(child->d->length == 0)
           return;
@@ -232,12 +252,13 @@ MP4::Atoms::Atoms(File *file) :
   d(std::make_unique<AtomsPrivate>())
 {
   d->atoms.setAutoDelete(true);
+  unsigned int atomCount = 0;
 
   file->seek(0, File::End);
   offset_t end = file->tell();
   file->seek(0);
   while(file->tell() + 8 <= end) {
-    auto atom = new MP4::Atom(file);
+    auto atom = new MP4::Atom(file, 0, atomCount);
     d->atoms.append(atom);
     if (atom->length() == 0)
       break;

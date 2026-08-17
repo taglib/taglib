@@ -56,6 +56,7 @@ namespace TagLib
 
     protected:
       bool read(File &file, int depth);
+      bool read(File &file, int depth, unsigned int &elementCount);
 
       offset_t offset;
       offset_t padding = 0;
