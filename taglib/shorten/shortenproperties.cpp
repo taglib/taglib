@@ -26,6 +26,8 @@
 
 #include "shortenproperties.h"
 
+#include <limits>
+
 #include "shortenutils.h"
 
 using namespace TagLib;
@@ -63,9 +65,16 @@ Shorten::Properties::Properties(const PropertyValues *values, ReadStyle style) :
     d->bitsPerSample = values->bitsPerSample;
     d->sampleFrames = values->sampleFrames;
 
-    d->bitrate = static_cast<int>(d->sampleRate * d->bitsPerSample * d->channelCount / 1000.0 + 0.5);
-    if(d->sampleRate > 0)
-      d->length = static_cast<int>(static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate + 0.5);
+    const auto maxInt = static_cast<double>(std::numeric_limits<int>::max());
+    const double bitrate = static_cast<double>(d->sampleRate) * d->bitsPerSample * d->channelCount / 1000.0;
+    if(bitrate >= 0.0 && bitrate + 0.5 <= maxInt)
+      d->bitrate = static_cast<int>(bitrate + 0.5);
+
+    if(d->sampleRate > 0) {
+      const double length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
+      if(length > 0.0 && length + 0.5 <= maxInt)
+        d->length = static_cast<int>(length + 0.5);
+    }
   }
 }
 

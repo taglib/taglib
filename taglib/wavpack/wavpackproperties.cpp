@@ -31,6 +31,7 @@
 
 #include <cstdint>
 #include <array>
+#include <limits>
 
 #include "tstring.h"
 #include "tdebug.h"
@@ -314,8 +315,14 @@ void WavPack::Properties::read(File *file, offset_t streamLength)
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
     const auto length = static_cast<double>(d->sampleFrames) * 1000.0 / d->sampleRate;
-    d->length  = static_cast<int>(length + 0.5);
-    d->bitrate = static_cast<int>(static_cast<double>(streamLength) * 8.0 / length + 0.5);
+    const auto maxInt = static_cast<double>(std::numeric_limits<int>::max());
+    if(length > 0.0 && length + 0.5 <= maxInt) {
+      d->length = static_cast<int>(length + 0.5);
+
+      const double bitrate = static_cast<double>(streamLength) * 8.0 / length;
+      if(bitrate >= 0.0 && bitrate + 0.5 <= maxInt)
+        d->bitrate = static_cast<int>(bitrate + 0.5);
+    }
   }
 }
 
