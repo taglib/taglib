@@ -24,6 +24,9 @@
  ***************************************************************************/
 
 #include "ebmlmktracks.h"
+
+#include <limits>
+
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlfloatelement.h"
@@ -76,11 +79,16 @@ void EBML::MkTracks::parse(Matroska::Properties *properties) const
       }
     }
     if(bitDepth || channels) {
-      properties->setSampleRate(static_cast<int>(samplingFrequency));
-      properties->setBitsPerSample(static_cast<int>(bitDepth));
-      properties->setChannels(static_cast<int>(channels));
-      properties->setCodecName(codecId);
-      return;
+      const auto maxInt = static_cast<unsigned long long>(std::numeric_limits<int>::max());
+      if(samplingFrequency >= 0.0 &&
+         samplingFrequency + 0.5 <= static_cast<double>(maxInt) &&
+         bitDepth <= maxInt && channels <= maxInt) {
+        properties->setSampleRate(static_cast<int>(samplingFrequency));
+        properties->setBitsPerSample(static_cast<int>(bitDepth));
+        properties->setChannels(static_cast<int>(channels));
+        properties->setCodecName(codecId);
+        return;
+      }
     }
   }
 }

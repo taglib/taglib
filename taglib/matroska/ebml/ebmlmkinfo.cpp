@@ -24,6 +24,9 @@
  ***************************************************************************/
 
 #include "ebmlmkinfo.h"
+
+#include <limits>
+
 #include "ebmlstringelement.h"
 #include "ebmluintelement.h"
 #include "ebmlfloatelement.h"
@@ -62,8 +65,9 @@ void EBML::MkInfo::parse(Matroska::Properties *properties) const
     }
   }
 
-  properties->setLengthInMilliseconds(
-    static_cast<int>(duration * static_cast<double>(timestampScale) / 1000000.0));
+  const double length = duration * static_cast<double>(timestampScale) / 1000000.0;
+  if(length >= 0.0 && length + 0.5 <= static_cast<double>(std::numeric_limits<int>::max()))
+    properties->setLengthInMilliseconds(static_cast<int>(length));
   properties->setTitle(parseTitle());
 }
 
