@@ -91,6 +91,7 @@ namespace
   const ByteVector contentEncryptionGuid("\xFB\xB3\x11\x22\x23\xBD\xD2\x11\xB4\xB7\x00\xA0\xC9\x55\xFC\x6E", 16);
   const ByteVector extendedContentEncryptionGuid("\x14\xE6\x8A\x29\x22\x26 \x17\x4C\xB9\x35\xDA\xE0\x7E\xE9\x28\x9C", 16);
   const ByteVector advancedContentEncryptionGuid("\xB6\x9B\x07\x7A\xA4\xDA\x12\x4E\xA5\xCA\x91\xD3\x8D\xC1\x1A\x8D", 16);
+  constexpr unsigned int MAX_ASF_HEADER_EXTENSION_OBJECT_COUNT = 50000;
 
   bool attributeDataFits(File *file, long long size, offset_t &end)
   {
@@ -435,20 +436,39 @@ ByteVector ASF::File::FilePrivate::HeaderExtensionObject::guid() const
   return headerExtensionGuid;
 }
 
-void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, long long /*size*/)
+void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, long long size)
 {
+  // The object header is 24 bytes. The extension header contains an 18-byte
+  // reserved field and a 4-byte data size before the child objects.
+  if(size < 46) {
+    file->setValid(false);
+    return;
+  }
+
   file->seek(18, File::Current);
-  long long dataSize = readDWORD(file);
+  bool ok;
+  const long long dataSize = readDWORD(file, &ok);
+  if(!ok || dataSize > size - 46) {
+    file->setValid(false);
+    return;
+  }
+
   long long dataPos = 0;
+  unsigned int objectCount = 0;
   while(dataPos < dataSize) {
+    if(objectCount++ >= MAX_ASF_HEADER_EXTENSION_OBJECT_COUNT) {
+      debug("ASF::HeaderExtensionObject::parse(): Maximum child object count exceeded.");
+      file->setValid(false);
+      break;
+    }
+
     ByteVector uid = file->readBlock(16);
     if(uid.size() != 16) {
       file->setValid(false);
       break;
     }
-    bool ok;
-    long long size = readQWORD(file, &ok);
-    if(!ok || size < 0 || size > dataSize - dataPos) {
+    const long long childSize = readQWORD(file, &ok);
+    if(!ok || childSize < 24 || childSize > dataSize - dataPos) {
       file->setValid(false);
       break;
     }
@@ -464,9 +484,9 @@ void ASF::File::FilePrivate::HeaderExtensionObject::parse(ASF::File *file, long 
     else {
       obj = new UnknownObject(uid);
     }
-    obj->parse(file, size);
+    obj->parse(file, childSize);
     objects.append(obj);
-    dataPos += size;
+    dataPos += childSize;
   }
 }
 
