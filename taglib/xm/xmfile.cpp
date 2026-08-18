@@ -594,7 +594,10 @@ void XM::File::read(bool)
       sumSampleCount += sampleCount;
       // wouldn't know which header size to assume otherwise:
       READ_ASSERT(instrumentHeaderSize >= inCnt + 4 && readU32L(sampleHeaderSize));
-      READ_ASSERT(sampleHeaderSize > 0);
+      // Some trackers wrote zero here even though 40-byte sample headers
+      // follow. The value is ignored by FastTracker 2 and other loaders.
+      if(sampleHeaderSize == 0)
+        sampleHeaderSize = 40;
       // skip unhandled header proportion:
       seek(instrumentHeaderSize - inCnt - 4, Current);
 
