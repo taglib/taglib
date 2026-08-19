@@ -112,9 +112,12 @@ namespace TagLib {
 
     protected:
       Atom(File *file, int depth);
+      Atom(File *file, int depth, unsigned int &atomCount);
 
     private:
+      friend class Atoms;
       class AtomPrivate;
+      void read(File *file, int depth, unsigned int &atomCount);
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<AtomPrivate> d;
     };
