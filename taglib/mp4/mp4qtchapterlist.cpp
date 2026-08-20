@@ -991,6 +991,25 @@ namespace
     return String(data.mid(2, textLen), String::UTF8);
   }
 
+  bool sampleFits(TagLib::File *file, const std::vector<unsigned int> &offsets,
+                  unsigned int sampleIndex, unsigned int sampleSize)
+  {
+    const offset_t offset = offsets[sampleIndex];
+    const offset_t fileLength = file->length();
+    if(offset < 0 || offset > fileLength ||
+       static_cast<offset_t>(sampleSize) > fileLength - offset)
+      return false;
+
+    if(sampleIndex + 1 < offsets.size()) {
+      const offset_t nextOffset = offsets[sampleIndex + 1];
+      if(nextOffset <= offset ||
+         static_cast<offset_t>(sampleSize) > nextOffset - offset)
+        return false;
+    }
+
+    return true;
+  }
+
   // -- Remove helpers -------------------------------------------------------
 
   //! Removes the tref atom from the audio track.
@@ -1249,6 +1268,9 @@ bool MP4::QtChapterList::read(TagLib::File *file)
       unsigned int sampleSize = sizeInfo.defaultSize;
       if(sampleSize == 0 && sampleIndex < sizeInfo.perSampleSizes.size())
         sampleSize = sizeInfo.perSampleSizes[sampleIndex];
+
+      if(!sampleFits(file, offsets, sampleIndex, sampleSize))
+        return false;
 
       String title = readTextSample(file, offsets[sampleIndex], sampleSize);
 
