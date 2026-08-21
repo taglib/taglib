@@ -943,19 +943,15 @@ namespace
     std::vector<unsigned int> sampleOffsets;
     const auto totalChunks = static_cast<unsigned int>(chunkOffsets.size());
     unsigned int sampleIndex = 0;
+    std::size_t stscIndex = 0;
 
     for(unsigned int chunkIdx = 0; chunkIdx < totalChunks; ++chunkIdx) {
       // Find which stsc entry applies to this chunk (1-based)
       const unsigned int chunkNum = chunkIdx + 1;
-      unsigned int samplesInChunk = stscEntries[0].samplesPerChunk;
-      for(const auto & stscEntry : stscEntries) {
-        if(stscEntry.firstChunk <= chunkNum) {
-          samplesInChunk = stscEntry.samplesPerChunk;
-        }
-        else {
-          break;
-        }
-      }
+      while(stscIndex + 1 < stscEntries.size() &&
+            stscEntries[stscIndex + 1].firstChunk <= chunkNum)
+        ++stscIndex;
+      unsigned int samplesInChunk = stscEntries[stscIndex].samplesPerChunk;
 
       unsigned int offsetInChunk = 0;
       if(samplesInChunk > sizeInfo.sampleCount - sampleIndex)
