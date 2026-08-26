@@ -26,6 +26,7 @@
 #include "asfattribute.h"
 
 #include "tdebug.h"
+#include "tutils.h"
 
 #include "asffile.h"
 #include "asfutils.h"
@@ -171,26 +172,27 @@ ASF::Attribute ASF::Attribute::fromGuid(const ByteVector& guid)
 
 String ASF::Attribute::parse(ASF::File &file, int kind)
 {
-  unsigned int size, nameLength;
+  unsigned int size;
+  unsigned short nameLength, dataType;
   String name;
   d->pictureValue = Picture::fromInvalid();
   // extended content descriptor
   if(kind == 0) {
     nameLength = readWORD(&file);
     name = readString(&file, nameLength);
-    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&file));
+    dataType = readWORD(&file);
     size = readWORD(&file);
   }
   // metadata & metadata library
   else {
-    int temp = readWORD(&file);
+    const unsigned short temp = readWORD(&file);
     // metadata library
     if(kind == 2) {
       d->language = temp;
     }
     d->stream = readWORD(&file);
     nameLength = readWORD(&file);
-    d->type = static_cast<ASF::Attribute::AttributeTypes>(readWORD(&file));
+    dataType = readWORD(&file);
     size = readDWORD(&file);
     name = readString(&file, nameLength);
   }
@@ -199,7 +201,7 @@ String ASF::Attribute::parse(ASF::File &file, int kind)
     debug("ASF::Attribute::parse() -- Value larger than 64kB");
   }
 
-  switch(d->type) {
+  switch(dataType) {
   case WordType:
     d->numericValue = readWORD(&file);
     break;
@@ -229,7 +231,13 @@ String ASF::Attribute::parse(ASF::File &file, int kind)
   case GuidType:
     d->byteVectorValue = file.readBlock(size);
     break;
+
+  default:
+    debug(Utils::formatString(
+      "ASF::Attribute::parse() -- Unknown data type 0x%hx", dataType));
+    return {};
   }
+  d->type = static_cast<AttributeTypes>(dataType);
 
   if(d->type == BytesType && name == "WM/Picture") {
     d->pictureValue.parse(d->byteVectorValue);

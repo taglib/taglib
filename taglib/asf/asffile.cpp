@@ -330,8 +330,9 @@ void ASF::File::FilePrivate::ExtendedContentDescriptionObject::parse(ASF::File *
     }
 
     ASF::Attribute attribute;
-    String name = attribute.parse(*file);
-    file->d->tag->addAttribute(name, attribute);
+    if(String name = attribute.parse(*file); !name.isEmpty()) {
+      file->d->tag->addAttribute(name, attribute);
+    }
 
     if(file->tell() > end) {
       file->setValid(false);
@@ -369,8 +370,9 @@ void ASF::File::FilePrivate::MetadataObject::parse(ASF::File *file, long long si
     }
 
     ASF::Attribute attribute;
-    String name = attribute.parse(*file, 1);
-    file->d->tag->addAttribute(name, attribute);
+    if(String name = attribute.parse(*file, 1); !name.isEmpty()) {
+      file->d->tag->addAttribute(name, attribute);
+    }
 
     if(file->tell() > end) {
       file->setValid(false);
@@ -408,8 +410,9 @@ void ASF::File::FilePrivate::MetadataLibraryObject::parse(ASF::File *file, long 
     }
 
     ASF::Attribute attribute;
-    String name = attribute.parse(*file, 2);
-    file->d->tag->addAttribute(name, attribute);
+    if(String name = attribute.parse(*file, 2); !name.isEmpty()) {
+      file->d->tag->addAttribute(name, attribute);
+    }
 
     if(file->tell() > end) {
       file->setValid(false);
