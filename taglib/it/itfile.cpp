@@ -81,6 +81,11 @@ bool IT::File::save()
     debug("IT::File::save() - Cannot save to a read only file.");
     return false;
   }
+  if(!isValid())
+  {
+    debug("IT::File::save() -- Trying to save invalid file.");
+    return false;
+  }
   seek(4);
   writeString(d->tag.title(), 25);
   writeByte(0);
