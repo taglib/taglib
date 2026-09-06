@@ -475,7 +475,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
                 ((h >= 'A' ? h + 10 - 'A' : h - '0') << 4) |
                  (l >= 'A' ? l + 10 - 'A' : l - '0'));
             }
-            ByteVector data = ByteVector(reinterpret_cast<char*>(buf), 16);
+            ByteVector data(reinterpret_cast<const char *>(buf), sizeof(buf));
             addAttribute(name, Attribute::fromGuid(data));
           }
           else {
