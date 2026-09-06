@@ -454,7 +454,7 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
           addAttribute(name, str.toULongLong());
           break;
         case Attribute::BoolType:
-          addAttribute(name, !str.isEmpty() && str != "0" && str.upper() != "TRUE");
+          addAttribute(name, str.toInt() != 0 || str.upper() == "TRUE");
           break;
         case Attribute::GuidType: {
           ByteVector data;
