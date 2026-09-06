@@ -457,7 +457,6 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
           addAttribute(name, !str.isEmpty() && str != "0" && str.upper() != "TRUE");
           break;
         case Attribute::GuidType: {
-          ByteVector data;
           String hexStr;
           for(wchar_t c : str) {
             if(c >= 'a' && c <= 'f') {
@@ -476,9 +475,12 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
                 ((h >= 'A' ? h + 10 - 'A' : h - '0') << 4) |
                  (l >= 'A' ? l + 10 - 'A' : l - '0'));
             }
-            data = ByteVector(reinterpret_cast<char*>(buf), 16);
+            ByteVector data = ByteVector(reinterpret_cast<char*>(buf), 16);
+            addAttribute(name, Attribute::fromGuid(data));
           }
-          addAttribute(name, Attribute::fromGuid(data));
+          else {
+            ignoredProps.insert(prop, str);
+          }
           break;
         }
         default:
