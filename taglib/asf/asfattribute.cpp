@@ -235,6 +235,7 @@ String ASF::Attribute::parse(ASF::File &file, int kind)
   default:
     debug(Utils::formatString(
       "ASF::Attribute::parse() -- Unknown data type 0x%hx", dataType));
+    file.seek(size, File::Current);
     return {};
   }
   d->type = static_cast<AttributeTypes>(dataType);
