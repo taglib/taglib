@@ -713,7 +713,11 @@ void ASF::File::read()
 
   bool ok;
   d->headerSize = readQWORD(this, &ok);
-  if(!ok) {
+  // The header must contain at least the 30-byte fixed portion
+  // (16-byte GUID + 8-byte size + 4-byte count + 2 reserved bytes),
+  // and it cannot extend beyond the physical file.
+  if(!ok || d->headerSize < 30 || d->headerSize > static_cast<unsigned long long>(length())) {
+    debug("ASF::File::read(): Invalid header size.");
     setValid(false);
     return;
   }
