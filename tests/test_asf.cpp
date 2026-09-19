@@ -362,6 +362,7 @@ public:
     tags["RELEASECOUNTRY"] = StringList("Release Country");
     tags["RELEASESTATUS"] = StringList("Release Status");
     tags["RELEASETYPE"] = StringList("Release Type");
+    tags["RATING"] = StringList("75");
     tags["REMIXER"] = StringList("Remixer");
     tags["SCRIPT"] = StringList("Script");
     tags["SUBTITLE"] = StringList("Subtitle");
@@ -438,6 +439,7 @@ public:
         {"MusicBrainz/Work Id", ASF::Attribute::UnicodeType},
         {"MusicIP/PUID", ASF::Attribute::UnicodeType},
         {"PeakValue", ASF::Attribute::DWordType},
+        {"WM/SharedUserRating", ASF::Attribute::DWordType},
         {"WM/ARTISTS", ASF::Attribute::UnicodeType},
         {"WM/AlbumArtist", ASF::Attribute::UnicodeType},
         {"WM/AlbumArtistSortOrder", ASF::Attribute::UnicodeType},
