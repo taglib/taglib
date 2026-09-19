@@ -249,6 +249,7 @@ namespace
     std::tuple("WM/TrackNumber", "TRACKNUMBER", ASF::Attribute::UnicodeType),
     std::tuple("WM/PartOfSet", "DISCNUMBER", ASF::Attribute::UnicodeType),
     std::tuple("WM/Genre", "GENRE", ASF::Attribute::UnicodeType),
+    std::tuple("WM/SharedUserRating", "RATING", ASF::Attribute::DWordType),
     std::tuple("WM/BeatsPerMinute", "BPM", ASF::Attribute::UnicodeType),
     std::tuple("WM/Mood", "MOOD", ASF::Attribute::UnicodeType),
     std::tuple("WM/InitialKey", "INITIALKEY", ASF::Attribute::UnicodeType),
