@@ -107,7 +107,10 @@ bool EBML::MasterElement::read(File &file, int depth)
 bool EBML::MasterElement::read(File &file, int depth, unsigned int &elementCount)
 {
   static constexpr int MAX_EBML_DEPTH = 64;
-  static constexpr int MAX_EBML_ELEMENT_COUNT = 50000;
+  // Whole-file budget. Must be considerably larger than the per-level limit below: a Matroska's
+  // Cues/SeekHead index scales with duration, and a real 6.0 GB, 48-minute album measures at 99780
+  // elements, so a 50000 whole-file budget rejects ordinary media outright.
+  static constexpr int MAX_EBML_ELEMENT_COUNT = 1000000;
   static constexpr int MAX_EBML_ELEMENT_COUNT_PER_LEVEL = 50000;
   if(depth > MAX_EBML_DEPTH) {
     debug("EBML: Maximum nesting depth exceeded");
