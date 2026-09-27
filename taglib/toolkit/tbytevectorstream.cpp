@@ -73,7 +73,7 @@ ByteVector ByteVectorStream::readBlock(size_t length)
 void ByteVectorStream::writeBlock(const ByteVector &data)
 {
   unsigned int size = data.size();
-  if(d->position + size > length()) {
+  if(static_cast<offset_t>(d->position + size) > length()) {
     truncate(d->position + size);
   }
   memcpy(d->data.data() + d->position, data.data(), size);

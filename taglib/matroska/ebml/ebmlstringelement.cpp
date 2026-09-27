@@ -46,7 +46,7 @@ void EBML::StringElement::setValue(const String& val)
 bool EBML::StringElement::read(File &file)
 {
   ByteVector buffer = file.readBlock(dataSize);
-  if(buffer.size() != dataSize) {
+  if(static_cast<offset_t>(buffer.size()) != dataSize) {
     debug("Failed to read string");
     return false;
   }

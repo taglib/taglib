@@ -905,7 +905,7 @@ namespace
     if(chunkOffsets.empty())
       return {};
     // Sample count cannot be > file length / 4 as every sample consumes 4 bytes in stsz
-    if(sizeInfo.sampleCount == 0 || sizeInfo.sampleCount > file->length() / 4)
+    if(sizeInfo.sampleCount == 0 || static_cast<offset_t>(sizeInfo.sampleCount) > file->length() / 4)
       return {};
 
     // Read stsc entries
@@ -1052,7 +1052,7 @@ namespace
       const unsigned int trakSize = file->readBlock(4).toUInt();
       if(static_cast<offset_t>(trefSize) != trefLen
          || static_cast<offset_t>(trakSize) != audioTrak->length()
-         || trefSize < cutLen || trakSize < cutLen)
+         || static_cast<offset_t>(trefSize) < cutLen || static_cast<offset_t>(trakSize) < cutLen)
         return;
 
       file->removeBlock(cutOff, cutLen);

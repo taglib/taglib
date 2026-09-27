@@ -44,7 +44,7 @@ bool Matroska::Segment::render()
   const auto beforeSize = sizeLength;
   auto data = renderInternal();
   setNeedsRender(false);
-  if(auto afterSize = data.size(); afterSize != beforeSize) {
+  if(auto afterSize = data.size(); static_cast<offset_t>(afterSize) != beforeSize) {
     sizeLength = 8;
     data = renderInternal();
     setNeedsRender(false);

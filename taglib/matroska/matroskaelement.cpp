@@ -129,9 +129,9 @@ bool Matroska::Element::render()
   const auto beforeSize = sizeRenderedOrWritten();
   const auto data = renderInternal();
   setNeedsRender(false);
-  if(const auto afterSize = data.size(); afterSize != beforeSize) {
+  if(const auto afterSize = data.size(); static_cast<offset_t>(afterSize) != beforeSize) {
     if(e->writeStyle == WriteStyle::AvoidInsert && !e->isLastElement
-       && afterSize > beforeSize && beforeSize > 0) {
+       && static_cast<offset_t>(afterSize) > beforeSize && beforeSize > 0) {
       // Record old slot for void-overwrite, move element to end of segment.
       e->voidAtOffset = e->offset;
       e->voidAtSize = beforeSize;
