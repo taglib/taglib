@@ -167,8 +167,10 @@ void RIFF::WAV::Properties::read(File *file)
   if(d->format != FORMAT_PCM && (d->format != FORMAT_IEEE_FLOAT || totalSamples != 0))
     d->sampleFrames = totalSamples;
   else if(d->channels > 0 && d->bitsPerSample > 0) {
-    const offset_t frames = streamLength / (d->channels * ((d->bitsPerSample + 7) / 8));
-    d->sampleFrames = static_cast<unsigned int>(std::min<offset_t>(frames, 0xffffffff));
+    // Clamp in 64 bits: with a 32-bit offset_t, 0xffffffff would become -1.
+    const auto frames = static_cast<unsigned long long>(
+      std::max<offset_t>(streamLength / (d->channels * ((d->bitsPerSample + 7) / 8)), 0));
+    d->sampleFrames = static_cast<unsigned int>(std::min<unsigned long long>(frames, 0xffffffffULL));
   }
 
   if(d->sampleFrames > 0 && d->sampleRate > 0) {
