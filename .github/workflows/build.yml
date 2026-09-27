@@ -9,14 +9,16 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest, windows-2025]
+        os: [ubuntu-latest, macos-latest, windows-latest, windows-2025, ubuntu-26.04]
         include:
           - os: windows-latest
             cmake_extra_args: '-DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"'
           - os: windows-2025
             cmake_extra_args: '-G "MinGW Makefiles" -DCPPUNIT_INCLUDE_DIR="$env:GITHUB_WORKSPACE/pkg/usr/local/include" -DCPPUNIT_LIBRARIES="$($env:GITHUB_WORKSPACE -replace "\\", "/")/pkg/usr/local/lib/libcppunit.dll.a" -DCPPUNIT_INSTALLED_VERSION="1.15.1"'
-    # The windows-2025 runner is used for MinGW.
-    name: ${{ matrix.os == 'windows-2025' && 'mingw' || matrix.os }}
+          - os: ubuntu-26.04
+            cmake_extra_args: '-DCMAKE_C_FLAGS="-m32" -DCMAKE_CXX_FLAGS="-m32"'
+    # The windows-2025 runner is used for MinGW. The ubuntu-26.04 runner is used for 32-bit.
+    name: ${{ matrix.os == 'windows-2025' && 'mingw' || matrix.os == 'ubuntu-26.04' && 'i386' || matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
     - name: Checkout
@@ -53,6 +55,13 @@ jobs:
         sed -i 's/^\(SUBDIRS.*\) examples\(.*\)$/\1\2/' build_cppunit/Makefile
         (cd build_cppunit && mingw32-make -j$(nproc) install DESTDIR=$(cd .. && pwd)/pkg)
       if: matrix.os == 'windows-2025'
+
+    - name: Set up Ubuntu i386
+      run: |
+        sudo dpkg --add-architecture i386
+        sudo apt update
+        sudo apt install -y gcc-multilib g++-multilib libc6-dev:i386 libcppunit-dev:i386 libutfcpp-dev zlib1g-dev:i386
+      if: matrix.os == 'ubuntu-26.04'
 
     - name: Configure
       run: >
