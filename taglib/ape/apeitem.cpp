@@ -25,6 +25,7 @@
 
 #include "apeitem.h"
 
+#include <algorithm>
 #include <utility>
 #include <numeric>
 
@@ -232,8 +233,20 @@ void APE::Item::parse(const ByteVector &data)
   setReadOnly(flags & 1);
   setType(static_cast<ItemTypes>((flags >> 1) & 3));
 
-  if(Text == d->type)
-    d->text = StringList(ByteVectorList::split(val, '\0'), String::UTF8);
+  if(Text == d->type) {
+    // Short, null-separated values otherwise allocate far more memory than
+    // the item occupies on disk.
+    static constexpr unsigned int MAX_TEXT_VALUE_COUNT = 50000;
+    const unsigned int maxValues = std::min(MAX_TEXT_VALUE_COUNT,
+      std::max(1024U, val.size() / 32));
+    const ByteVectorList values = ByteVectorList::split(
+      val, '\0', 1, static_cast<int>(maxValues + 1));
+    if(values.size() > maxValues) {
+      debug("APE::Item::parse() -- Maximum text value count exceeded");
+      return;
+    }
+    d->text = StringList(values, String::UTF8);
+  }
   else
     d->value = val;
 }
