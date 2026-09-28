@@ -81,22 +81,33 @@ namespace
     for(auto s : std::as_const(fields)) {
       int offset = 0;
       int end = 0;
+      unsigned int codeCount = 0;
+      const unsigned int maxCodes = std::min(50000U, std::max(1024U, s.size() / 32));
 
       while(static_cast<int>(s.length()) > offset && s[offset] == '(' &&
             (end = s.find(")", offset + 1)) > offset) {
+        if(codeCount++ >= maxCodes) {
+          debug("ID3v2: Maximum genre code count exceeded");
+          break;
+        }
         // "(12)Genre"
-        const String genreCode = s.substr(offset + 1, end - 1);
-        s = s.substr(end + 1);
+        const String genreCode = s.substr(offset + 1, end - offset - 1);
+        offset = end + 1;
         bool ok;
         int number = genreCode.toInt(&ok);
-        if((ok && number >= 0 && number <= 255 &&
-            ID3v1::genre(number) != s) ||
-           genreCode == "RX" || genreCode == "CR")
+        if(ok && number >= 0 && number <= 255) {
+          const String genre = ID3v1::genre(number);
+          if(genre.size() != s.size() - offset ||
+             !std::equal(genre.cbegin(), genre.cend(), s.cbegin() + offset))
+            newfields.append(genreCode);
+        }
+        else if(genreCode == "RX" || genreCode == "CR") {
           newfields.append(genreCode);
+        }
       }
-      if(!s.isEmpty())
+      if(static_cast<unsigned int>(offset) < s.size())
         // "Genre" or "12"
-        newfields.append(s);
+        newfields.append(s.substr(offset));
     }
 
     if(newfields.isEmpty())
