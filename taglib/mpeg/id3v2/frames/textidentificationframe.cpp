@@ -31,6 +31,7 @@
 
 #include "tutils.h"
 #include "tpropertymap.h"
+#include "tdebug.h"
 #include "id3v1genres.h"
 #include "id3v2tag.h"
 
@@ -236,7 +237,18 @@ void TextIdentificationFrame::parseFields(const ByteVector &data)
   while(dataLength % byteAlign != 0)
     dataLength++;
 
-  const ByteVectorList l = ByteVectorList::split(data.mid(1, dataLength), textDelimiter(d->textEncoding), byteAlign);
+  // Short, null-separated values otherwise allocate far more memory than the
+  // frame occupies on disk.  Allow at least 1024 fields in small frames.
+  static constexpr unsigned int MAX_TEXT_FIELD_COUNT = 50000;
+  const unsigned int maxFields = std::min(MAX_TEXT_FIELD_COUNT,
+    std::max(1024U, static_cast<unsigned int>(dataLength) / 32));
+  const ByteVectorList l = ByteVectorList::split(
+    data.mid(1, dataLength), textDelimiter(d->textEncoding), byteAlign,
+    static_cast<int>(maxFields + 1));
+  if(l.size() > maxFields) {
+    debug("ID3v2: Maximum text field count exceeded");
+    return;
+  }
 
   d->fieldList.clear();
 
