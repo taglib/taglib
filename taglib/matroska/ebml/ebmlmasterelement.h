@@ -41,6 +41,7 @@ namespace TagLib
 
       offset_t getOffset() const;
       bool read(File &file) override;
+      bool read(File &file, unsigned int &elementCount);
       ByteVector render() override;
       void appendElement(std::unique_ptr<Element> &&element);
       std::list<std::unique_ptr<Element>>::iterator begin();
