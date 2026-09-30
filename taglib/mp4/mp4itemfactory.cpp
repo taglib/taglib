@@ -380,6 +380,7 @@ Map<ByteVector, String> ItemFactory::namePropertyMap() const
     {"disk", "DISCNUMBER"},
     {"cpil", "COMPILATION"},
     {"tmpo", "BPM"},
+    {"rate", "RATING"},
     {"cprt", "COPYRIGHT"},
     {"\251lyr", "LYRICS"},
     {"\251too", "ENCODING"},

@@ -607,6 +607,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(123, f.tag()->item("tmpo").toInt());
     CPPUNIT_ASSERT_EQUAL(StringList("123"), tags["BPM"]);
 
+    tags["RATING"] = StringList("80");
+    f.setProperties(tags);
+
+    tags = f.properties();
+
+    CPPUNIT_ASSERT(f.tag()->contains("rate"));
+    CPPUNIT_ASSERT_EQUAL(StringList("80"), tags["RATING"]);
+
     CPPUNIT_ASSERT(f.tag()->contains("\251ART"));
     CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), f.tag()->item("\251ART").toStringList());
     CPPUNIT_ASSERT_EQUAL(StringList("Foo Bar"), tags["ARTIST"]);

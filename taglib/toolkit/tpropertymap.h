@@ -92,6 +92,7 @@ namespace TagLib {
    *  - ISRC
    *  - ASIN
    *  - BPM
+   *  - RATING
    *  - COPYRIGHT
    *  - ENCODEDBY
    *  - MOOD
