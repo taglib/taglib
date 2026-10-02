@@ -45,17 +45,12 @@ namespace TagLib {
     //! An abstraction for the string to data encoding in Info tags.
 
     /*!
-     * RIFF INFO tag has no clear definitions about character encodings.
-     * In practice, local encoding of each system is largely used and UTF-8 is
-     * popular too.
-     *
-     * Here is an option to read and write tags in your preferred encoding
-     * by subclassing this class, reimplementing parse() and render() and setting
-     * your reimplementation as the default with Info::Tag::setStringHandler().
-     *
-     * \see ID3v1::Tag::setStringHandler()
+     * Per the RIFF specification, the character encoding of the INFO tag is
+     * declared with a top-level CSET chunk; when it is absent, the default is
+     * the ISO 8859-1 (Latin-1) ANSI code page. A declared code page is decoded
+     * into UTF-8 as the tag is read, and render() writes UTF-8.
+     * https://www.robotplanet.dk/audio/wav_meta_data/riff_mci.pdf#page=25
      */
-
     class TAGLIB_EXPORT StringHandler
     {
     public:
@@ -67,7 +62,8 @@ namespace TagLib {
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
-       * \a data is an UTF-8 character array.
+       * \a data is an ISO 8859-1 (Latin-1) character array, which is the RIFF
+       * default when the file declares no CSET code page.
        */
       virtual String parse(const ByteVector &data) const;
 
@@ -86,8 +82,8 @@ namespace TagLib {
     //! The main class in the INFO tag implementation
 
     /*!
-     * This is the main class in the INFO tag implementation.  RIFF INFO tag is a
-     * metadata format found in WAV audio and AVI video files.  Though it is a part
+     * This is the main class in the INFO tag implementation. RIFF INFO tag is a
+     * metadata format found in WAV audio and AVI video files. Though it is a part
      * of Microsoft/IBM's RIFF specification, the author could not find the official
      * documents about it.  So, this implementation is referring to unofficial documents
      * online and some applications' behaviors especially Windows Explorer.
@@ -104,6 +100,24 @@ namespace TagLib {
        * Constructs an INFO tag read from \a data which is the contents of the "LIST" chunk.
        */
       Tag(const ByteVector &data);
+
+      /*!
+       * Constructs an INFO tag read from \a data which is the contents of the "LIST" chunk,
+       * decoding the text with the code page \a codePage declared by the file's top-level
+       * CSET chunk.
+       *
+       * \a codePage only decides how \a data is read. The text becomes UTF-8 in
+       * memory the moment it is read, and render() writes UTF-8, which is what
+       * RIFF::WAV::File::save() declares in the CSET chunk it writes. A tag is
+       * never converted back into the code page it was read from.
+       *
+       * Code page 0 is the RIFF "unspecified" value, used when a file has no CSET
+       * chunk, and means ISO 8859-1 (Latin-1).
+       *
+       * \note A handler installed with setStringHandler() takes precedence over
+       * \a codePage, because installing one is an explicit override.
+       */
+      Tag(const ByteVector &data, unsigned int codePage);
 
       ~Tag() override;
 
@@ -173,17 +187,22 @@ namespace TagLib {
        */
       ByteVector render() const;
 
-      /*!
-       * Sets the string handler that decides how the text data will be
-       * converted to and from binary data.
-       * If the parameter \a handler is null, the previous handler is
-       * released and default UTF-8 handler is restored.
-       *
-       * \note The caller is responsible for deleting the previous handler
-       * as needed after it is released.
-       *
-       * \see StringHandler
-       */
+       /*!
+        * Sets the string handler that decides how the text data will be
+        * converted to and from binary data.
+        * If the parameter \a handler is null, the previous handler is
+        * released and the default (ISO 8859-1 decode, UTF-8 encode) handler
+        * is restored.
+        *
+        * \note Installing a handler is an explicit override, so it is used for
+        * every INFO tag, including those read from a file that declares a CSET
+        * code page. Pass null to hand those files back to their own code page.
+        *
+        * \note The caller is responsible for deleting the previous handler
+        * as needed after it is released.
+        *
+        * \see StringHandler
+        */
       static void setStringHandler(const StringHandler *handler);
 
     protected:
@@ -197,7 +216,8 @@ namespace TagLib {
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TagPrivate> d;
     };
-  }  // namespace Info
+
+}  // namespace Info
 }  // namespace RIFF
 }  // namespace TagLib
 
