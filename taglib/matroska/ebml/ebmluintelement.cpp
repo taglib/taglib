@@ -55,7 +55,7 @@ void EBML::UIntElement::setValue(unsigned long long val)
 bool EBML::UIntElement::read(File &file)
 {
   const ByteVector buffer = file.readBlock(dataSize);
-  if(buffer.size() != dataSize) {
+  if(static_cast<offset_t>(buffer.size()) != dataSize) {
     debug("Failed to read EBML Uint element");
     return false;
   }

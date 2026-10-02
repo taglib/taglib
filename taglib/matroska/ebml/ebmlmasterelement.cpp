@@ -162,7 +162,7 @@ ByteVector EBML::MasterElement::render()
   buffer.append(data);
   if(minRenderSize) {
     if(const auto bufferSize = buffer.size();
-       minRenderSize >= bufferSize + MIN_VOID_ELEMENT_SIZE)
+       minRenderSize >= static_cast<offset_t>(bufferSize + MIN_VOID_ELEMENT_SIZE))
       buffer.append(VoidElement::renderSize(minRenderSize - bufferSize));
   }
   return buffer;

@@ -70,7 +70,7 @@ void EBML::FloatElement::setValue(FloatVariantType val)
 bool EBML::FloatElement::read(File &file)
 {
   const ByteVector buffer = file.readBlock(dataSize);
-  if(buffer.size() != dataSize) {
+  if(static_cast<offset_t>(buffer.size()) != dataSize) {
     debug("Failed to read EBML Float element");
     return false;
   }

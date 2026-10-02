@@ -109,7 +109,11 @@ unsigned int RIFF::File::chunkCount() const
 
 unsigned int RIFF::File::chunkDataSize(unsigned int i) const
 {
-  return static_cast<unsigned int>(std::min<offset_t>(chunkDataSize64(i), 0xffffffff));
+  // Do the clamping in an unsigned 64-bit type: offset_t may be a 32-bit
+  // signed off_t (e.g. i386 without _FILE_OFFSET_BITS=64), where 0xffffffff
+  // would convert to -1 and std::min<offset_t>() would return it.
+  const auto size64 = static_cast<unsigned long long>(std::max<offset_t>(chunkDataSize64(i), 0));
+  return static_cast<unsigned int>(std::min<unsigned long long>(size64, 0xffffffffULL));
 }
 
 offset_t RIFF::File::chunkDataSize64(unsigned int i) const
@@ -163,7 +167,8 @@ ByteVector RIFF::File::chunkData(unsigned int i)
 
   // A ByteVector is limited to 32 bits. The only chunk that can be larger is the
   // "data" chunk of an RF64 file, which no caller reads through this API.
-  return readBlock(static_cast<size_t>(std::min<offset_t>(d->chunks[i].size, 0xffffffff)));
+  const auto size64 = static_cast<unsigned long long>(std::max<offset_t>(d->chunks[i].size, 0));
+  return readBlock(static_cast<size_t>(std::min<unsigned long long>(size64, 0xffffffffULL)));
 }
 
 void RIFF::File::setChunkData(unsigned int i, const ByteVector &data)
@@ -358,18 +363,20 @@ void RIFF::File::read()
     }
 
     const offset_t available = fileLength - offset - 8;
-    offset_t chunkSize = declaredSize;
+    // Work in 64 bits: a declared size above 2 GiB does not fit a 32-bit
+    // signed offset_t and would turn negative before the clamping below.
+    long long chunkSize = declaredSize;
 
     if(d->isLongForm && chnkName == "data" && declaredSize == 0xffffffff && d->dataSize64 > 0) {
       // ds64 stores an unsigned 64-bit size, while the I/O API uses signed
       // offsets. Clamp before converting so a crafted value cannot become a
       // negative offset or overflow the chunk extent arithmetic below.
       chunkSize = d->dataSize64 > static_cast<unsigned long long>(available)
-        ? available
-        : static_cast<offset_t>(d->dataSize64);
+        ? static_cast<long long>(available)
+        : static_cast<long long>(d->dataSize64);
     }
 
-    if(chunkSize > available) {
+    if(chunkSize > static_cast<long long>(available)) {
       // Clamp to available bytes rather than rejecting the chunk outright.
       // Some encoders write a correct data chunk but with a slightly too-large
       // declared size, or place the data chunk outside the declared RIFF boundary.
@@ -380,7 +387,7 @@ void RIFF::File::read()
 
     Chunk chunk;
     chunk.name    = chnkName;
-    chunk.size    = chunkSize;
+    chunk.size    = static_cast<offset_t>(chunkSize);
     chunk.offset  = offset + 8;
     chunk.padding = 0;
 

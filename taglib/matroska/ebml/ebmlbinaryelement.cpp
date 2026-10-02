@@ -53,7 +53,7 @@ void EBML::BinaryElement::setValue(const ByteVector& val)
 bool EBML::BinaryElement::read(File &file)
 {
   value = file.readBlock(dataSize);
-  if(value.size() != dataSize) {
+  if(static_cast<offset_t>(value.size()) != dataSize) {
     debug("Failed to read binary element");
     return false;
   }
