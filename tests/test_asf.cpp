@@ -562,7 +562,7 @@ public:
     ScopedFileCopy copy("silence-1", ".wma");
     {
       ASF::File f(copy.fileName().c_str());
-      f.tag()->setAttribute("WM/SharedUserRating", static_cast<unsigned int>(75));
+      f.tag()->setAttribute("WM/SharedUserRating", 75U);
       f.tag()->setAttribute("POPULARIMETER", String("player@example.com|128|0"));
       f.save();
     }
@@ -602,12 +602,12 @@ public:
     {
       // Once WM/SharedUserRating exists, writes go to it.
       ASF::File f(copy.fileName().c_str());
-      f.tag()->setAttribute("WM/SharedUserRating", static_cast<unsigned int>(99));
+      f.tag()->setAttribute("WM/SharedUserRating", 99U);
       PropertyMap props = f.properties();
       CPPUNIT_ASSERT_EQUAL(StringList("99"), props["RATING"]);
       props["RATING"] = StringList("50");
       f.setProperties(props);
-      CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(50),
+      CPPUNIT_ASSERT_EQUAL(50U,
         f.tag()->attribute("WM/SharedUserRating").front().toUInt());
       f.save();
     }
@@ -645,7 +645,7 @@ public:
     CPPUNIT_ASSERT(map.find("WM/SharedUserRating") != map.end());
     CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
       map["WM/SharedUserRating"].front().type());
-    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(75),
+    CPPUNIT_ASSERT_EQUAL(75U,
       map["WM/SharedUserRating"].front().toUInt());
     CPPUNIT_ASSERT(map.find("POPULARIMETER") != map.end());
     CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
