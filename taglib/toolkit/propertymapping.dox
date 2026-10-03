@@ -10,6 +10,7 @@
 - %APE tags use the key unless another name is listed in their column.
 - %Matroska tags use the key unless another name is listed in their column. A target
   level can follow the name, e.g. /50 for Album. The default is /30 for Track.
+- %RIFF INFO and %ASF tags only support the keys listed in their columns.
 
 | Key                        | %ID3v2                                 | %RIFF | %MP4                                                     | %APE                    | %ASF                              | %Matroska                     |
 | -------------------------- | -------------------------------------- | ----- | -------------------------------------------------------- | ----------------------- | --------------------------------- | ----------------------------- |
