@@ -10,6 +10,8 @@
 - %APE tags use the key unless another name is listed in their column.
 - %Matroska tags use the key unless another name is listed in their column. A target
   level can follow the name, e.g. /50 for Album. The default is /30 for Track.
+- %ASF Title, Author, Copyright and Description are fields of the Content Description
+  Object. The other %ASF names are attributes.
 - %RIFF INFO and %ASF tags only support the keys listed in their columns.
 
 | Key                        | %ID3v2                                 | %RIFF | %MP4                                                     | %APE                    | %ASF                              | %Matroska                     |
@@ -21,7 +23,7 @@
 | ALBUMARTISTSORT            | TSO2                                   |       | soaa                                                     |                         | WM/AlbumArtistSortOrder           | ARTISTSORT/50                 |
 | ALBUMSORT                  | TSOA                                   |       | soal                                                     |                         | WM/AlbumSortOrder                 | TITLESORT/50                  |
 | ARRANGER                   | TIPL                                   | IENG  |                                                          |                         |                                   |                               |
-| ARTIST                     | TPE1                                   | IART  | &copy;ART                                                |                         |                                   |                               |
+| ARTIST                     | TPE1                                   | IART  | &copy;ART                                                |                         | Author                            |                               |
 | ARTISTS                    |                                        |       |                                                          |                         | WM/ARTISTS                        |                               |
 | ARTISTSORT                 | TSOP                                   |       | soar                                                     |                         | WM/ArtistSortOrder                |                               |
 | ARTISTWEBPAGE              | WOAR                                   | IBSU  |                                                          |                         | WM/AuthorURL                      |                               |
@@ -33,7 +35,7 @@
 | CATALOGNUMBER              |                                        |       |                                                          |                         | WM/CatalogNo                      | CATALOG_NUMBER                |
 | COLLECTIONGROUPID          |                                        |       |                                                          |                         | WM/WMCollectionGroupID            |                               |
 | COLLECTIONID               |                                        |       |                                                          |                         | WM/WMCollectionID                 |                               |
-| COMMENT                    | COMM                                   | ICMT  | &copy;cmt                                                |                         |                                   |                               |
+| COMMENT                    | COMM                                   | ICMT  | &copy;cmt                                                |                         | Description                       |                               |
 | COMMENT:\<description>     | COMM:\<description>                    |       |                                                          |                         |                                   |                               |
 | COMPILATION                | TCMP                                   |       | cpil                                                     |                         |                                   |                               |
 | COMPOSER                   | TCOM                                   | IMUS  | &copy;wrt                                                |                         | WM/Composer                       |                               |
@@ -41,7 +43,7 @@
 | CONDUCTOR                  | TPE3                                   |       |                                                          |                         | WM/Conductor                      |                               |
 | CONTENTDISTRIBUTOR         |                                        |       |                                                          |                         | WM/ContentDistributor             |                               |
 | CONTENTID                  |                                        |       |                                                          |                         | WM/WMContentID                    |                               |
-| COPYRIGHT                  | TCOP                                   | ICOP  | cprt                                                     |                         |                                   |                               |
+| COPYRIGHT                  | TCOP                                   | ICOP  | cprt                                                     |                         | Copyright                         |                               |
 | COPYRIGHTURL               | WCOP                                   |       |                                                          |                         |                                   |                               |
 | DATE                       | TDRC                                   | ICRD  | &copy;day                                                | YEAR                    | WM/Year                           | DATE_RECORDED                 |
 | DEVICECONFORMANCETEMPLATE  |                                        |       |                                                          |                         | DeviceConformanceTemplate         |                               |
@@ -126,7 +128,7 @@
 | SHOWWORKMOVEMENT           |                                        |       | shwm                                                     |                         |                                   |                               |
 | SUBTITLE                   | TIT3                                   |       |                                                          |                         | WM/SubTitle                       |                               |
 | TAGGINGDATE                | TDTG                                   |       |                                                          |                         |                                   | DATE_TAGGED                   |
-| TITLE                      | TIT2                                   | INAM  | &copy;nam                                                |                         |                                   |                               |
+| TITLE                      | TIT2                                   | INAM  | &copy;nam                                                |                         | Title                             |                               |
 | TITLESORT                  | TSOT                                   |       | sonm                                                     |                         | WM/TitleSortOrder                 |                               |
 | TOOLNAME                   |                                        |       |                                                          |                         | WM/ToolName                       |                               |
 | TOOLVERSION                |                                        |       |                                                          |                         | WM/ToolVersion                    |                               |
