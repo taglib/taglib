@@ -1,13 +1,13 @@
 /*!
 \page p_propertymapping Mapping of Properties to Various Formats
 
-- If no mapping is given for an %ID3v2 tag, a TXXX frame will be used with the
-  key as a description.
+- %ID3v2 tags use a TXXX frame with the key as description unless a frame is
+  listed in their column.
 - Vorbis Comments are not included in the table because they use the names from
   the *Key* column.
-- %APE tags will also use these keys unless another name can be found in its column.
-- %Matroska tags will also use these keys unless another name can be found in its column,
-  additionally, the target level is listed, e.g. /50 for Album, /30 for Track (default).
+- %APE tags use the key unless another name is listed in their column.
+- %Matroska tags use the key unless another name is listed in their column. A target
+  level can follow the name, e.g. /50 for Album. The default is /30 for Track.
 
 | Key                        | %ID3v2 | %RIFF | %MP4                                                     | %APE                    | %ASF                              | %Matroska                     |
 | -------------------------- | ------ | ----- | -------------------------------------------------------- | ----------------------- | --------------------------------- | ----------------------------- |
