@@ -17,7 +17,7 @@
 | ALBUMARTIST                | TPE2   |       | aART                                                     | ALBUM ARTIST            | WM/AlbumArtist                    | ARTIST/50                     |
 | ALBUMARTISTSORT            | TSO2   |       | soaa                                                     |                         | WM/AlbumArtistSortOrder           | ARTISTSORT/50                 |
 | ALBUMSORT                  | TSOA   |       | soal                                                     |                         | WM/AlbumSortOrder                 | TITLESORT/50                  |
-| ARRANGER                   |        | IENG  |                                                          |                         |                                   |                               |
+| ARRANGER                   | TIPL   | IENG  |                                                          |                         |                                   |                               |
 | ARTIST                     | TPE1   | IART  | &copy;ART                                                |                         |                                   |                               |
 | ARTISTS                    |        |       | \----:com.apple.iTunes:ARTISTS                           |                         | WM/ARTISTS                        |                               |
 | ARTISTSORT                 | TSOP   |       | soar                                                     |                         | WM/ArtistSortOrder                |                               |
@@ -38,18 +38,17 @@
 | DISCNUMBER                 | TPOS   |       | disk                                                     | DISC                    | WM/PartOfSet                      | PART_NUMBER/50                |
 | DISCSUBTITLE               | TSST   | PRT1  | \----:com.apple.iTunes:DISCSUBTITLE                      |                         | WM/SetSubTitle                    |                               |
 | DISCTOTAL                  |        |       |                                                          |                         |                                   | TOTAL_PARTS/50                |
-| DJMIXER                    |        |       | \----:com.apple.iTunes:DJMIXER                           |                         |                                   | MIXED_BY                      |
+| DJMIXER                    | TIPL   |       | \----:com.apple.iTunes:DJMIXER                           |                         |                                   | MIXED_BY                      |
 | ENCODEDBY                  | TENC   | ITCH  | &copy;enc                                                |                         | WM/EncodedBy                      | ENCODER                       |
 | ENCODING                   | TSSE   | ISFT  | &copy;too                                                |                         | WM/EncodingSettings               | ENCODER_SETTINGS              |
 | ENCODINGTIME               | TDEN   | IDIT  |                                                          |                         | WM/EncodingTime                   | DATE_ENCODED                  |
-| ENGINEER                   |        |       | \----:com.apple.iTunes:ENGINEER                          |                         |                                   |                               |
+| ENGINEER                   | TIPL   |       | \----:com.apple.iTunes:ENGINEER                          |                         |                                   |                               |
 | FILETYPE                   | TFLT   |       |                                                          |                         |                                   |                               |
 | FILEWEBPAGE                | WOAF   |       |                                                          |                         | WM/AudioFileURL                   |                               |
 | GAPLESSPLAYBACK            |        |       | pgap                                                     |                         |                                   |                               |
 | GENRE                      | TCON   | IGNR  | &copy;gen                                                |                         | WM/Genre                          |                               |
 | GROUPING                   | GRP1   |       | &copy;grp                                                |                         |                                   |                               |
 | INITIALKEY                 | TKEY   |       |                                                          |                         | WM/InitialKey                     | INITIAL_KEY                   |
-| INVOLVEDPEOPLE             | TIPL   |       |                                                          |                         |                                   |                               |
 | ISRC                       | TSRC   | ISRC  | \----:com.apple.iTunes:ISRC                              |                         | WM/ISRC                           |                               |
 | LABEL                      | TPUB   | IPUB  | \----:com.apple.iTunes:LABEL                             |                         | WM/Publisher                      | LABEL_CODE                    |
 | LANGUAGE                   | TLAN   | ILNG  | \----:com.apple.iTunes:LANGUAGE                          |                         | WM/Language                       |                               |
@@ -58,7 +57,7 @@
 | LYRICIST                   | TEXT   | IWRI  | \----:com.apple.iTunes:LYRICIST                          |                         | WM/Writer                         |                               |
 | LYRICS                     | USLT   |       | &copy;lyr                                                |                         | WM/Lyrics                         |                               |
 | MEDIA                      | TMED   | IMED  | \----:com.apple.iTunes:MEDIA                             |                         | WM/Media                          | ORIGINAL_MEDIA_TYPE           |
-| MIXER                      |        |       | \----:com.apple.iTunes:MIXER                             |                         |                                   |                               |
+| MIXER                      | TIPL   |       | \----:com.apple.iTunes:MIXER                             |                         |                                   |                               |
 | MOOD                       | TMOO   |       | \----:com.apple.iTunes:MOOD                              |                         | WM/Mood                           |                               |
 | MOVEMENTCOUNT              |        |       | &copy;mvc                                                |                         |                                   |                               |
 | MOVEMENTNAME               | MVNM   |       | &copy;mvn                                                |                         |                                   |                               |
@@ -70,7 +69,6 @@
 | MUSICBRAINZ_RELEASETRACKID |        |       | \----:com.apple.iTunes:MusicBrainz Release Track Id      |                         | MusicBrainz/Release Track Id      |                               |
 | MUSICBRAINZ_TRACKID        |        |       | \----:com.apple.iTunes:MusicBrainz Track Id              |                         | MusicBrainz/Track Id              |                               |
 | MUSICBRAINZ_WORKID         |        |       | \----:com.apple.iTunes:MusicBrainz Work Id               |                         | MusicBrainz/Work Id               |                               |
-| MUSICIANCREDITS            | TMCL   |       |                                                          |                         |                                   |                               |
 | MUSICIP_PUID               |        |       |                                                          |                         | MusicIP/PUID                      |                               |
 | ORIGINALALBUM              | TOAL   |       |                                                          |                         | WM/OriginalAlbumTitle             |                               |
 | ORIGINALARTIST             | TOPE   |       |                                                          |                         | WM/OriginalArtist                 |                               |
@@ -80,6 +78,7 @@
 | OWNER                      | TOWN   |       | ownr                                                     |                         |                                   | PURCHASE_OWNER                |
 | PAYMENTWEBPAGE             | WPAY   |       |                                                          |                         |                                   |                               |
 | PERFORMER                  |        | ISTR  |                                                          |                         |                                   |                               |
+| PERFORMER:\<instrument>    | TMCL   |       |                                                          |                         |                                   |                               |
 | PLAYLISTDELAY              | TDLY   |       |                                                          |                         |                                   |                               |
 | PODCAST                    | PCST   |       | pcst                                                     |                         |                                   |                               |
 | PODCASTCATEGORY            | TCAT   |       | catg                                                     |                         |                                   |                               |
@@ -87,7 +86,7 @@
 | PODCASTID                  | TGID   |       | egid                                                     |                         |                                   |                               |
 | PODCASTURL                 | WFED   |       | purl                                                     |                         |                                   |                               |
 | PRODUCEDNOTICE             | TPRO   |       |                                                          |                         |                                   |                               |
-| PRODUCER                   |        |       | \----:com.apple.iTunes:PRODUCER                          |                         | WM/Producer                       |                               |
+| PRODUCER                   | TIPL   |       | \----:com.apple.iTunes:PRODUCER                          |                         | WM/Producer                       |                               |
 | PUBLISHERWEBPAGE           | WPUB   |       |                                                          |                         |                                   |                               |
 | RADIOSTATION               | TRSN   |       |                                                          |                         |                                   |                               |
 | RADIOSTATIONOWNER          | TRSO   |       |                                                          |                         |                                   |                               |
