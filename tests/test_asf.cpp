@@ -53,6 +53,8 @@ class TestASF : public CppUnit::TestFixture
   CPPUNIT_TEST(testProperties);
   CPPUNIT_TEST(testPropertiesAllSupported);
   CPPUNIT_TEST(testPropertiesRealFile);
+  CPPUNIT_TEST(testRating);
+  CPPUNIT_TEST(testRatingWma);
   CPPUNIT_TEST(testCaseInsensitiveAttributeNames);
   CPPUNIT_TEST(testRepeatedSave);
   CPPUNIT_TEST_SUITE_END();
@@ -392,6 +394,7 @@ public:
     tags["ISVBR"] = StringList("1");
     tags["PEAKVALUE"] = StringList("32104");
     tags["AVERAGELEVEL"] = StringList("2450");
+    tags["RATING"] = StringList("80");
 
     ScopedFileCopy copy("silence-1", ".wma");
     {
@@ -478,6 +481,7 @@ public:
         {"WM/PromotionURL", ASF::Attribute::UnicodeType},
         {"WM/Provider", ASF::Attribute::UnicodeType},
         {"WM/Publisher", ASF::Attribute::UnicodeType},
+        {"WM/SharedUserRating", ASF::Attribute::DWordType},
         {"WM/Script", ASF::Attribute::UnicodeType},
         {"WM/SetSubTitle", ASF::Attribute::UnicodeType},
         {"WM/SubTitle", ASF::Attribute::UnicodeType},
@@ -549,6 +553,103 @@ public:
     CPPUNIT_ASSERT_EQUAL(StringList("BC7D60D1-23E3-E24B-86A1-48A42A28441E"), tags["MEDIACLASSPRIMARYID"]);
     CPPUNIT_ASSERT_EQUAL(StringList("00000000-0000-0000-0000-000000000000"), tags["MEDIACLASSSECONDARYID"]);
     CPPUNIT_ASSERT_EQUAL(StringList(";"), tags["UNIQUEFILEIDENTIFIER"]);
+  }
+
+  void testRating()
+  {
+    // The example of the bug report: a file carrying both a Windows Media
+    // rating and a foobar2000-style POPM attribute.
+    ScopedFileCopy copy("silence-1", ".wma");
+    {
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->setAttribute("WM/SharedUserRating", 75U);
+      f.tag()->setAttribute("POPULARIMETER", String("player@example.com|128|0"));
+      f.save();
+    }
+    {
+      const ASF::File f(copy.fileName().c_str());
+      PropertyMap tags = f.properties();
+
+      // WM/SharedUserRating is exposed and takes precedence over POPULARIMETER.
+      CPPUNIT_ASSERT_EQUAL(StringList("75"), tags["RATING"]);
+      CPPUNIT_ASSERT(!tags.unsupportedData().contains("WM/SharedUserRating"));
+      CPPUNIT_ASSERT(!tags.unsupportedData().contains("POPULARIMETER"));
+    }
+    {
+      // Without WM/SharedUserRating, the numeric POPM rating is extracted.
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->removeItem("WM/SharedUserRating");
+      f.save();
+    }
+    {
+      ASF::File f(copy.fileName().c_str());
+      const PropertyMap tags = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("128"), tags["RATING"]);
+
+      // Setting RATING keeps the existing POPULARIMETER convention while
+      // preserving the email and counter.
+      PropertyMap props = f.properties();
+      props["RATING"] = StringList("200");
+      f.setProperties(props);
+      CPPUNIT_ASSERT_EQUAL(String("player@example.com|200|0"),
+        f.tag()->attribute("POPULARIMETER").front().toString());
+      f.save();
+    }
+    {
+      const ASF::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT_EQUAL(StringList("200"), f.properties()["RATING"]);
+    }
+    {
+      // Once WM/SharedUserRating exists, writes go to it.
+      ASF::File f(copy.fileName().c_str());
+      f.tag()->setAttribute("WM/SharedUserRating", 99U);
+      PropertyMap props = f.properties();
+      CPPUNIT_ASSERT_EQUAL(StringList("99"), props["RATING"]);
+      props["RATING"] = StringList("50");
+      f.setProperties(props);
+      CPPUNIT_ASSERT_EQUAL(50U,
+        f.tag()->attribute("WM/SharedUserRating").front().toUInt());
+      f.save();
+    }
+    {
+      // Removing RATING removes both rating sources.
+      ASF::File f(copy.fileName().c_str());
+      PropertyMap props = f.properties();
+      props.erase("RATING");
+      f.setProperties(props);
+      CPPUNIT_ASSERT(!f.tag()->contains("WM/SharedUserRating"));
+      CPPUNIT_ASSERT(!f.tag()->contains("POPULARIMETER"));
+    }
+  }
+
+  void testRatingWma()
+  {
+    // Regression test on a real-world Windows Media file carrying both the
+    // Windows Media rating (WM/SharedUserRating, DWORD on the 0-99 scale) and
+    // a foobar2000-style POPULARIMETER attribute (email|rating|counter) whose
+    // numeric rating is higher. WM/SharedUserRating must win, and neither
+    // attribute may be dropped into the unsupported data.
+    const ASF::File f(TEST_FILE_PATH_C("wma_rating.wma"));
+    CPPUNIT_ASSERT(f.isValid());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT(f.tag());
+
+    const PropertyMap tags = f.properties();
+    CPPUNIT_ASSERT_EQUAL(StringList("75"), tags["RATING"]);
+    CPPUNIT_ASSERT(!tags.unsupportedData().contains("WM/SharedUserRating"));
+    CPPUNIT_ASSERT(!tags.unsupportedData().contains("POPULARIMETER"));
+
+    // The two rating sources are present in the raw attribute map with the
+    // expected types: a 0-99 DWORD and a POPM-style string.
+    const ASF::AttributeListMap &map = f.tag()->attributeListMap();
+    CPPUNIT_ASSERT(map.find("WM/SharedUserRating") != map.end());
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::DWordType,
+      map["WM/SharedUserRating"].front().type());
+    CPPUNIT_ASSERT_EQUAL(75U,
+      map["WM/SharedUserRating"].front().toUInt());
+    CPPUNIT_ASSERT(map.find("POPULARIMETER") != map.end());
+    CPPUNIT_ASSERT_EQUAL(ASF::Attribute::UnicodeType,
+      map["POPULARIMETER"].front().type());
   }
 
   void testCaseInsensitiveAttributeNames()
