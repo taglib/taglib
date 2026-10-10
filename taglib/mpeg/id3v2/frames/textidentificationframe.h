@@ -92,7 +92,6 @@ namespace TagLib {
      *  TSRC  | ISRC (international standard recording code)
      *  TSSE  | Software/Hardware and settings used for encoding
      *  TSST  | Set subtitle
-     * </ul>
      *
      * The ID3v2 Frames document gives a description of each of these formats
      * and the expected order of strings in each.  ID3v2::Header::frameID() can
