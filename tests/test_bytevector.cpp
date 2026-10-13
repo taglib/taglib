@@ -610,6 +610,43 @@ public:
     {
       ByteVector invalid("abd\x00\x01\x02\x03\x04");
       CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid));
+
+      ByteVector invalid2("YW55IGNh-cm5hbCBwbGVhc3VyZQ==");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid2));
+    }
+
+    // Skip whitespace
+    {
+      ByteVector w1("YW55IGNhcm5h\nbCBwbGVhc3VyZQ==");
+      CPPUNIT_ASSERT_EQUAL(s2,ByteVector::fromBase64(w1));
+
+      ByteVector w2("YW55IGNhcm5hbCBw\r\nbGVhc3VyZS4=\r\n");
+      CPPUNIT_ASSERT_EQUAL(s1,ByteVector::fromBase64(w2));
+
+      ByteVector w3(" YW55 IGNh\tcm5hbCBwbGVhc3Vy\n");
+      CPPUNIT_ASSERT_EQUAL(s3,ByteVector::fromBase64(w3));
+
+      ByteVector w4("YQ=\n=");
+      CPPUNIT_ASSERT_EQUAL(s0,ByteVector::fromBase64(w4));
+
+      ByteVector w5(" \r\n\t");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(w5));
+
+      // Whitespace does not make otherwise invalid input valid
+      ByteVector w6("YW55IGNhcm5h\nbCBwbGVhc3VyZQ=");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(w6));
+
+      ByteVector w7("YW55IGNh\n-cm5hbCBwbGVhc3VyZQ==");
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(w7));
+
+      // Line wrapped every 76 characters like MIME base64
+      ByteVector wrapped;
+      const ByteVector b64 = all.toBase64();
+      for(unsigned int i = 0; i < b64.size(); i += 76) {
+        wrapped.append(b64.mid(i, 76));
+        wrapped.append('\n');
+      }
+      CPPUNIT_ASSERT_EQUAL(all,ByteVector::fromBase64(wrapped));
     }
 
   }

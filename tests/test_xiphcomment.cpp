@@ -48,6 +48,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST(testPicture);
   CPPUNIT_TEST(testLowercaseFields);
+  CPPUNIT_TEST(testLineWrappedPicture);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -208,6 +209,44 @@ public:
       Vorbis::File f(copy.fileName().c_str());
       CPPUNIT_ASSERT(f.find("METADATA_BLOCK_PICTURE") > 0);
     }
+  }
+
+  void testLineWrappedPicture()
+  {
+    FLAC::Picture pic;
+    pic.setType(FLAC::Picture::FrontCover);
+    pic.setMimeType("image/jpeg");
+    pic.setDescription("cover");
+    pic.setData(ByteVector(200, 'x'));
+
+    // Base64 with a line break every 76 characters as written by MIME style
+    // encoders
+    const ByteVector b64 = pic.render().toBase64();
+    ByteVector wrapped;
+    for(unsigned int i = 0; i < b64.size(); i += 76) {
+      wrapped.append(b64.mid(i, 76));
+      wrapped.append("\r\n");
+    }
+
+    const ByteVector vendor("test");
+    const ByteVector field = ByteVector("METADATA_BLOCK_PICTURE=") + wrapped;
+    ByteVector data;
+    data.append(ByteVector::fromUInt(vendor.size(), false));
+    data.append(vendor);
+    data.append(ByteVector::fromUInt(1, false));
+    data.append(ByteVector::fromUInt(field.size(), false));
+    data.append(field);
+
+    Ogg::XiphComment comment(data);
+    List<FLAC::Picture *> lst = comment.pictureList();
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1), lst.size());
+    CPPUNIT_ASSERT_EQUAL(FLAC::Picture::FrontCover, lst[0]->type());
+    CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
+    CPPUNIT_ASSERT_EQUAL(String("cover"), lst[0]->description());
+    CPPUNIT_ASSERT_EQUAL(ByteVector(200, 'x'), lst[0]->data());
+
+    const ByteVector rendered = comment.render(false);
+    CPPUNIT_ASSERT(rendered.find(ByteVector("METADATA_BLOCK_PICTURE=") + b64) >= 0);
   }
 
 };
