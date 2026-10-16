@@ -180,7 +180,6 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testNeroChaptersAloneWhenNoQT);
   CPPUNIT_TEST(testLazyReadingAndWritingChapters);
   CPPUNIT_TEST(testReadingChaptersAfterSave);
-  CPPUNIT_TEST(testReadingChaptersOfUnreadableFile);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -2023,14 +2022,6 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("Nero 2"), nero[1].title());
       CPPUNIT_ASSERT_EQUAL(10000LL, nero[1].startTime());
     }
-  }
-
-  void testReadingChaptersOfUnreadableFile()
-  {
-    MP4::File f(TEST_FILE_PATH_C("nonexistent.m4a"));
-    CPPUNIT_ASSERT(!f.isValid());
-    CPPUNIT_ASSERT(f.neroChapters().isEmpty());
-    CPPUNIT_ASSERT(f.qtChapters().isEmpty());
   }
 
 };

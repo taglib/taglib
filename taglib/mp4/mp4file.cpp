@@ -119,7 +119,7 @@ MP4::Properties *MP4::File::audioProperties() const
 
 MP4::ChapterList MP4::File::neroChapters()
 {
-  if(d->atomsOutdated || !d->atoms)
+  if(d->atomsOutdated)
     return getChaptersLazy(d->neroChapterList, this);
   return getChaptersLazy(d->neroChapterList, this, d->atoms.get());
 }
@@ -131,7 +131,7 @@ void MP4::File::setNeroChapters(const ChapterList& chapters)
 
 MP4::ChapterList MP4::File::qtChapters()
 {
-  if(d->atomsOutdated || !d->atoms)
+  if(d->atomsOutdated)
     return getChaptersLazy(d->qtChapterList, this);
   return getChaptersLazy(d->qtChapterList, this, d->atoms.get());
 }
