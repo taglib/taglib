@@ -38,7 +38,8 @@ namespace {
 template <EBML::Element::Id Id, typename ElementType>
 std::unique_ptr<ElementType> readElementAt(File &file,
                                            offset_t offset,
-                                           offset_t maxOffset)
+                                           offset_t maxOffset,
+                                           unsigned int &elementCount)
 {
   if(offset < 0 || offset >= maxOffset) {
     return nullptr;
@@ -51,7 +52,7 @@ std::unique_ptr<ElementType> readElementAt(File &file,
   }
 
   auto typed = EBML::element_cast<Id>(std::move(element));
-  if(!typed || !typed->read(file)) {
+  if(!typed || !typed->read(file, elementCount)) {
     return nullptr;
   }
   return typed;
@@ -94,11 +95,12 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
   const bool skipCues = file.readOnly() && scanLimit < dataSize;
   MasterElement *pendingPaddingTarget = nullptr;
   offset_t accumulatedPadding = 0;
+  unsigned int elementCount = 0;
   std::unique_ptr<Element> element;
   while((element = findNextElement(file, maxOffset, maxScanOffset))) {
     if(const Id id = element->getId(); id == Id::MkSeekHead) {
       seekHead = element_cast<Id::MkSeekHead>(std::move(element));
-      if(!seekHead->read(file))
+      if(!seekHead->read(file, elementCount))
         return false;
       // We have a seek head, let's use it for faster access to the other elements
       if(const auto elementAfterSeekHead = findNextElement(file, maxOffset, maxScanOffset);
@@ -138,7 +140,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
           if(chainedSeekHeadsFollowed++ >= MAX_CHAINED_SEEKHEADS)
             break;
           auto chained = readElementAt<Id::MkSeekHead, MkSeekHead>(
-            file, absoluteOffset, maxOffset);
+            file, absoluteOffset, maxOffset, elementCount);
           if(!chained)
             break;
           if(const auto parsed = chained->parse(segDataOffset)) {
@@ -150,35 +152,35 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
         case Id::MkCues:
           if(!skipCues) {
             if(!((cues = readElementAt<Id::MkCues, MkCues>(
-              file, absoluteOffset, maxOffset))))
+              file, absoluteOffset, maxOffset, elementCount))))
               return false;
           }
           break;
         case Id::MkInfo:
           if(!((info = readElementAt<Id::MkInfo, MkInfo>(
-            file, absoluteOffset, maxOffset))))
+            file, absoluteOffset, maxOffset, elementCount))))
             return false;
           break;
         case Id::MkTracks:
           if(!((tracks = readElementAt<Id::MkTracks, MkTracks>(
-            file, absoluteOffset, maxOffset))))
+            file, absoluteOffset, maxOffset, elementCount))))
             return false;
           break;
         case Id::MkTags:
           if(!((tags = readElementAt<Id::MkTags, MkTags>(
-            file, absoluteOffset, maxOffset))))
+            file, absoluteOffset, maxOffset, elementCount))))
             return false;
           accumulateVoidPadding(tags.get());
           break;
         case Id::MkAttachments:
           if(!((attachments = readElementAt<Id::MkAttachments, MkAttachments>(
-            file, absoluteOffset, maxOffset))))
+            file, absoluteOffset, maxOffset, elementCount))))
             return false;
           accumulateVoidPadding(attachments.get());
           break;
         case Id::MkChapters:
           if(!((chapters = readElementAt<Id::MkChapters, MkChapters>(
-            file, absoluteOffset, maxOffset))))
+            file, absoluteOffset, maxOffset, elementCount))))
             return false;
           accumulateVoidPadding(chapters.get());
           break;
@@ -200,7 +202,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       accumulatedPadding = 0;
       if(!skipCues) {
         cues = element_cast<Id::MkCues>(std::move(element));
-        if(!cues->read(file))
+        if(!cues->read(file, elementCount))
           return false;
       }
       else {
@@ -211,21 +213,21 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       info = element_cast<Id::MkInfo>(std::move(element));
-      if(!info->read(file))
+      if(!info->read(file, elementCount))
         return false;
     }
     else if(id == Id::MkTracks) {
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       tracks = element_cast<Id::MkTracks>(std::move(element));
-      if(!tracks->read(file))
+      if(!tracks->read(file, elementCount))
         return false;
     }
     else if(id == Id::MkTags) {
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       tags = element_cast<Id::MkTags>(std::move(element));
-      if(!tags->read(file))
+      if(!tags->read(file, elementCount))
         return false;
       pendingPaddingTarget = tags.get();
     }
@@ -233,7 +235,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       attachments = element_cast<Id::MkAttachments>(std::move(element));
-      if(!attachments->read(file))
+      if(!attachments->read(file, elementCount))
         return false;
       pendingPaddingTarget = attachments.get();
     }
@@ -241,7 +243,7 @@ bool EBML::MkSegment::readLimited(File &file, offset_t scanLimit)
       pendingPaddingTarget = nullptr;
       accumulatedPadding = 0;
       chapters = element_cast<Id::MkChapters>(std::move(element));
-      if(!chapters->read(file))
+      if(!chapters->read(file, elementCount))
         return false;
       pendingPaddingTarget = chapters.get();
     }
