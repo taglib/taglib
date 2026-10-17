@@ -47,8 +47,8 @@ namespace TagLib {
       bool read(TagLib::File *file);
 
       /*!
-       * Same as read(TagLib::File *), using the already parsed  atoms
-       * of  file instead of parsing them again.
+       * Same as read(TagLib::File *), using the already parsed \a atoms
+       * of \a file instead of parsing them again.
        */
       bool read(TagLib::File *file, const Atoms *atoms);
 
