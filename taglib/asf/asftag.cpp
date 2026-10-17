@@ -477,6 +477,16 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
   }
 
   PropertyMap ignoredProps;
+  const auto setSingleValue = [&ignoredProps](const String &prop,
+                                              const StringList &values, String &target) {
+    target = values.isEmpty() ? String() : values.front();
+    if(values.size() > 1) {
+      StringList ignoredValues = values;
+      ignoredValues.erase(ignoredValues.begin());
+      ignoredProps.insert(prop, ignoredValues);
+    }
+  };
+
   for(const auto &[prop, attributes] : props) {
     if(reverseKeyMap.contains(prop)) {
       const auto &[name, type] = reverseKeyMap[prop];
@@ -542,16 +552,16 @@ PropertyMap ASF::Tag::setProperties(const PropertyMap &props)
       }
     }
     else if(prop == "TITLE") {
-      d->title = attributes.toString();
+      setSingleValue(prop, attributes, d->title);
     }
     else if(prop == "ARTIST") {
-      d->artist = attributes.toString();
+      setSingleValue(prop, attributes, d->artist);
     }
     else if(prop == "COMMENT") {
-      d->comment = attributes.toString();
+      setSingleValue(prop, attributes, d->comment);
     }
     else if(prop == "COPYRIGHT") {
-      d->copyright = attributes.toString();
+      setSingleValue(prop, attributes, d->copyright);
     }
     else {
       ignoredProps.insert(prop, attributes);
