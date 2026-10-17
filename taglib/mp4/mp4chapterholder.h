@@ -31,6 +31,7 @@
 namespace TagLib {
   class File;
   namespace MP4 {
+    class Atoms;
     /*!
      * Base class to hold chapters and store modified state.
      */
@@ -71,9 +72,28 @@ namespace TagLib {
     template <typename T>
     ChapterList getChaptersLazy(std::unique_ptr<T> &holder, TagLib::File *file)
     {
-      if (!holder) {
+      if(!holder) {
         holder = std::make_unique<T>();
         holder->read(file);
+      }
+      return holder->chapters();
+    }
+
+    /*!
+     * Lazily fetch list of chapters from the already parsed \a atoms of \a file,
+     * instead of parsing them again.
+     * @tparam T class derived from ChapterHolder and implementing read(File *, const Atoms *)
+     * @param holder unique pointer to holder, initially null
+     * @param file file with chapters
+     * @param atoms parsed atoms of \a file, must be up to date
+     * @return list of chapters, empty if no chapters found.
+     */
+    template <typename T>
+    ChapterList getChaptersLazy(std::unique_ptr<T> &holder, TagLib::File *file, const Atoms *atoms)
+    {
+      if(!holder) {
+        holder = std::make_unique<T>();
+        holder->read(file, atoms);
       }
       return holder->chapters();
     }
@@ -87,7 +107,7 @@ namespace TagLib {
     template <typename T>
     void setChaptersLazy(std::unique_ptr<T> &holder, const ChapterList& chapters)
     {
-      if (!holder) {
+      if(!holder) {
         holder = std::make_unique<T>();
         // The chapters have not been read before, so we do not know their
         // current state and mark them as modified. Otherwise, the check below

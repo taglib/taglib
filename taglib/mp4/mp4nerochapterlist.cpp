@@ -221,8 +221,12 @@ namespace
 bool MP4::NeroChapterList::read(TagLib::File *file)
 {
   const Atoms atoms(file);
+  return read(file, &atoms);
+}
 
-  const Atom *chpl = atoms.find("moov", "udta", "chpl");
+bool MP4::NeroChapterList::read(TagLib::File *file, const Atoms *atoms)
+{
+  const Atom *chpl = atoms->find("moov", "udta", "chpl");
   modified = false;
   chapterList.clear();
   if(chpl) {

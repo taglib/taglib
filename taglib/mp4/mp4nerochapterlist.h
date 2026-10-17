@@ -30,6 +30,7 @@
 namespace TagLib {
   class File;
   namespace MP4 {
+    class Atoms;
 
     /*!
      * Reads, writes, and removes Nero-style chapter markers (chpl atom)
@@ -44,6 +45,12 @@ namespace TagLib {
        * Returns \c false if the file has no chpl atom.
        */
       bool read(TagLib::File *file);
+
+      /*!
+       * Same as read(TagLib::File *), using the already parsed \a atoms
+       * of \a file instead of parsing them again.
+       */
+      bool read(TagLib::File *file, const Atoms *atoms);
 
       /*!
        * Writes chapter markers to the already-opened \a file,

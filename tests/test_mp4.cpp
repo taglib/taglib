@@ -179,6 +179,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testNeroAndQTChaptersAreIndependent);
   CPPUNIT_TEST(testNeroChaptersAloneWhenNoQT);
   CPPUNIT_TEST(testLazyReadingAndWritingChapters);
+  CPPUNIT_TEST(testReadingChaptersAfterSave);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1989,6 +1990,37 @@ public:
       f.save();
       CPPUNIT_ASSERT(f.chapters().isEmpty());
       CPPUNIT_ASSERT_EQUAL(5, f.chapterList->writeCount);
+    }
+  }
+
+  void testReadingChaptersAfterSave()
+  {
+    ScopedFileCopy copy("has-tags", ".m4a");
+    string filename = copy.fileName();
+
+    {
+      MP4::File f(filename.c_str());
+      f.setNeroChapters(MP4::ChapterList{
+        MP4::Chapter("Nero 1", 0),
+        MP4::Chapter("Nero 2", 10000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+
+    // Writing QT chapters moves atoms, chapters first read afterwards must
+    // not use the atoms parsed when the file was opened.
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("QT 1", 0),
+        MP4::Chapter("QT 2", 20000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+
+      const MP4::ChapterList nero = f.neroChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, nero.size());
+      CPPUNIT_ASSERT_EQUAL(String("Nero 2"), nero[1].title());
+      CPPUNIT_ASSERT_EQUAL(10000LL, nero[1].startTime());
     }
   }
 

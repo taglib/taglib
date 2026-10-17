@@ -30,6 +30,7 @@
 namespace TagLib {
   class File;
   namespace MP4 {
+    class Atoms;
 
     /*!
      * Reads, writes, and removes QuickTime-style chapter tracks from MP4
@@ -56,6 +57,12 @@ namespace TagLib {
        * Returns \c false if the file has no chapter track.
        */
       bool read(TagLib::File *file);
+
+      /*!
+       * Same as read(TagLib::File *), using the already parsed \a atoms
+       * of \a file instead of parsing them again.
+       */
+      bool read(TagLib::File *file, const Atoms *atoms);
 
       /*!
        * Writes chapter markers as a QuickTime chapter track to the

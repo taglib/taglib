@@ -52,6 +52,8 @@ public:
   std::unique_ptr<MP4::Properties> properties;
   std::unique_ptr<MP4::NeroChapterList> neroChapterList;
   std::unique_ptr<MP4::QtChapterList> qtChapterList;
+  // Saving can move atoms without updating all offsets of the parsed tree.
+  bool atomsStale = false;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -117,7 +119,9 @@ MP4::Properties *MP4::File::audioProperties() const
 
 MP4::ChapterList MP4::File::neroChapters()
 {
-  return getChaptersLazy(d->neroChapterList, this);
+  if(d->atomsStale)
+    return getChaptersLazy(d->neroChapterList, this);
+  return getChaptersLazy(d->neroChapterList, this, d->atoms.get());
 }
 
 void MP4::File::setNeroChapters(const ChapterList& chapters)
@@ -127,7 +131,9 @@ void MP4::File::setNeroChapters(const ChapterList& chapters)
 
 MP4::ChapterList MP4::File::qtChapters()
 {
-  return getChaptersLazy(d->qtChapterList, this);
+  if(d->atomsStale)
+    return getChaptersLazy(d->qtChapterList, this);
+  return getChaptersLazy(d->qtChapterList, this, d->atoms.get());
 }
 
 void MP4::File::setQtChapters(const ChapterList& chapters)
@@ -172,6 +178,7 @@ MP4::File::save()
     return false;
   }
 
+  d->atomsStale = true;
   return d->tag->save() &&
     saveChaptersIfModified(d->neroChapterList, this) &&
     saveChaptersIfModified(d->qtChapterList, this);
@@ -191,6 +198,7 @@ MP4::File::strip(int tags)
   }
 
   if(tags & MP4) {
+    d->atomsStale = true;
     return d->tag->strip();
   }
 

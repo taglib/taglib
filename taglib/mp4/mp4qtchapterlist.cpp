@@ -1231,14 +1231,19 @@ namespace
 bool MP4::QtChapterList::read(TagLib::File *file)
 {
   const Atoms atoms(file);
+  return read(file, &atoms);
+}
+
+bool MP4::QtChapterList::read(TagLib::File *file, const Atoms *atoms)
+{
   modified = false;
   chapterList.clear();
 
-  TrackInfo audio = findAudioTrack(file, &atoms);
+  TrackInfo audio = findAudioTrack(file, atoms);
   if(!audio.trak)
     return false;
 
-  Atom *chapterTrak = findChapterTrak(file, &atoms, audio.trak);
+  Atom *chapterTrak = findChapterTrak(file, atoms, audio.trak);
   if(!chapterTrak)
     return false;
 
