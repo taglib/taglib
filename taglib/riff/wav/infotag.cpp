@@ -25,9 +25,13 @@
 
 #include "infotag.h"
 
+#include <memory>
 #include <utility>
+#include <vector>
 
+#include "charset.h"
 #include "tbytevector.h"
+#include "tdebug.h"
 #include "tpropertymap.h"
 #include "riffutils.h"
 
@@ -38,12 +42,91 @@ namespace
 {
   const RIFF::Info::StringHandler defaultStringHandler;
   const RIFF::Info::StringHandler *stringHandler = &defaultStringHandler;
+
+  // The code page RIFF::Info::Tag::setAssumedCodePage() states, used when a file
+  // declares none. 0 is the RIFF "unspecified" value and keeps the ISO 8859-1 the
+  // specification prescribes for it.
+  unsigned int codePageAssumed = 0;
+
+  // The charset a file's CSET code page selects. Code page 0 means the file
+  // declares none, so the code page the caller assumed applies; so does the
+  // RIFF default "Latin1" for a code page this library has no table for. The
+  // number is a hint about how the text was written, and dropping every field
+  // over a hint we cannot follow would throw the whole tag away; Latin-1 at
+  // least keeps the ASCII part of it intact.
+  Charset::Type charsetForCodePage(unsigned int codePage)
+  {
+    if(const auto charset = Charset::typeForCodePage(codePage))
+      return *charset;
+
+    if(codePage != 0) {
+      debug("RIFF::Info::Tag::parse() - Unsupported CSET code page " +
+            String::number(static_cast<int>(codePage)) +
+            ", using the RIFF default ISO 8859-1.");
+      return Charset::Type::Latin1;
+    }
+
+    // The file declares nothing. setAssumedCodePage() only ever stored 0 or a
+    // code page it verified, so the only way to miss here is that 0, which
+    // means the default this function returns anyway.
+    if(const auto charset = Charset::typeForCodePage(codePageAssumed))
+      return *charset;
+
+    return Charset::Type::Latin1;
+  }
+
+  // Decodes according to the code page the file declares.
+  class CodePageStringHandler : public RIFF::Info::StringHandler
+  {
+  public:
+    explicit CodePageStringHandler(Charset::Type charset) :
+      m_charset(charset)
+    {
+    }
+
+    String parse(const ByteVector &data) const override
+    {
+      return Charset::decode(data, m_charset);
+    }
+
+  private:
+    const Charset::Type m_charset;
+  };
+
+  const RIFF::Info::StringHandler *stringHandlerForCodePage(unsigned int codePage)
+  {
+    // 1 handler per code page. They are stateless apart from the type they
+    // decode, so they are built once and then shared. Charset::TypeCount of
+    // them covers every code page Charset knows.
+    static const std::vector<std::unique_ptr<CodePageStringHandler>> handlers = [] {
+      std::vector<std::unique_ptr<CodePageStringHandler>> v;
+      v.reserve(Charset::TypeCount);
+      for(unsigned int i = 0; i < Charset::TypeCount; ++i)
+        v.push_back(std::make_unique<CodePageStringHandler>(static_cast<Charset::Type>(i)));
+      return v;
+    }();
+
+    return handlers[static_cast<unsigned int>(charsetForCodePage(codePage))].get();
+  }
 } // namespace
 
 class RIFF::Info::Tag::TagPrivate
 {
 public:
   FieldListMap fieldListMap;
+
+  // The handler that decodes the code page this file declares, or null when the
+  // file declares none. It is only a fallback: see effectiveHandler().
+  const StringHandler *codePageHandler = nullptr;
+
+  // A handler the user installed with setStringHandler() is an explicit
+  // override, so it overrides whatever the file declares.
+  const StringHandler *effectiveHandler() const
+  {
+    if(stringHandler != &defaultStringHandler)
+      return stringHandler;
+    return codePageHandler ? codePageHandler : stringHandler;
+  }
 };
 
 class RIFF::Info::StringHandler::StringHandlerPrivate
@@ -60,12 +143,12 @@ StringHandler::~StringHandler() = default;
 
 String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 {
-  return String(data, String::UTF8);
+  return Charset::decode(data, Charset::Type::Latin1);
 }
 
 ByteVector RIFF::Info::StringHandler::render(const String &s) const
 {
-  return s.data(String::UTF8);
+  return Charset::encode(s);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -73,8 +156,14 @@ ByteVector RIFF::Info::StringHandler::render(const String &s) const
 ////////////////////////////////////////////////////////////////////////////////
 
 RIFF::Info::Tag::Tag(const ByteVector &data) :
+  Tag(data, 0)
+{
+}
+
+RIFF::Info::Tag::Tag(const ByteVector &data, unsigned int codePage) :
   d(std::make_unique<TagPrivate>())
 {
+  d->codePageHandler = stringHandlerForCodePage(codePage);
   parse(data);
 }
 
@@ -278,10 +367,11 @@ void RIFF::Info::Tag::removeField(const ByteVector &id)
 
 ByteVector RIFF::Info::Tag::render() const
 {
+  const StringHandler *handler = d->effectiveHandler();
   ByteVector data("INFO");
 
   for(const auto &[field, list] : std::as_const(d->fieldListMap)) {
-    ByteVector text = stringHandler->render(list);
+    ByteVector text = handler->render(list);
     if(text.isEmpty())
       continue;
 
@@ -307,12 +397,29 @@ void RIFF::Info::Tag::setStringHandler(const StringHandler *handler)
     stringHandler = &defaultStringHandler;
 }
 
+unsigned int RIFF::Info::Tag::assumedCodePage()
+{
+  return codePageAssumed;
+}
+
+void RIFF::Info::Tag::setAssumedCodePage(unsigned int codePage)
+{
+  if(codePage != 0 && !Charset::typeForCodePage(codePage)) {
+    debug("RIFF::Info::Tag::setAssumedCodePage() - Unsupported code page " +
+          String::number(static_cast<int>(codePage)) + ", ignored.");
+    return;
+  }
+
+  codePageAssumed = codePage;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected members
 ////////////////////////////////////////////////////////////////////////////////
 
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
+  const StringHandler *handler = d->effectiveHandler();
   unsigned int p = 4;
   // Needs a full 8-byte header; fewer bytes left would wrap the check below.
   while(p + 8 <= data.size()) {
@@ -321,7 +428,7 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
       break;
 
     if(const ByteVector id = data.mid(p, 4); isValidChunkName(id)) {
-      const String text = stringHandler->parse(data.mid(p + 8, size));
+      const String text = handler->parse(data.mid(p + 8, size));
       d->fieldListMap[id] = text;
     }
 
