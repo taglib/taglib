@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
 
@@ -749,13 +750,35 @@ long double ByteVector::toFloat80BE(size_t offset) const
   return toFloat80<Utils::BigEndian>(*this, offset);
 }
 
+namespace
+{
+  // If the standard library checks indices in std::vector::operator[], e.g.
+  // with _GLIBCXX_ASSERTIONS or a libc++ hardening mode, ByteVector::operator[]
+  // is checked too. This cannot be left to std::vector, because a ByteVector
+  // created by mid() shares the buffer of the original byte vector.
+  void checkIndex(const ByteVector &v, int index)
+  {
+#if defined(_GLIBCXX_ASSERTIONS) || \
+    (defined(_LIBCPP_HARDENING_MODE) && \
+     _LIBCPP_HARDENING_MODE != _LIBCPP_HARDENING_MODE_NONE)
+    if(index < 0 || static_cast<unsigned int>(index) >= v.size())
+      std::abort();
+#else
+    static_cast<void>(v);
+    static_cast<void>(index);
+#endif
+  }
+}  // namespace
+
 const char &ByteVector::operator[](int index) const
 {
+  checkIndex(*this, index);
   return (*d->data)[d->offset + index];
 }
 
 char &ByteVector::operator[](int index)
 {
+  checkIndex(*this, index);
   detach();
   return (*d->data)[d->offset + index];
 }
