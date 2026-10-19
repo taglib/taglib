@@ -50,6 +50,7 @@ class TestByteVector : public CppUnit::TestFixture
   CPPUNIT_TEST(testReplace);
   CPPUNIT_TEST(testReplaceAndDetach);
   CPPUNIT_TEST(testIterator);
+  CPPUNIT_TEST(testIndex);
   CPPUNIT_TEST(testResize);
   CPPUNIT_TEST(testAppend1);
   CPPUNIT_TEST(testAppend2);
@@ -418,6 +419,21 @@ public:
     it4 = v3.rend() - 1;
     CPPUNIT_ASSERT_EQUAL('6', *it3);
     CPPUNIT_ASSERT_EQUAL('3', *it4);
+  }
+
+  void testIndex()
+  {
+    const ByteVector a("0123456789");
+    const ByteVector b = a.mid(3, 4);
+    CPPUNIT_ASSERT_EQUAL('3', b[0]);
+    CPPUNIT_ASSERT_EQUAL('6', b[3]);
+
+    ByteVector c = a.mid(7);
+    CPPUNIT_ASSERT_EQUAL('7', c[0]);
+    CPPUNIT_ASSERT_EQUAL('9', c[2]);
+    c[2] = 'X';
+    CPPUNIT_ASSERT_EQUAL(ByteVector("78X"), c);
+    CPPUNIT_ASSERT_EQUAL('9', a[9]);
   }
 
   void testResize()
