@@ -107,3 +107,31 @@ check_cxx_source_compiles("
 if(CMAKE_SYSTEM_NAME STREQUAL "WindowsStore")
   set(PLATFORM_WINRT 1)
 endif()
+
+# Check if 64-bit atomics require -latomic
+
+set(_CMAKE_REQUIRED_LIBRARIES_TMP ${CMAKE_REQUIRED_LIBRARIES})
+set(CMAKE_REQUIRED_LIBRARIES "")
+check_cxx_source_compiles("
+  #include <atomic>
+  #include <cstdint>
+  std::atomic<uint64_t> x;
+  int main() {
+    x.fetch_add(1, std::memory_order_relaxed);
+    return 0;
+  }
+" HAVE_CXX_ATOMICS_WITHOUT_LIB)
+
+if(NOT HAVE_CXX_ATOMICS_WITHOUT_LIB)
+  set(CMAKE_REQUIRED_LIBRARIES "atomic")
+  check_cxx_source_compiles("
+    #include <atomic>
+    #include <cstdint>
+    std::atomic<uint64_t> x;
+    int main() {
+      x.fetch_add(1, std::memory_order_relaxed);
+      return 0;
+    }
+  " HAVE_CXX_ATOMICS_WITH_LIBATOMIC)
+endif()
+set(CMAKE_REQUIRED_LIBRARIES ${_CMAKE_REQUIRED_LIBRARIES_TMP})
