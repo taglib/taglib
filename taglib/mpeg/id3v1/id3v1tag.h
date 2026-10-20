@@ -51,11 +51,16 @@ namespace TagLib {
      * ID3v1::Tag::setStringHandler() you can define how you would like these
      * transformations to be done.
      *
+     * An alternative for reading is a Windows code page number, which
+     * ID3v1::Tag supports directly and which needs no subclass; see
+     * ID3v1::Tag::setAssumedCodePage() and the ID3v1::Tag constructor taking one.
+     *
      * \warning It is advisable <b>not</b> to write non-ISO-8859-1 data to ID3v1
      * tags.  Please consider disabling the writing of ID3v1 tags in the case
      * that the data is not ISO-8859-1.
      *
      * \see ID3v1::Tag::setStringHandler()
+     * \see ID3v1::Tag::setAssumedCodePage()
      */
 
     class TAGLIB_EXPORT StringHandler
@@ -126,6 +131,34 @@ namespace TagLib {
       Tag(File *file, offset_t tagOffset);
 
       /*!
+       * Create an ID3v1 tag and parse the data in \a file starting at
+       * \a tagOffset, decoding the text with the Windows code page \a codePage.
+       *
+       * \a codePage is a Windows code page number in the same numbering a CSET
+       * chunk of a RIFF file uses: 1252 reads Windows-1252, 866 reads IBM866,
+       * 65001 reads UTF-8, and 0 is the default, which is the code page
+       * assumedCodePage() names and ISO 8859-1 unless the caller has stated
+       * another one.
+       *
+       * An ID3v1 tag has no place to declare a charset, so unlike a RIFF CSET
+       * chunk this number is nothing but what the caller states about its files.
+       * A code page this library has no table for falls back to
+       * assumedCodePage(), and the fields are still read rather than dropped
+       * over a number that could not be followed.
+       *
+       * \a codePage only decides how the text is read; it becomes a normal
+       * in-memory String the moment it is read. render() is not affected by it,
+       * as it writes through the StringHandler, which produces ISO 8859-1.
+       *
+       * \note A handler installed with setStringHandler() takes precedence over
+       * \a codePage, because installing one is an explicit override.
+       *
+       * \see assumedCodePage()
+       * \see setStringHandler()
+       */
+      Tag(File *file, offset_t tagOffset, unsigned int codePage);
+
+      /*!
        * Destroys this Tag instance.
        */
       ~Tag() override;
@@ -184,12 +217,52 @@ namespace TagLib {
        * If the parameter \a handler is null, the previous handler is
        * released and default ISO-8859-1 handler is restored.
        *
+       * \note Installing a handler is an explicit override, so it is used for
+       * every ID3v1 tag, including those read with a code page. Pass null to
+       * hand those tags back to their own code page.
+       *
        * \note The caller is responsible for deleting the previous handler
        * as needed after it is released.
        *
        * \see StringHandler
        */
       static void setStringHandler(const StringHandler *handler);
+
+      /*!
+       * Returns the code page assumed for an ID3v1 tag read without an explicit
+       * one, which is 0 until setAssumedCodePage() states another one.
+       *
+       * \see setAssumedCodePage()
+       */
+      static unsigned int assumedCodePage();
+
+      /*!
+       * Sets the code page \a codePage assumed for an ID3v1 tag read without an
+       * explicit one: a tag read through the two argument constructor, or one
+       * read with a \a codePage of 0 or of a value this library cannot convert.
+       *
+       * \a codePage is a Windows code page number, the same numbering a CSET
+       * chunk of a RIFF file uses: 65001 assumes UTF-8, 1252 assumes
+       * Windows-1252, and 0, the initial value, assumes the ISO 8859-1 the
+       * ID3v1 specification prescribes.
+       *
+       * ID3v1 has no way to declare a charset, so a file that holds UTF-8 or
+       * any Windows code page looks exactly like one holding ISO 8859-1.  This
+       * is where the caller says which of them its files hold.
+       *
+       * \note This is a process wide setting, like setStringHandler(), and
+       * applies to the tags read after the call.
+       *
+       * \note It only decides how text is read. render() writes through the
+       * StringHandler, which produces ISO 8859-1, whatever is assumed here.
+       *
+       * \note A code page this library cannot convert is refused: the call then
+       * has no effect and a debug message is emitted.
+       *
+       * \see assumedCodePage()
+       * \see setStringHandler()
+       */
+      static void setAssumedCodePage(unsigned int codePage);
 
     protected:
       /*!
