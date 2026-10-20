@@ -1,3 +1,4 @@
+
 /***************************************************************************
  *   This library is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU Lesser General Public License version   *
@@ -32,7 +33,9 @@
  */
 
 
-#include "charset.h"
+#include "charsettables.h"
+
+#include <unordered_map>
 
 namespace TagLib {
   namespace Charset {
@@ -1359,95 +1362,114 @@ namespace TagLib {
       };
 
       constexpr CodePageEntry codePageTable[] = {
-        { Type::EBCDIC037, 37, "IBM EBCDIC US-Canada", EBCDIC037Table },
-        { Type::OEM437, 437, "IBM437 OEM US", OEM437Table },
-        { Type::EBCDIC500, 500, "IBM EBCDIC International", EBCDIC500Table },
-        { Type::OEM708, 708, "ASMO-708 Arabic", OEM708Table },
-        { Type::OEM737, 737, "IBM737 OEM Greek", OEM737Table },
-        { Type::OEM775, 775, "IBM775 OEM Baltic", OEM775Table },
-        { Type::OEM850, 850, "IBM850 OEM Latin 1", OEM850Table },
-        { Type::OEM852, 852, "IBM852 OEM Latin 2", OEM852Table },
-        { Type::OEM855, 855, "IBM855 OEM Cyrillic", OEM855Table },
-        { Type::OEM857, 857, "IBM857 OEM Turkish", OEM857Table },
-        { Type::OEM858, 858, "IBM858 OEM Latin 1 with Euro", OEM858Table },
-        { Type::OEM860, 860, "IBM860 OEM Portuguese", OEM860Table },
-        { Type::OEM861, 861, "IBM861 OEM Icelandic", OEM861Table },
-        { Type::OEM862, 862, "DOS-862 OEM Hebrew", OEM862Table },
-        { Type::OEM863, 863, "IBM863 OEM French Canadian", OEM863Table },
-        { Type::OEM864, 864, "IBM864 OEM Arabic", OEM864Table },
-        { Type::OEM865, 865, "IBM865 OEM Nordic", OEM865Table },
-        { Type::OEM866, 866, "IBM866 OEM Russian", OEM866Table },
-        { Type::OEM869, 869, "IBM869 OEM Modern Greek", OEM869Table },
-        { Type::Thai874, 874, "Thai (Windows-874)", Thai874Table },
-        { Type::EBCDIC1047, 1047, "IBM1047 EBCDIC Latin 1/Open System", EBCDIC1047Table },
-        { Type::EBCDIC1140, 1140, "IBM037 EBCDIC US-Canada with Euro", EBCDIC1140Table },
-        { Type::EBCDIC1141, 1141, "IBM273 EBCDIC Germany with Euro", EBCDIC1141Table },
-        { Type::EBCDIC1142, 1142, "IBM277 EBCDIC Denmark-Norway with Euro", EBCDIC1142Table },
-        { Type::EBCDIC1143, 1143, "IBM278 EBCDIC Finland-Sweden with Euro", EBCDIC1143Table },
-        { Type::EBCDIC1144, 1144, "IBM280 EBCDIC Italy with Euro", EBCDIC1144Table },
-        { Type::EBCDIC1145, 1145, "IBM284 EBCDIC Latin America-Spain with Euro", EBCDIC1145Table },
-        { Type::EBCDIC1146, 1146, "IBM285 EBCDIC UK with Euro", EBCDIC1146Table },
-        { Type::EBCDIC1147, 1147, "IBM297 EBCDIC France with Euro", EBCDIC1147Table },
-        { Type::EBCDIC1148, 1148, "IBM500 EBCDIC International with Euro", EBCDIC1148Table },
-        { Type::EBCDIC1149, 1149, "IBM871 EBCDIC Icelandic with Euro", EBCDIC1149Table },
-        { Type::Windows1250, 1250, "Windows-1250 Central European", Windows1250Table },
-        { Type::Windows1251, 1251, "Windows-1251 Cyrillic", Windows1251Table },
-        { Type::Windows1252, 1252, "Windows-1252 Western European", Windows1252Table },
-        { Type::Windows1253, 1253, "Windows-1253 Greek", Windows1253Table },
-        { Type::Windows1254, 1254, "Windows-1254 Turkish", Windows1254Table },
-        { Type::Windows1255, 1255, "Windows-1255 Hebrew", Windows1255Table },
-        { Type::Windows1256, 1256, "Windows-1256 Arabic", Windows1256Table },
-        { Type::Windows1257, 1257, "Windows-1257 Baltic", Windows1257Table },
-        { Type::Windows1258, 1258, "Windows-1258 Vietnamese", Windows1258Table },
-        { Type::ASCII, 20127, "US-ASCII", ASCIITable },
-        { Type::EBCDIC273, 20273, "IBM273 EBCDIC Germany", EBCDIC273Table },
-        { Type::EBCDIC277, 20277, "IBM277 EBCDIC Denmark-Norway", EBCDIC277Table },
-        { Type::EBCDIC278, 20278, "IBM278 EBCDIC Finland-Sweden", EBCDIC278Table },
-        { Type::EBCDIC280, 20280, "IBM280 EBCDIC Italy", EBCDIC280Table },
-        { Type::EBCDIC284, 20284, "IBM284 EBCDIC Latin America-Spain", EBCDIC284Table },
-        { Type::EBCDIC285, 20285, "IBM285 EBCDIC United Kingdom", EBCDIC285Table },
-        { Type::EBCDIC290, 20290, "IBM290 EBCDIC Japanese Katakana Extended", EBCDIC290Table },
-        { Type::EBCDIC297, 20297, "IBM297 EBCDIC France", EBCDIC297Table },
-        { Type::EBCDIC420, 20420, "IBM420 EBCDIC Arabic", EBCDIC420Table },
-        { Type::EBCDIC423, 20423, "IBM423 EBCDIC Greek", EBCDIC423Table },
-        { Type::KOI8R, 20866, "KOI8-R", KOI8RTable },
-        { Type::EBCDIC871, 20871, "IBM871 EBCDIC Icelandic", EBCDIC871Table },
-        { Type::EBCDIC1025, 21025, "IBM1025 EBCDIC Cyrillic Serbian-Bulgarian", EBCDIC1025Table },
-        { Type::KOI8U, 21866, "KOI8-U", KOI8UTable },
-        { Type::Latin1, 28591, "ISO 8859-1", Latin1Table },
-        { Type::Latin2, 28592, "ISO 8859-2", Latin2Table },
-        { Type::Latin3, 28593, "ISO 8859-3", Latin3Table },
-        { Type::Latin4, 28594, "ISO 8859-4", Latin4Table },
-        { Type::Latin5, 28595, "ISO 8859-5", Latin5Table },
-        { Type::Latin6, 28596, "ISO 8859-6", Latin6Table },
-        { Type::Latin7, 28597, "ISO 8859-7", Latin7Table },
-        { Type::Latin8, 28598, "ISO 8859-8 Hebrew (logical)", Latin8Table },
-        { Type::Latin9, 28599, "ISO 8859-9", Latin9Table },
-        { Type::Latin13, 28603, "ISO 8859-13", Latin13Table },
-        { Type::Latin15, 28605, "ISO 8859-15", Latin15Table },
+        { Type::EBCDIC037, 37, EBCDIC037Table },
+        { Type::OEM437, 437, OEM437Table },
+        { Type::EBCDIC500, 500, EBCDIC500Table },
+        { Type::OEM708, 708, OEM708Table },
+        { Type::OEM737, 737, OEM737Table },
+        { Type::OEM775, 775, OEM775Table },
+        { Type::OEM850, 850, OEM850Table },
+        { Type::OEM852, 852, OEM852Table },
+        { Type::OEM855, 855, OEM855Table },
+        { Type::OEM857, 857, OEM857Table },
+        { Type::OEM858, 858, OEM858Table },
+        { Type::OEM860, 860, OEM860Table },
+        { Type::OEM861, 861, OEM861Table },
+        { Type::OEM862, 862, OEM862Table },
+        { Type::OEM863, 863, OEM863Table },
+        { Type::OEM864, 864, OEM864Table },
+        { Type::OEM865, 865, OEM865Table },
+        { Type::OEM866, 866, OEM866Table },
+        { Type::OEM869, 869, OEM869Table },
+        { Type::Thai874, 874, Thai874Table },
+        { Type::EBCDIC1047, 1047, EBCDIC1047Table },
+        { Type::EBCDIC1140, 1140, EBCDIC1140Table },
+        { Type::EBCDIC1141, 1141, EBCDIC1141Table },
+        { Type::EBCDIC1142, 1142, EBCDIC1142Table },
+        { Type::EBCDIC1143, 1143, EBCDIC1143Table },
+        { Type::EBCDIC1144, 1144, EBCDIC1144Table },
+        { Type::EBCDIC1145, 1145, EBCDIC1145Table },
+        { Type::EBCDIC1146, 1146, EBCDIC1146Table },
+        { Type::EBCDIC1147, 1147, EBCDIC1147Table },
+        { Type::EBCDIC1148, 1148, EBCDIC1148Table },
+        { Type::EBCDIC1149, 1149, EBCDIC1149Table },
+        { Type::Windows1250, 1250, Windows1250Table },
+        { Type::Windows1251, 1251, Windows1251Table },
+        { Type::Windows1252, 1252, Windows1252Table },
+        { Type::Windows1253, 1253, Windows1253Table },
+        { Type::Windows1254, 1254, Windows1254Table },
+        { Type::Windows1255, 1255, Windows1255Table },
+        { Type::Windows1256, 1256, Windows1256Table },
+        { Type::Windows1257, 1257, Windows1257Table },
+        { Type::Windows1258, 1258, Windows1258Table },
+        { Type::ASCII, 20127, ASCIITable },
+        { Type::EBCDIC273, 20273, EBCDIC273Table },
+        { Type::EBCDIC277, 20277, EBCDIC277Table },
+        { Type::EBCDIC278, 20278, EBCDIC278Table },
+        { Type::EBCDIC280, 20280, EBCDIC280Table },
+        { Type::EBCDIC284, 20284, EBCDIC284Table },
+        { Type::EBCDIC285, 20285, EBCDIC285Table },
+        { Type::EBCDIC290, 20290, EBCDIC290Table },
+        { Type::EBCDIC297, 20297, EBCDIC297Table },
+        { Type::EBCDIC420, 20420, EBCDIC420Table },
+        { Type::EBCDIC423, 20423, EBCDIC423Table },
+        { Type::KOI8R, 20866, KOI8RTable },
+        { Type::EBCDIC871, 20871, EBCDIC871Table },
+        { Type::EBCDIC1025, 21025, EBCDIC1025Table },
+        { Type::KOI8U, 21866, KOI8UTable },
+        { Type::Latin1, 28591, Latin1Table },
+        { Type::Latin2, 28592, Latin2Table },
+        { Type::Latin3, 28593, Latin3Table },
+        { Type::Latin4, 28594, Latin4Table },
+        { Type::Latin5, 28595, Latin5Table },
+        { Type::Latin6, 28596, Latin6Table },
+        { Type::Latin7, 28597, Latin7Table },
+        { Type::Latin8, 28598, Latin8Table },
+        { Type::Latin9, 28599, Latin9Table },
+        { Type::Latin13, 28603, Latin13Table },
+        { Type::Latin15, 28605, Latin15Table },
       };
 
-      // Every Type except UTF8 has exactly one row, in Type order.
+      // Every Type but UTF8 has exactly one row.
       static_assert(
-        sizeof(codePageTable) / sizeof(codePageTable[0]) + 1 == TypeCount,
+        sizeof(codePageTable) / sizeof(codePageTable[0]) == 66,
         "the code page table and Charset::Type disagree");
 
-      // Charset::entryFor() indexes this table by the numeric value of a
-      // Type, so the order is not merely a convention: it is load bearing.
+      // A Type and the CSET code page number name the same row, so the
+      // code page of every row has to equal the value of its Type.
       static_assert([] {
         for(unsigned int i = 0; i < sizeof(codePageTable) / sizeof(codePageTable[0]); ++i) {
-          if(codePageTable[i].type != static_cast<Type>(i))
+          if(codePageTable[i].codePage != static_cast<unsigned int>(codePageTable[i].type))
             return false;
         }
         return true;
-      }(), "the code page table is not in Charset::Type order");
+      }(), "a row's code page does not match the value of its Type");
+
+      // A row is found by its code page, which is also the value of its Type.
+      // The index is built once, from the table above, and never changes, so
+      // a lookup cannot move it and the pointer entryForCodePage() hands out
+      // stays valid. The local static guards that one time build.
+      const std::unordered_map<unsigned int, const CodePageEntry *> &
+      codePageIndex()
+      {
+        static const std::unordered_map<unsigned int, const CodePageEntry *> index = [] {
+          std::unordered_map<unsigned int, const CodePageEntry *> m;
+          m.reserve(sizeof(codePageTable) / sizeof(codePageTable[0]));
+          for(const auto &entry : codePageTable)
+            m.emplace(entry.codePage, &entry);
+          return m;
+        }();
+
+        return index;
+      }
+
+      const CodePageEntry *entryForCodePage(unsigned int codePage)
+      {
+        const auto &index = codePageIndex();
+        const auto it = index.find(codePage);
+        return it != index.end() ? it->second : nullptr;
+      }
 
     }  // namespace detail
-
-    const detail::CodePageEntry *detail::codePageEntries(unsigned int *count)
-    {
-      *count = sizeof(detail::codePageTable) / sizeof(detail::codePageTable[0]);
-      return detail::codePageTable;
-    }
   }  // namespace Charset
 }  // namespace TagLib

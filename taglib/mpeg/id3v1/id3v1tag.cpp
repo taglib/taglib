@@ -25,9 +25,12 @@
 
 #include "id3v1tag.h"
 
+#include "tcharset.h"
 #include "tdebug.h"
 #include "tfile.h"
 #include "id3v1genres.h"
+
+#include <memory>
 
 using namespace TagLib;
 using namespace ID3v1;
@@ -36,6 +39,43 @@ namespace
 {
   const ID3v1::StringHandler defaultStringHandler;
   const ID3v1::StringHandler *stringHandler = &defaultStringHandler;
+
+  // The code page ID3v1::Tag::setAssumedCodePage() states, used when a tag is
+  // read without an explicit one. 0 keeps the ISO 8859-1 the ID3v1
+  // specification prescribes.
+  unsigned int codePageAssumed = 0;
+
+  // The charset a tag's code page selects.  ID3v1 declares no charset, so the
+  // code page is only ever what the caller states: the constructor's, or the
+  // assumed one for the unspecified 0.  An unsupported number falls back to
+  // the assumed one too, rather than dropping the tag over it.
+  Charset::Type charsetForCodePage(unsigned int codePage)
+  {
+    if(codePage == 0) {
+      codePage = codePageAssumed;
+    }
+    else if(!Charset::typeForCodePage(codePage)) {
+      debug("ID3v1::Tag::Tag() - Unsupported code page " +
+            String::number(static_cast<int>(codePage)) +
+            ", using the assumed one.");
+      codePage = codePageAssumed;
+    }
+
+    if(const auto charset = Charset::typeForCodePage(codePage))
+      return *charset;
+
+    // setAssumedCodePage() only ever stores 0 or a code page it verified, so
+    // the only way to miss here is that 0, which means the ISO 8859-1 default
+    // this function returns anyway.
+    return Charset::Type::Latin1;
+  }
+
+  // ID3v1 fields are fixed width and space padded, so the padding is stripped
+  // here rather than in Charset::decode, which the RIFF decoder shares.
+  String decodeField(const ByteVector &data, Charset::Type charset)
+  {
+    return Charset::decode(data, charset).stripWhiteSpace();
+  }
 } // namespace
 
 class ID3v1::Tag::TagPrivate
@@ -44,6 +84,10 @@ public:
   File *file { nullptr };
   offset_t tagOffset { 0 };
 
+  // The charset the tag's code page selects, resolved once when the tag is
+  // read.
+  Charset::Type charset { Charset::Type::Latin1 };
+
   String title;
   String artist;
   String album;
@@ -51,6 +95,16 @@ public:
   String comment;
   unsigned char track { 0 };
   unsigned char genre { 255 };
+
+  // A handler the user installed with setStringHandler() is an explicit
+  // override, so it takes precedence over the code page that was stated. With
+  // no handler installed the fields are decoded with the charset.
+  String parseField(const ByteVector &data) const
+  {
+    if(stringHandler != &defaultStringHandler)
+      return stringHandler->parse(data);
+    return decodeField(data, charset);
+  }
 };
 
 class ID3v1::StringHandler::StringHandlerPrivate
@@ -87,10 +141,16 @@ ID3v1::Tag::Tag() :
 }
 
 ID3v1::Tag::Tag(File *file, offset_t tagOffset) :
+  ID3v1::Tag(file, tagOffset, 0)
+{
+}
+
+ID3v1::Tag::Tag(File *file, offset_t tagOffset, unsigned int codePage) :
   d(std::make_unique<TagPrivate>())
 {
   d->file = file;
   d->tagOffset = tagOffset;
+  d->charset = charsetForCodePage(codePage);
 
   read();
 }
@@ -207,6 +267,22 @@ void ID3v1::Tag::setStringHandler(const StringHandler *handler)
     stringHandler = &defaultStringHandler;
 }
 
+unsigned int ID3v1::Tag::assumedCodePage()
+{
+  return codePageAssumed;
+}
+
+void ID3v1::Tag::setAssumedCodePage(unsigned int codePage)
+{
+  if(codePage != 0 && !Charset::typeForCodePage(codePage)) {
+    debug("ID3v1::Tag::setAssumedCodePage() - Unsupported code page " +
+          String::number(static_cast<int>(codePage)) + ", ignored.");
+    return;
+  }
+
+  codePageAssumed = codePage;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // protected methods
 ////////////////////////////////////////////////////////////////////////////////
@@ -229,16 +305,16 @@ void ID3v1::Tag::parse(const ByteVector &data)
 {
   int offset = 3;
 
-  d->title = stringHandler->parse(data.mid(offset, 30));
+  d->title = d->parseField(data.mid(offset, 30));
   offset += 30;
 
-  d->artist = stringHandler->parse(data.mid(offset, 30));
+  d->artist = d->parseField(data.mid(offset, 30));
   offset += 30;
 
-  d->album = stringHandler->parse(data.mid(offset, 30));
+  d->album = d->parseField(data.mid(offset, 30));
   offset += 30;
 
-  d->year = stringHandler->parse(data.mid(offset, 4));
+  d->year = d->parseField(data.mid(offset, 4));
   offset += 4;
 
   // Check for ID3v1.1 -- Note that ID3v1 *does not* support "track zero" -- this
@@ -249,11 +325,11 @@ void ID3v1::Tag::parse(const ByteVector &data)
   if(data[offset + 28] == 0 && data[offset + 29] != 0) {
     // ID3v1.1 detected
 
-    d->comment = stringHandler->parse(data.mid(offset, 28));
+    d->comment = d->parseField(data.mid(offset, 28));
     d->track   = static_cast<unsigned char>(data[offset + 29]);
   }
   else
-    d->comment = data.mid(offset, 30);
+    d->comment = d->parseField(data.mid(offset, 30));
 
   offset += 30;
 

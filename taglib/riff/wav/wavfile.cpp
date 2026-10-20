@@ -24,7 +24,7 @@
  ***************************************************************************/
 
 #include "wavfile.h"
-#include "charset.h"
+#include "tcharset.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "tagutils.h"

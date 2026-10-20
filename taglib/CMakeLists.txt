@@ -96,6 +96,7 @@ set(tag_HDRS
   toolkit/tpicturetype.h
   toolkit/tpropertymap.h
   toolkit/tdebuglistener.h
+  toolkit/tcharset.h
   toolkit/tversionnumber.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
@@ -517,7 +518,7 @@ set(toolkit_SRCS
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp
   toolkit/tversionnumber.cpp
-  toolkit/charset.cpp
+  toolkit/tcharset.cpp
   toolkit/charsettables.cpp
 )
 

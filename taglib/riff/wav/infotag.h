@@ -127,6 +127,9 @@ namespace TagLib {
        *
        * \note A handler installed with setStringHandler() takes precedence over
        * \a codePage, because installing one is an explicit override.
+       *
+       * \see assumedCodePage()
+       * \see setStringHandler()
        */
       Tag(const ByteVector &data, unsigned int codePage);
 

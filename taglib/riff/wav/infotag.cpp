@@ -27,9 +27,8 @@
 
 #include <memory>
 #include <utility>
-#include <vector>
 
-#include "charset.h"
+#include "tcharset.h"
 #include "tbytevector.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
@@ -48,12 +47,11 @@ namespace
   // specification prescribes for it.
   unsigned int codePageAssumed = 0;
 
-  // The charset a file's CSET code page selects. Code page 0 means the file
-  // declares none, so the code page the caller assumed applies; so does the
-  // RIFF default "Latin1" for a code page this library has no table for. The
-  // number is a hint about how the text was written, and dropping every field
-  // over a hint we cannot follow would throw the whole tag away; Latin-1 at
-  // least keeps the ASCII part of it intact.
+  // The charset a file's CSET code page selects.  A number with no table is
+  // the file declaring something we cannot follow, so it falls to the RIFF
+  // default Latin-1 rather than the assumed page: a declared number is
+  // evidence about that file, not a caller hint.  0 means the file declared
+  // nothing, so the assumed page applies.
   Charset::Type charsetForCodePage(unsigned int codePage)
   {
     if(const auto charset = Charset::typeForCodePage(codePage))
@@ -75,38 +73,11 @@ namespace
     return Charset::Type::Latin1;
   }
 
-  // Decodes according to the code page the file declares.
-  class CodePageStringHandler : public RIFF::Info::StringHandler
+  // RIFF INFO fields are NUL terminated, which Charset::decode already
+  // handles, so unlike the ID3v1 decoder nothing is stripped here.
+  String decodeField(const ByteVector &data, Charset::Type charset)
   {
-  public:
-    explicit CodePageStringHandler(Charset::Type charset) :
-      m_charset(charset)
-    {
-    }
-
-    String parse(const ByteVector &data) const override
-    {
-      return Charset::decode(data, m_charset);
-    }
-
-  private:
-    const Charset::Type m_charset;
-  };
-
-  const RIFF::Info::StringHandler *stringHandlerForCodePage(unsigned int codePage)
-  {
-    // 1 handler per code page. They are stateless apart from the type they
-    // decode, so they are built once and then shared. Charset::TypeCount of
-    // them covers every code page Charset knows.
-    static const std::vector<std::unique_ptr<CodePageStringHandler>> handlers = [] {
-      std::vector<std::unique_ptr<CodePageStringHandler>> v;
-      v.reserve(Charset::TypeCount);
-      for(unsigned int i = 0; i < Charset::TypeCount; ++i)
-        v.push_back(std::make_unique<CodePageStringHandler>(static_cast<Charset::Type>(i)));
-      return v;
-    }();
-
-    return handlers[static_cast<unsigned int>(charsetForCodePage(codePage))].get();
+    return Charset::decode(data, charset);
   }
 } // namespace
 
@@ -115,17 +86,19 @@ class RIFF::Info::Tag::TagPrivate
 public:
   FieldListMap fieldListMap;
 
-  // The handler that decodes the code page this file declares, or null when the
-  // file declares none. It is only a fallback: see effectiveHandler().
-  const StringHandler *codePageHandler = nullptr;
+  // The charset the file's CSET chunk declares, resolved once when the tag is
+  // parsed. RIFF says nothing about the charset without one, so ISO 8859-1 is
+  // the default.
+  Charset::Type charset { Charset::Type::Latin1 };
 
   // A handler the user installed with setStringHandler() is an explicit
-  // override, so it overrides whatever the file declares.
-  const StringHandler *effectiveHandler() const
+  // override, so it takes precedence over what the file declares. With no
+  // handler installed the field is decoded with the charset.
+  String parseField(const ByteVector &data) const
   {
     if(stringHandler != &defaultStringHandler)
-      return stringHandler;
-    return codePageHandler ? codePageHandler : stringHandler;
+      return stringHandler->parse(data);
+    return decodeField(data, charset);
   }
 };
 
@@ -163,7 +136,7 @@ RIFF::Info::Tag::Tag(const ByteVector &data) :
 RIFF::Info::Tag::Tag(const ByteVector &data, unsigned int codePage) :
   d(std::make_unique<TagPrivate>())
 {
-  d->codePageHandler = stringHandlerForCodePage(codePage);
+  d->charset = charsetForCodePage(codePage);
   parse(data);
 }
 
@@ -367,11 +340,10 @@ void RIFF::Info::Tag::removeField(const ByteVector &id)
 
 ByteVector RIFF::Info::Tag::render() const
 {
-  const StringHandler *handler = d->effectiveHandler();
   ByteVector data("INFO");
 
   for(const auto &[field, list] : std::as_const(d->fieldListMap)) {
-    ByteVector text = handler->render(list);
+    ByteVector text = stringHandler->render(list);
     if(text.isEmpty())
       continue;
 
@@ -419,7 +391,6 @@ void RIFF::Info::Tag::setAssumedCodePage(unsigned int codePage)
 
 void RIFF::Info::Tag::parse(const ByteVector &data)
 {
-  const StringHandler *handler = d->effectiveHandler();
   unsigned int p = 4;
   // Needs a full 8-byte header; fewer bytes left would wrap the check below.
   while(p + 8 <= data.size()) {
@@ -427,10 +398,8 @@ void RIFF::Info::Tag::parse(const ByteVector &data)
     if(size > data.size() - p - 8)
       break;
 
-    if(const ByteVector id = data.mid(p, 4); isValidChunkName(id)) {
-      const String text = handler->parse(data.mid(p + 8, size));
-      d->fieldListMap[id] = text;
-    }
+    if(const ByteVector id = data.mid(p, 4); isValidChunkName(id))
+      d->fieldListMap[id] = d->parseField(data.mid(p + 8, size));
 
     p += ((size + 1) & ~1) + 8;
   }

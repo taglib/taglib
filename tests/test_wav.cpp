@@ -27,7 +27,7 @@
 #include <string>
 #include <cstdio>
 
-#include "charset.h"
+#include "tcharset.h"
 #include "id3v2tag.h"
 #include "infotag.h"
 #include "tbytevectorlist.h"

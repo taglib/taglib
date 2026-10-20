@@ -18,7 +18,8 @@
  *   http://www.mozilla.org/MPL/                                           *
  ***************************************************************************/
 
-#include "charset.h"
+#include "tcharset.h"
+#include "charsettables.h"
 #include "tbytevector.h"
 #include "tstring.h"
 
@@ -26,25 +27,11 @@
 
 using namespace TagLib;
 
-namespace
-{
-  const TagLib::Charset::detail::CodePageEntry *entryFor(TagLib::Charset::Type type)
-  {
-    unsigned int count = 0;
-    const auto *entries = TagLib::Charset::detail::codePageEntries(&count);
-    const auto index = static_cast<unsigned int>(type);
-    return index < count ? &entries[index] : nullptr;
-  }
-}  // namespace
-
 std::optional<TagLib::Charset::Type> TagLib::Charset::typeForCodePage(unsigned int codePage)
 {
-  unsigned int count = 0;
-  const auto *entries = detail::codePageEntries(&count);
-  for(unsigned int i = 0; i < count; ++i) {
-    if(entries[i].codePage == codePage)
-      return entries[i].type;
-  }
+  const auto *entry = detail::entryForCodePage(codePage);
+  if(entry)
+    return entry->type;
   if(codePage == 65001)
     return Type::UTF8;
 
@@ -53,12 +40,7 @@ std::optional<TagLib::Charset::Type> TagLib::Charset::typeForCodePage(unsigned i
 
 unsigned int TagLib::Charset::codePageForType(Type type)
 {
-  if(type == Type::UTF8)
-    return 65001;
-  if(const auto *entry = entryFor(type))
-    return entry->codePage;
-
-  return 0;
+  return static_cast<unsigned int>(type);
 }
 
 String TagLib::Charset::decode(const ByteVector &data, Type type)
@@ -66,7 +48,7 @@ String TagLib::Charset::decode(const ByteVector &data, Type type)
   if(type == Type::UTF8)
     return String(data, String::UTF8);
 
-  const auto *entry = entryFor(type);
+  const auto *entry = detail::entryForCodePage(static_cast<unsigned int>(type));
   if(!entry)
     return String();
 
