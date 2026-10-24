@@ -27,6 +27,7 @@
 #include <cstdio>
 
 #include "infotag.h"
+#include "tpropertymap.h"
 #include <cppunit/extensions/HelperMacros.h>
 #include "utils.h"
 
@@ -38,6 +39,7 @@ class TestInfoTag : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestInfoTag);
   CPPUNIT_TEST(testTitle);
   CPPUNIT_TEST(testNumericFields);
+  CPPUNIT_TEST(testUnsupportedProperties);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -69,6 +71,21 @@ public:
     tag.setYear(1234);
     CPPUNIT_ASSERT_EQUAL(static_cast<unsigned int>(1234), tag.year());
     CPPUNIT_ASSERT_EQUAL(String("1234"), tag.fieldText("ICRD"));
+  }
+
+  void testUnsupportedProperties()
+  {
+    RIFF::Info::Tag tag;
+    tag.setFieldText("INAM", "Title");
+    tag.setFieldText("ITRK", "7");
+
+    const PropertyMap props = tag.properties();
+    CPPUNIT_ASSERT_EQUAL(StringList("ITRK"), props.unsupportedData());
+    CPPUNIT_ASSERT_EQUAL(StringList("Title"), props["TITLE"]);
+
+    tag.removeUnsupportedProperties(props.unsupportedData());
+    CPPUNIT_ASSERT(!tag.fieldListMap().contains("ITRK"));
+    CPPUNIT_ASSERT_EQUAL(String("Title"), tag.fieldText("INAM"));
   }
 };
 
