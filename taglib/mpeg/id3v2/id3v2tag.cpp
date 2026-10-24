@@ -433,6 +433,23 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   PropertyMap tiplProperties;
   PropertyMap tmclProperties;
   Frame::splitProperties(origProps, singleFrameProperties, tiplProperties, tmclProperties);
+  // A key can be spread over several frames (e.g. comments in different
+  // languages), whose values properties() merges in frame order. Keep all of
+  // them if the requested values are the merged ones.
+  PropertyMap spreadProperties;
+  for(const auto &frame : std::as_const(frameList())) {
+    if(const ByteVector id = frame->frameID(); id != "TIPL" && id != "TMCL") {
+      if(PropertyMap frameProperties = frame->asProperties(); frameProperties.size() == 1)
+        spreadProperties.merge(frameProperties);
+    }
+  }
+  StringList keptKeys;
+  for(const auto &[key, values] : std::as_const(spreadProperties)) {
+    if(singleFrameProperties.contains(key) && singleFrameProperties[key] == values) {
+      keptKeys.append(key);
+      singleFrameProperties.erase(key);
+    }
+  }
   for(const auto &[tag, frames] : std::as_const(frameListMap())) {
     for(const auto &frame : frames) {
       PropertyMap frameProperties = frame->asProperties();
@@ -448,6 +465,8 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
         else
           tmclProperties.erase(frameProperties);
       }
+      else if(frameProperties.size() == 1 && keptKeys.contains(frameProperties.begin()->first))
+        continue;
       else if(!singleFrameProperties.contains(frameProperties))
         framesToDelete.append(frame);
       else
