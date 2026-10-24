@@ -204,7 +204,7 @@ PropertyMap RIFF::Info::Tag::properties() const
       props[key].append(val);
     }
     else {
-      props.addUnsupportedData(key);
+      props.addUnsupportedData(String(id, String::Latin1));
     }
   }
   return props;
