@@ -169,6 +169,7 @@ class TestMP4 : public CppUnit::TestFixture
   CPPUNIT_TEST(testQTChapterListOverwrite);
   CPPUNIT_TEST(testQTChapterListTimestampPrecision);
   CPPUNIT_TEST(testQTChapterListNonZeroFirstChapter);
+  CPPUNIT_TEST(testQTChapterListNonZeroFirstChapterEditList);
   CPPUNIT_TEST(testQTChapterListNoOrphanedMdat);
   CPPUNIT_TEST(testQTChapterListSharedTref);
   CPPUNIT_TEST(testQTChapterListSharedMdatPreservesAudio);
@@ -1402,6 +1403,138 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title());
       CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title());
       CPPUNIT_ASSERT_EQUAL(String("Three"), chapters[2].title());
+    }
+  }
+
+  // A chapter track's samples run back to back from media time 0, so a list
+  // whose first chapter starts later is written with an untitled placeholder
+  // sample before it.  The edit list covers that placeholder with an empty edit,
+  // so that players which honor edit lists start at the first written chapter.
+  void testQTChapterListNonZeroFirstChapterEditList()
+  {
+    ScopedFileCopy copy("no-tags", ".m4a");
+    string filename = copy.fileName();
+
+    struct EditListEntry {
+      unsigned int segmentDuration;
+      int mediaTime;
+    };
+    struct ChapterTrackTiming {
+      unsigned int movieTimescale = 0;
+      unsigned int movieDuration = 0;
+      unsigned int mediaTimescale = 0;
+      std::vector<EditListEntry> edits;
+    };
+
+    // The mvhd timing, and the chapter (text) track's mdhd timescale and
+    // version 0 edit list entries.
+    auto chapterTrackTiming = [&]() {
+      ChapterTrackTiming timing;
+      PlainFile pf(filename.c_str());
+      MP4::Atoms atoms(&pf);
+      MP4::Atom *moov = atoms.find("moov");
+      if(!moov)
+        return timing;
+
+      if(const MP4::Atom *mvhd = moov->find("mvhd")) {
+        pf.seek(mvhd->offset());
+        const ByteVector data = pf.readBlock(mvhd->length());
+        if(data.size() >= 28 && data[8] == 0) {
+          timing.movieTimescale = data.toUInt(20U);
+          timing.movieDuration = data.toUInt(24U);
+        }
+      }
+
+      for(auto *trak : moov->findall("trak")) {
+        const MP4::Atom *hdlr = trak->find("mdia", "hdlr");
+        if(!hdlr)
+          continue;
+        pf.seek(hdlr->offset());
+        if(!pf.readBlock(hdlr->length()).containsAt("text", 16))
+          continue;
+
+        if(const MP4::Atom *mdhd = trak->find("mdia", "mdhd")) {
+          pf.seek(mdhd->offset());
+          const ByteVector data = pf.readBlock(mdhd->length());
+          if(data.size() >= 24 && data[8] == 0)
+            timing.mediaTimescale = data.toUInt(20U);
+        }
+
+        // edts is not parsed as a container, so its elst is read from its data.
+        if(const MP4::Atom *edts = trak->find("edts")) {
+          pf.seek(edts->offset());
+          const ByteVector data = pf.readBlock(edts->length());
+          if(data.size() >= 24 && data.containsAt("elst", 12) && data[16] == 0) {
+            const unsigned int count = data.toUInt(20U);
+            for(unsigned int i = 0; i < count && 24 + (i + 1) * 12 <= data.size(); ++i) {
+              const unsigned int pos = 24 + i * 12;
+              timing.edits.push_back({
+                data.toUInt(pos),
+                static_cast<int>(data.toUInt(pos + 4))
+              });
+            }
+          }
+        }
+        break;
+      }
+      return timing;
+    };
+
+    // First chapter after 0: an empty edit spans the gap, then the media plays
+    // from the first written chapter.
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("One", 1000LL),
+        MP4::Chapter("Two", 2000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      const ChapterTrackTiming timing = chapterTrackTiming();
+      CPPUNIT_ASSERT(timing.movieTimescale > 0);
+      CPPUNIT_ASSERT(timing.mediaTimescale > 0);
+      CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(2), timing.edits.size());
+
+      const unsigned int lead = timing.movieTimescale;
+      CPPUNIT_ASSERT_EQUAL(lead, timing.edits[0].segmentDuration);
+      CPPUNIT_ASSERT_EQUAL(-1, timing.edits[0].mediaTime);
+      CPPUNIT_ASSERT_EQUAL(timing.movieDuration - lead, timing.edits[1].segmentDuration);
+      CPPUNIT_ASSERT_EQUAL(static_cast<int>(timing.mediaTimescale), timing.edits[1].mediaTime);
+    }
+    {
+      MP4::File f(filename.c_str());
+      const MP4::ChapterList chapters = f.qtChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(1000LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(2000LL, chapters[1].startTime());
+    }
+
+    // First chapter at 0: a single edit plays the whole media.
+    {
+      MP4::File f(filename.c_str());
+      f.setQtChapters(MP4::ChapterList{
+        MP4::Chapter("One", 0),
+        MP4::Chapter("Two", 2000LL)
+      });
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      const ChapterTrackTiming timing = chapterTrackTiming();
+      CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(1), timing.edits.size());
+      CPPUNIT_ASSERT_EQUAL(timing.movieDuration, timing.edits[0].segmentDuration);
+      CPPUNIT_ASSERT_EQUAL(0, timing.edits[0].mediaTime);
+    }
+    {
+      MP4::File f(filename.c_str());
+      const MP4::ChapterList chapters = f.qtChapters();
+      CPPUNIT_ASSERT_EQUAL(2U, chapters.size());
+      CPPUNIT_ASSERT_EQUAL(String("One"), chapters[0].title());
+      CPPUNIT_ASSERT_EQUAL(0LL, chapters[0].startTime());
+      CPPUNIT_ASSERT_EQUAL(String("Two"), chapters[1].title());
+      CPPUNIT_ASSERT_EQUAL(2000LL, chapters[1].startTime());
     }
   }
 
