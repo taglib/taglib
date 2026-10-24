@@ -134,6 +134,7 @@
 #include "matroskachapteredition.h"
 #include "matroskachapters.h"
 #include "matroskasimpletag.h"
+#include "ebml/ebmlutils.h"
 #include "plainfile.h"
 #include "tfilestream.h"
 #include <cppunit/extensions/HelperMacros.h>
@@ -186,6 +187,8 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testAttachedFileDataReadOnDemand);
   CPPUNIT_TEST(testSaveUnrequestedAttachedFileData);
   CPPUNIT_TEST(testSegmentTitleWithoutAudioProperties);
+  CPPUNIT_TEST(testElementSizeLength);
+  CPPUNIT_TEST(testSaveElementSizeAtLengthLimit);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1925,6 +1928,45 @@ public:
     Matroska::File noTitle(TEST_FILE_PATH_C("no-tags.mka"), false);
     CPPUNIT_ASSERT(noTitle.isValid());
     CPPUNIT_ASSERT_EQUAL(String(""), noTitle.tag()->title());
+  }
+
+  void testElementSizeLength()
+  {
+    for(int length = 1; length <= 8; ++length) {
+      // 2^(7n) - 1 is the "unknown size" value of a size length of n bytes.
+      const uint64_t unknownSize = (1ULL << (7 * length)) - 1;
+      CPPUNIT_ASSERT_EQUAL(length, EBML::minSize(unknownSize - 1));
+      if(length < 8) {
+        CPPUNIT_ASSERT_EQUAL(length + 1, EBML::minSize(unknownSize));
+      }
+    }
+    CPPUNIT_ASSERT_EQUAL(1, EBML::minSize(0));
+    CPPUNIT_ASSERT_EQUAL(0, EBML::minSize(0xFFFFFFFFFFFFFFULL));
+    CPPUNIT_ASSERT_EQUAL(0, EBML::minSize(0xFFFFFFFFFFFFFFFFULL));
+  }
+
+  void testSaveElementSizeAtLengthLimit()
+  {
+    // A title of 127 or 16383 bytes gives its string element a size equal to
+    // the "unknown size" value of a size length of 1 or 2 bytes.
+    for(const unsigned int length : {126U, 127U, 128U, 16382U, 16383U, 16384U}) {
+      ScopedFileCopy copy("no-tags", ".mka");
+      string newname = copy.fileName();
+      const String title(string(length, 'a'));
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        f.tag(true)->setTitle(title);
+        CPPUNIT_ASSERT(f.save());
+      }
+      {
+        Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+        CPPUNIT_ASSERT(f.isValid());
+        CPPUNIT_ASSERT(f.tag(false));
+        CPPUNIT_ASSERT_EQUAL(title, f.tag()->title());
+        CPPUNIT_ASSERT_EQUAL(444, f.audioProperties()->lengthInMilliseconds());
+      }
+    }
   }
 
   void testUnknownSizeSegment()
