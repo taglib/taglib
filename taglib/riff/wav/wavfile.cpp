@@ -24,14 +24,15 @@
  ***************************************************************************/
 
 #include "wavfile.h"
+
+#include <optional>
+
 #include "tcharset.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
 #include "infotag.h"
 #include "tagunion.h"
-
-#include <optional>
 
 using namespace TagLib;
 
@@ -40,6 +41,8 @@ namespace
   enum { ID3v2Index = 0, InfoIndex = 1 };
 
   /*!
+   * Render CSET chunk.
+   *
    * A CSET chunk declares the charset of the file's text and is laid out as
    *   <CSET chunk> -> CSET( <wCodePage:WORD> <wCountryCode:WORD>
    *                         <wLanguageCode:WORD> <wDialect:WORD> )
@@ -48,10 +51,10 @@ namespace
    * spec's "no opinion" value for each of them.
    * https://www.robotplanet.dk/audio/wav_meta_data/riff_mci.pdf#page=25
    */
-  constexpr unsigned int CSETChunkSize = 8;
-
   ByteVector renderCSET(unsigned int codePage)
   {
+    constexpr unsigned int CSETChunkSize = 8;
+
     ByteVector cset = ByteVector::fromShort(static_cast<short>(codePage), false);
     cset.resize(CSETChunkSize, 0);
     return cset;

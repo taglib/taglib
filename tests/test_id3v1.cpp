@@ -25,8 +25,8 @@
 
 #include <string>
 #include <cstdio>
-#include <cstdlib>
 
+#include "taglib_config.h"
 #include "tstring.h"
 #include "mpegfile.h"
 #include "id3v1tag.h"
@@ -64,6 +64,7 @@ class TestID3v1 : public CppUnit::TestFixture
   CPPUNIT_TEST(testStripWhiteSpace);
   CPPUNIT_TEST(testGenres);
   CPPUNIT_TEST(testRenamedGenres);
+#ifdef TAGLIB_WITH_CHARSETTABLES
   CPPUNIT_TEST(testAssumedCodePageDefaultIsLatin1);
   CPPUNIT_TEST(testAssumedCodePage);
   CPPUNIT_TEST(testConstructorCodePage);
@@ -72,6 +73,7 @@ class TestID3v1 : public CppUnit::TestFixture
   CPPUNIT_TEST(testUserHandlerBeatsCodePage);
   CPPUNIT_TEST(testMp3ReadsWithIso88591);
   CPPUNIT_TEST(testMp3ReadsWithWindows1252);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -114,41 +116,63 @@ public:
     CPPUNIT_ASSERT_EQUAL(129U, tag.genreNumber());
   }
 
-private:
-
-  // Writes a tag whose raw artist bytes are \a artist, so that the reading of
-  // the bytes is what the rest of the test can look at.  Nothing else is set,
-  // as an empty field renders as a run of NULs.
-  static string makeTag(const ByteVector &artist)
+#ifdef TAGLIB_WITH_CHARSETTABLES
+  //! A temporary MP3 file which is automatically deleted when it goes out of scope.
+  class ScopedMp3FileCopyWithId3v1Tag : public ScopedFileCopy
   {
-    ScopedFileCopy copy("xing", ".mp3", false);
-    const string name = copy.fileName();
+  public:
+    static constexpr unsigned int ARTIST_OFFSET = 3 + 30;
+    static constexpr unsigned int COMMENT_OFFSET = 3 + 30 + 30 + 30 + 4;
 
-    FILE *file = fopen(name.c_str(), "r+b");
-    CPPUNIT_ASSERT(file);
-    // The tag goes where a file already ending in one would carry it: the last
-    // 128 bytes. The source file is longer than that, so a shorter tag would
-    // not be found at all.
-    CPPUNIT_ASSERT_EQUAL(0, fseek(file, -128, SEEK_END));
+    //! Construct MP3 file with an ID3v1 tag which has one raw \a value at
+    //! \a offset, which points by default to the artist field.
+    explicit  ScopedMp3FileCopyWithId3v1Tag(const ByteVector &value,
+      unsigned int offset = ARTIST_OFFSET)
+      : ScopedFileCopy("xing", ".mp3")
+    {
+      ByteVector tag = ID3v1::Tag::fileIdentifier();
+      // Leave empty fields up to the given offset.
+      tag.resize(offset, 0);
+      tag.append(value);
+      tag.resize(128, 0);
+      // 0xff in the genre byte is the ID3v1 value for "no genre".
+      tag[127] = static_cast<char>(0xff);
 
-    ByteVector tag = ID3v1::Tag::fileIdentifier();
-    // Leave an empty title behind, so the bytes land in the artist field.
-    tag.resize(3 + 30, 0);
-    tag.append(artist);
-    tag.resize(128, 0);
-    // 0xff in the genre byte is the ID3v1 value for "no genre".
-    tag[127] = static_cast<char>(0xff);
+      std::ofstream file(fileName().c_str(), std::ios::in | std::ios::out | std::ios::binary);
+      // The tag goes where a file already ending in one would carry it: the last
+      // 128 bytes. The source file is longer than that, so a shorter tag would
+      // not be found at all.
+      file.seekp(-128, std::ios::end);
+      file.write(tag.data(), tag.size());
+    }
 
-    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(128), fwrite(tag.data(), 1, 128, file));
-    fclose(file);
-    return name;
-  }
+    //! The file offset of the ID3v1 tag.
+    offset_t tagOffset() const
+    {
+      std::ifstream file(fileName().c_str(), std::ios::binary | std::ios::ate);
+      return static_cast<offset_t>(file.tellg()) - 128;
+    }
 
-  // The offset makeTag() wrote at: a tag lives in the last 128 bytes.
-  static offset_t tagOffset(File *file)
-  {
-    return file->length() - 128;
-  }
+    //! Get the raw field value from the ID3v1 tag starting at \a offset to
+    //! the next zero byte.
+    ByteVector getRawValue(unsigned int offset = ARTIST_OFFSET)
+    {
+      std::ifstream file(fileName().c_str(), std::ios::binary | std::ios::ate);
+      file.seekg(-128, std::ios::end);
+      ByteVector tag(128U, 0);
+      file.read(tag.data(), tag.size());
+      return extractRawValue(tag, offset);
+    }
+
+    static ByteVector extractRawValue(const ByteVector &tag, unsigned int offset = ARTIST_OFFSET)
+    {
+      if(tag.size() != 128)
+        return {};
+      const char *str = tag.data();
+      const char *end = std::find(str + offset, str + 128, '\0');
+      return tag.mid(offset, static_cast<unsigned int>(end - str - offset));
+    }
+  };
 
   // Puts back the code page a tag is assumed to have when none is stated, so
   // that a test stating another one does not carry it into the next test.
@@ -184,11 +208,12 @@ private:
   {
     CPPUNIT_ASSERT_EQUAL(0u, ID3v1::Tag::assumedCodePage());
 
-    const string name = makeTag(kUtf8Artist);
+    ScopedMp3FileCopyWithId3v1Tag copy(kUtf8Artist);
+    const string name = copy.fileName();
+
     MPEG::File f(name.c_str());
     CPPUNIT_ASSERT(f.ID3v1Tag(false));
     CPPUNIT_ASSERT_EQUAL(kUtf8ArtistLatin1, f.ID3v1Tag(false)->artist());
-    deleteFile(name);
   }
 
   // Software that writes UTF-8 or an ANSI code page without any way of saying
@@ -202,40 +227,64 @@ private:
     CPPUNIT_ASSERT_EQUAL(65001u, ID3v1::Tag::assumedCodePage());
 
     {
-      const string name = makeTag(kUtf8Artist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kUtf8Artist);
+      const string name = copy.fileName();
       MPEG::File f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(kUtf8ArtistText, f.ID3v1Tag(false)->artist());
-      deleteFile(name);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(kUtf8Artist, copy.getRawValue());
     }
 
     ID3v1::Tag::setAssumedCodePage(1252);
     CPPUNIT_ASSERT_EQUAL(1252u, ID3v1::Tag::assumedCodePage());
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       MPEG::File f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, f.ID3v1Tag(false)->artist());
-      deleteFile(name);
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(kAnsiArtist, copy.getRawValue());
     }
 
     ID3v1::Tag::setAssumedCodePage(1251);
     CPPUNIT_ASSERT_EQUAL(1251u, ID3v1::Tag::assumedCodePage());
 
     {
-      const string name = makeTag(kCyrillicArtist);
-      MPEG::File f(name.c_str());
-      CPPUNIT_ASSERT_EQUAL(kCyrillicArtistText, f.ID3v1Tag(false)->artist());
-      deleteFile(name);
+      ScopedMp3FileCopyWithId3v1Tag copy(kCyrillicArtist);
+      const string name = copy.fileName();
+      {
+        MPEG::File f(name.c_str());
+        CPPUNIT_ASSERT_EQUAL(kCyrillicArtistText, f.ID3v1Tag(false)->artist());
+        f.save();
+        CPPUNIT_ASSERT_EQUAL(kCyrillicArtist, copy.getRawValue());
+      }
+      {
+        MPEG::File f(name.c_str());
+        ID3v1::Tag *tag = f.ID3v1Tag(false);
+        CPPUNIT_ASSERT_EQUAL(kCyrillicArtistText, tag->artist());
+        // The character 03B1 is a greek alpha, which is not represented in 1251
+        tag->setArtist((L"A \x0410\x03B1 B"));
+        CPPUNIT_ASSERT(f.save());
+      }
+      {
+        MPEG::File f(name.c_str());
+        CPPUNIT_ASSERT_EQUAL(String(L"A \x0410? B"), f.ID3v1Tag(false)->artist());
+      }
     }
 
     // Stating 0 again is going back to what the specification says.
     ID3v1::Tag::setAssumedCodePage(0);
     CPPUNIT_ASSERT_EQUAL(0u, ID3v1::Tag::assumedCodePage());
 
-    const string name = makeTag(kUtf8Artist);
-    MPEG::File f(name.c_str());
-    CPPUNIT_ASSERT_EQUAL(kUtf8ArtistLatin1, f.ID3v1Tag(false)->artist());
-    deleteFile(name);
+    {
+      ScopedMp3FileCopyWithId3v1Tag copy(kUtf8Artist);
+      const string name = copy.fileName();
+      MPEG::File f(name.c_str());
+      CPPUNIT_ASSERT_EQUAL(kUtf8ArtistLatin1, f.ID3v1Tag(false)->artist());
+      f.save();
+      CPPUNIT_ASSERT_EQUAL(kUtf8Artist, copy.getRawValue());
+    }
   }
 
   // A tag can be given its own code page as well, for callers that read files
@@ -249,29 +298,35 @@ private:
     ID3v1::Tag::setAssumedCodePage(65001);
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       PlainFile file(name.c_str());
       CPPUNIT_ASSERT(file.isValid());
-      ID3v1::Tag tag(&file, tagOffset(&file), 1252);
+      ID3v1::Tag tag(&file, copy.tagOffset(), 1252);
       CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, tag.artist());
-      deleteFile(name);
+      CPPUNIT_ASSERT_EQUAL(kAnsiArtist,
+        ScopedMp3FileCopyWithId3v1Tag::extractRawValue(tag.render()));
     }
 
     {
-      const string name = makeTag(kCyrillicArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kCyrillicArtist);
+      const string name = copy.fileName();
       PlainFile file(name.c_str());
-      ID3v1::Tag tag(&file, tagOffset(&file), 1251);
+      ID3v1::Tag tag(&file, copy.tagOffset(), 1251);
       CPPUNIT_ASSERT_EQUAL(kCyrillicArtistText, tag.artist());
-      deleteFile(name);
+      CPPUNIT_ASSERT_EQUAL(kCyrillicArtist,
+        ScopedMp3FileCopyWithId3v1Tag::extractRawValue(tag.render()));
     }
 
     // Code page 0 is the "not stated" value, which means the assumption.
     {
-      const string name = makeTag(kUtf8Artist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kUtf8Artist);
+      const string name = copy.fileName();
       PlainFile file(name.c_str());
-      ID3v1::Tag tag(&file, tagOffset(&file), 0);
+      ID3v1::Tag tag(&file, copy.tagOffset(), 0);
       CPPUNIT_ASSERT_EQUAL(kUtf8ArtistText, tag.artist());
-      deleteFile(name);
+      CPPUNIT_ASSERT_EQUAL(kUtf8Artist,
+        ScopedMp3FileCopyWithId3v1Tag::extractRawValue(tag.render()));
     }
   }
 
@@ -289,13 +344,15 @@ private:
     CPPUNIT_ASSERT_EQUAL(1252u, ID3v1::Tag::assumedCodePage());
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       PlainFile file(name.c_str());
       // Handing the same unsupported number to the constructor falls back to
       // the assumption rather than refusing to read the tag.
-      ID3v1::Tag tag(&file, tagOffset(&file), 932);
+      ID3v1::Tag tag(&file, copy.tagOffset(), 932);
       CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, tag.artist());
-      deleteFile(name);
+      CPPUNIT_ASSERT_EQUAL(kAnsiArtist,
+        ScopedMp3FileCopyWithId3v1Tag::extractRawValue(tag.render()));
     }
   }
 
@@ -307,26 +364,14 @@ private:
     const RestoreAssumedCodePage restore;
     ID3v1::Tag::setAssumedCodePage(1252);
 
-    ScopedFileCopy copy("xing", ".mp3", false);
+    ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist,
+      ScopedMp3FileCopyWithId3v1Tag::COMMENT_OFFSET);
     const string name = copy.fileName();
-
-    FILE *file = fopen(name.c_str(), "r+b");
-    CPPUNIT_ASSERT(file);
-    CPPUNIT_ASSERT_EQUAL(0, fseek(file, -128, SEEK_END));
-
-    ByteVector tag = ID3v1::Tag::fileIdentifier();
-    tag.resize(3 + 30 + 30 + 30 + 4, 0);
-    tag.append(kAnsiArtist);
-    tag.resize(128, 0);
-    tag[127] = static_cast<char>(0xff);
-
-    CPPUNIT_ASSERT_EQUAL(static_cast<size_t>(128), fwrite(tag.data(), 1, 128, file));
-    fclose(file);
-
     MPEG::File f(name.c_str());
     CPPUNIT_ASSERT(f.ID3v1Tag(false));
     CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, f.ID3v1Tag(false)->comment());
-    deleteFile(name);
+    CPPUNIT_ASSERT_EQUAL(kAnsiArtist, copy.getRawValue(
+      ScopedMp3FileCopyWithId3v1Tag::COMMENT_OFFSET));
   }
 
   // A real MP3 carrying an ID3v1 tag whose bytes are only meaningful as ISO
@@ -345,12 +390,12 @@ private:
     const ByteVector latin1Artist("Caf\xE9", 4);
     const String   latin1ArtistText(L"Caf\xE9");
 
-    const string name = makeTag(latin1Artist);
+    ScopedMp3FileCopyWithId3v1Tag copy(latin1Artist);
+    const string name = copy.fileName();
     PlainFile file(name.c_str());
     CPPUNIT_ASSERT(file.isValid());
-    ID3v1::Tag tag(&file, tagOffset(&file), 28591);
+    ID3v1::Tag tag(&file, copy.tagOffset(), 28591);
     CPPUNIT_ASSERT_EQUAL(latin1ArtistText, tag.artist());
-    deleteFile(name);
   }
 
   // The same MP3 shape read as Windows-1252 instead. The bytes below are a
@@ -367,12 +412,12 @@ private:
     const ByteVector windows1252Artist("A \x80 \x93q" "\x94", 7);
     const String   windows1252ArtistText(L"A \x20AC \x201Cq\x201D");
 
-    const string name = makeTag(windows1252Artist);
+    ScopedMp3FileCopyWithId3v1Tag copy(windows1252Artist);
+    const string name = copy.fileName();
     PlainFile file(name.c_str());
     CPPUNIT_ASSERT(file.isValid());
-    ID3v1::Tag tag(&file, tagOffset(&file), 1252);
+    ID3v1::Tag tag(&file, copy.tagOffset(), 1252);
     CPPUNIT_ASSERT_EQUAL(windows1252ArtistText, tag.artist());
-    deleteFile(name);
   }
 
   // An installed handler is used for every tag, whatever code page is stated,
@@ -390,40 +435,41 @@ private:
     ID3v1::Tag::setAssumedCodePage(1252);
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       MPEG::File f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, f.ID3v1Tag(false)->artist());
-      deleteFile(name);
     }
 
     const FixedStringHandler handler;
     ID3v1::Tag::setStringHandler(&handler);
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       MPEG::File f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(String(L"from the handler"), f.ID3v1Tag(false)->artist());
-      deleteFile(name);
     }
 
     // Also for a tag whose code page was stated explicitly.
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       PlainFile file(name.c_str());
-      ID3v1::Tag tag(&file, tagOffset(&file), 1252);
+      ID3v1::Tag tag(&file, copy.tagOffset(), 1252);
       CPPUNIT_ASSERT_EQUAL(String(L"from the handler"), tag.artist());
-      deleteFile(name);
     }
 
     ID3v1::Tag::setStringHandler(nullptr);
 
     {
-      const string name = makeTag(kAnsiArtist);
+      ScopedMp3FileCopyWithId3v1Tag copy(kAnsiArtist);
+      const string name = copy.fileName();
       MPEG::File f(name.c_str());
       CPPUNIT_ASSERT_EQUAL(kAnsiArtistText, f.ID3v1Tag(false)->artist());
-      deleteFile(name);
     }
   }
+#endif // TAGLIB_WITH_CHARSETTABLES
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(TestID3v1);

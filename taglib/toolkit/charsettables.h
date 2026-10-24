@@ -26,6 +26,7 @@
 #ifndef DO_NOT_DOCUMENT  // tell Doxygen not to document this header
 
 #include "tcharset.h"
+#include "taglib_config.h"
 
 namespace TagLib {
   namespace Charset {
@@ -47,8 +48,11 @@ namespace TagLib {
        * A Type and the code page number a CSET chunk states are the same value,
        * so they name the same row.  UTF8 has no row and is never found here.
        */
+#ifdef TAGLIB_WITH_CHARSETTABLES
       const CodePageEntry *entryForCodePage(unsigned int codePage);
-
+#else
+      inline const CodePageEntry *entryForCodePage(unsigned int) { return nullptr; }
+#endif
     }  // namespace detail
   }  // namespace Charset
 }  // namespace TagLib

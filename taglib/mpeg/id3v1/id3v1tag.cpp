@@ -25,12 +25,13 @@
 
 #include "id3v1tag.h"
 
+#include <memory>
+
 #include "tcharset.h"
 #include "tdebug.h"
+#include "tutils.h"
 #include "tfile.h"
 #include "id3v1genres.h"
-
-#include <memory>
 
 using namespace TagLib;
 using namespace ID3v1;
@@ -40,41 +41,52 @@ namespace
   const ID3v1::StringHandler defaultStringHandler;
   const ID3v1::StringHandler *stringHandler = &defaultStringHandler;
 
-  // The code page ID3v1::Tag::setAssumedCodePage() states, used when a tag is
-  // read without an explicit one. 0 keeps the ISO 8859-1 the ID3v1
-  // specification prescribes.
+  //! The code page ID3v1::Tag::setAssumedCodePage() states.
+  //!
+  //! Used when a tag is read without an explicit one.
+  //! 0 keeps the ISO 8859-1 the ID3v1 specification prescribes.
   unsigned int codePageAssumed = 0;
 
-  // The charset a tag's code page selects.  ID3v1 declares no charset, so the
-  // code page is only ever what the caller states: the constructor's, or the
-  // assumed one for the unspecified 0.  An unsupported number falls back to
-  // the assumed one too, rather than dropping the tag over it.
+  //! Look up charset for \a codePage.
+  //!
+  //! The charset a tag's code page selects.  ID3v1 declares no charset, so the
+  //! code page is only ever what the caller states: the constructor's, or the
+  //! assumed one for the unspecified 0.  An unsupported number falls back to
+  //! the assumed one too, rather than dropping the tag over it.
   Charset::Type charsetForCodePage(unsigned int codePage)
   {
     if(codePage == 0) {
       codePage = codePageAssumed;
     }
     else if(!Charset::typeForCodePage(codePage)) {
-      debug("ID3v1::Tag::Tag() - Unsupported code page " +
-            String::number(static_cast<int>(codePage)) +
-            ", using the assumed one.");
+      debug(Utils::formatString(
+        "ID3v1::Tag::Tag() - Unsupported code page %u, using the assumed one.",
+        codePage));
       codePage = codePageAssumed;
     }
 
+    // Fast path without lookup for the likely default case.
+    if(codePage == 0)
+      return Charset::Type::Latin1;
+
+    // If we get here, setAssumedCodePage() stored a verified code page, not 0,
+    // the condition will always be true.
     if(const auto charset = Charset::typeForCodePage(codePage))
       return *charset;
 
-    // setAssumedCodePage() only ever stores 0 or a code page it verified, so
-    // the only way to miss here is that 0, which means the ISO 8859-1 default
-    // this function returns anyway.
     return Charset::Type::Latin1;
   }
 
-  // ID3v1 fields are fixed width and space padded, so the padding is stripped
-  // here rather than in Charset::decode, which the RIFF decoder shares.
   String decodeField(const ByteVector &data, Charset::Type charset)
   {
+    // ID3v1 fields are fixed width and space padded, so the padding is stripped
+    // here rather than in Charset::decode, which the RIFF decoder shares.
     return Charset::decode(data, charset).stripWhiteSpace();
+  }
+
+  ByteVector encodeField(const String &s, Charset::Type charset)
+  {
+    return Charset::encode(s, charset);
   }
 } // namespace
 
@@ -84,26 +96,34 @@ public:
   File *file { nullptr };
   offset_t tagOffset { 0 };
 
-  // The charset the tag's code page selects, resolved once when the tag is
-  // read.
-  Charset::Type charset { Charset::Type::Latin1 };
-
   String title;
   String artist;
   String album;
   String year;
   String comment;
+
+  //! The charset the tag's code page selects, resolved once when the tag is
+  //! read.
+  Charset::Type charset { Charset::Type::Latin1 };
+
   unsigned char track { 0 };
   unsigned char genre { 255 };
 
-  // A handler the user installed with setStringHandler() is an explicit
-  // override, so it takes precedence over the code page that was stated. With
-  // no handler installed the fields are decoded with the charset.
   String parseField(const ByteVector &data) const
   {
+    // A handler the user installed with setStringHandler() is an explicit
+    // override, so it takes precedence over the code page that was stated. With
+    // no handler installed the fields are decoded with the charset.
     if(stringHandler != &defaultStringHandler)
       return stringHandler->parse(data);
     return decodeField(data, charset);
+  }
+
+  ByteVector renderField(const String &s) const
+  {
+    if(stringHandler != &defaultStringHandler)
+      return stringHandler->render(s);
+    return encodeField(s, charset);
   }
 };
 
@@ -162,11 +182,11 @@ ByteVector ID3v1::Tag::render() const
   ByteVector data;
 
   data.append(fileIdentifier());
-  data.append(stringHandler->render(d->title).resize(30));
-  data.append(stringHandler->render(d->artist).resize(30));
-  data.append(stringHandler->render(d->album).resize(30));
-  data.append(stringHandler->render(d->year).resize(4));
-  data.append(stringHandler->render(d->comment).resize(28));
+  data.append(d->renderField(d->title).resize(30));
+  data.append(d->renderField(d->artist).resize(30));
+  data.append(d->renderField(d->album).resize(30));
+  data.append(d->renderField(d->year).resize(4));
+  data.append(d->renderField(d->comment).resize(28));
   data.append(static_cast<char>(0));
   data.append(static_cast<char>(d->track));
   data.append(static_cast<char>(d->genre));
@@ -275,8 +295,9 @@ unsigned int ID3v1::Tag::assumedCodePage()
 void ID3v1::Tag::setAssumedCodePage(unsigned int codePage)
 {
   if(codePage != 0 && !Charset::typeForCodePage(codePage)) {
-    debug("ID3v1::Tag::setAssumedCodePage() - Unsupported code page " +
-          String::number(static_cast<int>(codePage)) + ", ignored.");
+    debug(Utils::formatString(
+      "ID3v1::Tag::setAssumedCodePage() - Unsupported code page %u, ignored.",
+      codePage));
     return;
   }
 

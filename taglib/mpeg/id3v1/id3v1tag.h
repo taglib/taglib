@@ -146,9 +146,7 @@ namespace TagLib {
        * assumedCodePage(), and the fields are still read rather than dropped
        * over a number that could not be followed.
        *
-       * \a codePage only decides how the text is read; it becomes a normal
-       * in-memory String the moment it is read. render() is not affected by it,
-       * as it writes through the StringHandler, which produces ISO 8859-1.
+       * \a codePage decides how the text is read and written.
        *
        * \note A handler installed with setStringHandler() takes precedence over
        * \a codePage, because installing one is an explicit override.
@@ -252,9 +250,6 @@ namespace TagLib {
        *
        * \note This is a process wide setting, like setStringHandler(), and
        * applies to the tags read after the call.
-       *
-       * \note It only decides how text is read. render() writes through the
-       * StringHandler, which produces ISO 8859-1, whatever is assumed here.
        *
        * \note A code page this library cannot convert is refused: the call then
        * has no effect and a debug message is emitted.

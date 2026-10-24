@@ -148,17 +148,16 @@ namespace TagLib {
     TAGLIB_EXPORT String decode(const ByteVector &data, Type type);
 
     /*!
-     * Encodes \a s as UTF-8, which is the only encoding this module produces.
-     * A string is decoded into TagLib's internal representation, which is UTF-16
-     * and not a byte encoding at all, so a caller that stores the output has to
-     * say what it is, and the only thing this module can make it is UTF-8.
+     * Encodes \a s according to \a type.
      *
-     * There is deliberately no way to encode into a legacy code page. Doing so
-     * would have to invent a byte for every character the page cannot represent,
-     * and the usual choice, '?', throws away text that the internal
-     * representation is still holding perfectly intact.
+     * A string is decoded into TagLib's internal representation, which is UTF-16
+     * and not a byte encoding at all, so to encode all characters, UTF-8 has
+     * to be selected as the \a type.
+     *
+     * When encoding into a legacy code page, characters which cannot be
+     * represented by the code page are replaced by '?'.
      */
-    TAGLIB_EXPORT ByteVector encode(const String &s);
+    TAGLIB_EXPORT ByteVector encode(const String &s, Type type);
   }  // namespace Charset
 }  // namespace TagLib
 

@@ -83,8 +83,8 @@ namespace TagLib {
     //! The main class in the INFO tag implementation
 
     /*!
-     * This is the main class in the INFO tag implementation. RIFF INFO tag is a
-     * metadata format found in WAV audio and AVI video files. Though it is a part
+     * This is the main class in the INFO tag implementation.  RIFF INFO tag is a
+     * metadata format found in WAV audio and AVI video files.  Though it is a part
      * of Microsoft/IBM's RIFF specification, the author could not find the official
      * documents about it.  So, this implementation is referring to unofficial documents
      * online and some applications' behaviors especially Windows Explorer.
@@ -268,7 +268,6 @@ namespace TagLib {
       TAGLIB_MSVC_SUPPRESS_WARNING_NEEDS_TO_HAVE_DLL_INTERFACE
       std::unique_ptr<TagPrivate> d;
     };
-
   }  // namespace Info
 }  // namespace RIFF
 }  // namespace TagLib

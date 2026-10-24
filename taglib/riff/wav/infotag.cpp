@@ -31,6 +31,7 @@
 #include "tcharset.h"
 #include "tbytevector.h"
 #include "tdebug.h"
+#include "tutils.h"
 #include "tpropertymap.h"
 #include "riffutils.h"
 
@@ -42,41 +43,51 @@ namespace
   const RIFF::Info::StringHandler defaultStringHandler;
   const RIFF::Info::StringHandler *stringHandler = &defaultStringHandler;
 
-  // The code page RIFF::Info::Tag::setAssumedCodePage() states, used when a file
-  // declares none. 0 is the RIFF "unspecified" value and keeps the ISO 8859-1 the
-  // specification prescribes for it.
+  //! The code page RIFF::Info::Tag::setAssumedCodePage() states.
+  //!
+  //! Used when a file declares none. 0 is the RIFF "unspecified" value and
+  //! keeps the ISO 8859-1 the specification prescribes for it.
   unsigned int codePageAssumed = 0;
 
-  // The charset a file's CSET code page selects.  A number with no table is
-  // the file declaring something we cannot follow, so it falls to the RIFF
-  // default Latin-1 rather than the assumed page: a declared number is
-  // evidence about that file, not a caller hint.  0 means the file declared
-  // nothing, so the assumed page applies.
+  //! Look up charset for \a codePage.
+  //!
+  //! The charset a file's CSET code page selects.  A number with no table is
+  //! the file declaring something we cannot follow, so it falls to the RIFF
+  //! default Latin-1 rather than the assumed page: a declared number is
+  //! evidence about that file, not a caller hint.  0 means the file declared
+  //! nothing, so the assumed page applies.
   Charset::Type charsetForCodePage(unsigned int codePage)
   {
-    if(const auto charset = Charset::typeForCodePage(codePage))
+    if(codePage == 0) {
+      codePage = codePageAssumed;
+    }
+    else if(const auto charset = Charset::typeForCodePage(codePage)) {
       return *charset;
-
-    if(codePage != 0) {
-      debug("RIFF::Info::Tag::parse() - Unsupported CSET code page " +
-            String::number(static_cast<int>(codePage)) +
-            ", using the RIFF default ISO 8859-1.");
+    }
+    else {
+      debug(Utils::formatString(
+        "RIFF::Info::Tag::parse() - Unsupported CSET code page %u, "
+        "using the RIFF default ISO 8859-1.", codePage));
       return Charset::Type::Latin1;
     }
 
-    // The file declares nothing. setAssumedCodePage() only ever stored 0 or a
-    // code page it verified, so the only way to miss here is that 0, which
-    // means the default this function returns anyway.
-    if(const auto charset = Charset::typeForCodePage(codePageAssumed))
+    // The file declares nothing.
+    // Fast path without lookup for the likely default case.
+    if(codePage == 0)
+      return Charset::Type::Latin1;
+
+    // If we get here, setAssumedCodePage() stored a verified code page, not 0,
+    // the condition will always be true.
+    if(const auto charset = Charset::typeForCodePage(codePage))
       return *charset;
 
     return Charset::Type::Latin1;
   }
 
-  // RIFF INFO fields are NUL terminated, which Charset::decode already
-  // handles, so unlike the ID3v1 decoder nothing is stripped here.
   String decodeField(const ByteVector &data, Charset::Type charset)
   {
+    // RIFF INFO fields are NUL terminated, which Charset::decode already
+    // handles, so unlike the ID3v1 decoder nothing is stripped here.
     return Charset::decode(data, charset);
   }
 } // namespace
@@ -86,16 +97,16 @@ class RIFF::Info::Tag::TagPrivate
 public:
   FieldListMap fieldListMap;
 
-  // The charset the file's CSET chunk declares, resolved once when the tag is
-  // parsed. RIFF says nothing about the charset without one, so ISO 8859-1 is
-  // the default.
+  //! The charset the file's CSET chunk declares, resolved once when the tag is
+  //! parsed. RIFF says nothing about the charset without one, so ISO 8859-1 is
+  //! the default.
   Charset::Type charset { Charset::Type::Latin1 };
 
-  // A handler the user installed with setStringHandler() is an explicit
-  // override, so it takes precedence over what the file declares. With no
-  // handler installed the field is decoded with the charset.
   String parseField(const ByteVector &data) const
   {
+    // A handler the user installed with setStringHandler() is an explicit
+    // override, so it takes precedence over what the file declares. With no
+    // handler installed the field is decoded with the charset.
     if(stringHandler != &defaultStringHandler)
       return stringHandler->parse(data);
     return decodeField(data, charset);
@@ -121,7 +132,7 @@ String RIFF::Info::StringHandler::parse(const ByteVector &data) const
 
 ByteVector RIFF::Info::StringHandler::render(const String &s) const
 {
-  return Charset::encode(s);
+  return Charset::encode(s, Charset::Type::UTF8);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -377,8 +388,9 @@ unsigned int RIFF::Info::Tag::assumedCodePage()
 void RIFF::Info::Tag::setAssumedCodePage(unsigned int codePage)
 {
   if(codePage != 0 && !Charset::typeForCodePage(codePage)) {
-    debug("RIFF::Info::Tag::setAssumedCodePage() - Unsupported code page " +
-          String::number(static_cast<int>(codePage)) + ", ignored.");
+    debug(Utils::formatString(
+      "RIFF::Info::Tag::setAssumedCodePage() - Unsupported code page %u, ignored.",
+      codePage));
     return;
   }
 

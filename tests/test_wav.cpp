@@ -27,6 +27,7 @@
 #include <string>
 #include <cstdio>
 
+#include "taglib_config.h"
 #include "tcharset.h"
 #include "id3v2tag.h"
 #include "infotag.h"
@@ -42,6 +43,7 @@
 using namespace std;
 using namespace TagLib;
 
+#ifdef TAGLIB_WITH_CHARSETTABLES
 namespace
 {
   // The bytes of a chunk: its id, its size, its payload, and the pad byte that
@@ -286,6 +288,7 @@ namespace
   const String kNewComment(L"\x4F60\x597D");
   const ByteVector kNewCommentUtf8("\xE4\xBD\xA0\xE5\xA5\xBD", 6);
 }
+#endif // TAGLIB_WITH_CHARSETTABLES
 
 class TestWAV : public CppUnit::TestFixture
 {
@@ -316,6 +319,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testBEXTTagWithOtherTags);
   CPPUNIT_TEST(testiXMLTag);
   CPPUNIT_TEST(testiXMLTagWithOtherTags);
+#ifdef TAGLIB_WITH_CHARSETTABLES
   CPPUNIT_TEST(testInfoLatin1Default);
   CPPUNIT_TEST(testInfoWindows1252);
   CPPUNIT_TEST(testInfoUtf8);
@@ -338,6 +342,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testInfoAssumedCodePageWindows1252);
   CPPUNIT_TEST(testInfoAssumedCodePageOnlyWhenUndeclared);
   CPPUNIT_TEST(testInfoAssumedCodePageRejectsUnsupported);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -505,6 +510,7 @@ public:
     }
   }
 
+#ifdef TAGLIB_WITH_CHARSETTABLES
   void testInfoLatin1Default()
   {
     ByteVectorStream stream(latin1Riff());
@@ -881,12 +887,12 @@ public:
 
     // Encoding is UTF-8 and nothing else, so text no single byte code page could
     // ever represent survives instead of turning into '?'.
-    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE4\xBD\xA0", 3), Charset::encode(String(L"\x4F60")));
-    CPPUNIT_ASSERT_EQUAL(kNewTitleUtf8, Charset::encode(kNewTitle));
+    CPPUNIT_ASSERT_EQUAL(ByteVector("\xE4\xBD\xA0", 3), Charset::encode(String(L"\x4F60"), Charset::Type::UTF8));
+    CPPUNIT_ASSERT_EQUAL(kNewTitleUtf8, Charset::encode(kNewTitle, Charset::Type::UTF8));
 
     // And it is a plain UTF-8 round trip, so nothing is lost on the way through.
     const String sample(L"\x0416\x0490\x05D0\x0625\x0E01\x20A7");
-    CPPUNIT_ASSERT_EQUAL(sample, Charset::decode(Charset::encode(sample), Charset::Type::UTF8));
+    CPPUNIT_ASSERT_EQUAL(sample, Charset::decode(Charset::encode(sample, Charset::Type::UTF8), Charset::Type::UTF8));
   }
 
   // A handler the user installed is an explicit override, so it outranks the
@@ -1061,6 +1067,7 @@ public:
     RIFF::Info::Tag::setAssumedCodePage(932);
     CPPUNIT_ASSERT_EQUAL(1252u, RIFF::Info::Tag::assumedCodePage());
   }
+#endif // TAGLIB_WITH_CHARSETTABLES
 
   void testStripTags()
   {

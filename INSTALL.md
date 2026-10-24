@@ -44,6 +44,7 @@ CMakeLists.txt file.
 | `BUILD_FRAMEWORK`       | Build a macOS framework                            |
 | `TESTS_DIR`             | Where to find unit test data (with data appended)  |
 | `TESTS_TMPDIR`          | Where to create temporary files in unit tests      |
+| `WITH_CHARSETTABLES`    | Include code page character tables (default ON)    |
 
 
 If you want to install TagLib 2 alongside TagLib 1, you can use
