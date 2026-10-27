@@ -715,9 +715,19 @@ bool Matroska::File::save(WriteStyle writeStyle)
       }
     }
     if(!movedElements.isEmpty()) {
-      // The segment end includes in-place growths AND all moved element sizes.
-      // The moved elements start right after all in-place content.
-      offset_t appendAt = d->segment->endOffset() - totalMovedSize;
+      // The segment end includes in-place growths AND all moved and new
+      // element sizes. New elements were placed at the old end before
+      // rendering and may have been shifted past it by the size changes of
+      // moved elements, so they are laid out again too: new elements first,
+      // then the moved elements, right after all in-place content.
+      offset_t totalNewSize = 0;
+      for(const auto element : newElements)
+        totalNewSize += static_cast<offset_t>(element->data().size());
+      offset_t appendAt = d->segment->endOffset() - totalMovedSize - totalNewSize;
+      for(const auto element : newElements) {
+        element->setOffset(appendAt);
+        appendAt += static_cast<offset_t>(element->data().size());
+      }
       for(const auto element : movedElements) {
         element->setOffset(appendAt);
         appendAt += static_cast<offset_t>(element->data().size());
@@ -725,12 +735,13 @@ bool Matroska::File::save(WriteStyle writeStyle)
     }
   }
 
-  // For elements that were moved to the end by AvoidInsert, update their
-  // seek head entry to reflect the new file position.
+  // For elements that were moved to the end by AvoidInsert, and new elements
+  // laid out again with them, update their seek head entry to reflect the
+  // new file position.
   if(writeStyle == WriteStyle::AvoidInsert && d->seekHead) {
     const offset_t segDataOffset = d->segment->dataOffset();
     for(const auto element : renderList) {
-      if(element->wasMoved()) {
+      if(element->wasMoved() || newElements.contains(element)) {
         d->seekHead->updateEntry(element->id(), element->offset() - segDataOffset);
       }
     }
