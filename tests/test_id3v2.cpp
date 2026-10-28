@@ -130,6 +130,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertyInterface2);
   CPPUNIT_TEST(testPropertiesMovement);
   CPPUNIT_TEST(testPropertyGrouping);
+  CPPUNIT_TEST(testSetPropertiesKeepsSpreadFrames);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST(testParseChapterFrame);
@@ -1382,6 +1383,107 @@ public:
     CPPUNIT_ASSERT_EQUAL(String("Grouping"), parsedFrameGrp1->toString());
 
     tag.addFrame(parsedFrameGrp1);
+  }
+
+  void testSetPropertiesKeepsSpreadFrames()
+  {
+    const auto addComment = [](ID3v2::Tag &tag, const ByteVector &language, const String &text) {
+      auto frame = new ID3v2::CommentsFrame;
+      frame->setLanguage(language);
+      frame->setText(text);
+      tag.addFrame(frame);
+      return frame;
+    };
+
+    {
+      // The combined values of both frames are unchanged, so both are kept.
+      ID3v2::Tag tag;
+      const auto eng = addComment(tag, "eng", "hello");
+      const auto deu = addComment(tag, "deu", "hallo");
+      CPPUNIT_ASSERT_EQUAL(StringList("hello").append("hallo"),
+                           tag.properties()["COMMENT"]);
+
+      tag.setProperties(tag.properties());
+      const ID3v2::FrameList comments = tag.frameList("COMM");
+      CPPUNIT_ASSERT_EQUAL(2u, comments.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(eng), comments[0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(deu), comments[1]);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("eng"), eng->language());
+      CPPUNIT_ASSERT_EQUAL(String("hello"), eng->text());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), deu->language());
+      CPPUNIT_ASSERT_EQUAL(String("hallo"), deu->text());
+      CPPUNIT_ASSERT(tag.frameList("TXXX").isEmpty());
+    }
+    {
+      // A single frame whose value is the whole list is kept, as before.
+      ID3v2::Tag tag;
+      const auto eng = addComment(tag, "eng", "hello");
+      addComment(tag, "deu", "hallo");
+
+      PropertyMap properties;
+      properties["COMMENT"] = StringList("hello");
+      tag.setProperties(properties);
+      CPPUNIT_ASSERT_EQUAL(1u, tag.frameList("COMM").size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(eng), tag.frameList("COMM").front());
+      CPPUNIT_ASSERT(tag.frameList("TXXX").isEmpty());
+    }
+    {
+      // A changed list is still written as one frame.
+      ID3v2::Tag tag;
+      addComment(tag, "eng", "hello");
+      addComment(tag, "deu", "hallo");
+
+      PropertyMap properties;
+      properties["COMMENT"] = StringList("a").append("b");
+      tag.setProperties(properties);
+      CPPUNIT_ASSERT(tag.frameList("COMM").isEmpty());
+      CPPUNIT_ASSERT_EQUAL(1u, tag.frameList("TXXX").size());
+      CPPUNIT_ASSERT(ID3v2::UserTextIdentificationFrame::find(&tag, "COMMENT"));
+      CPPUNIT_ASSERT_EQUAL(properties["COMMENT"], tag.properties()["COMMENT"]);
+    }
+    {
+      // Values are compared in the order properties() returns them, which
+      // follows the frames rather than their IDs.
+      ID3v2::Tag tag;
+      tag.addFrame(new ID3v2::UserTextIdentificationFrame("COMMENT", StringList("first")));
+      addComment(tag, "eng", "second");
+      CPPUNIT_ASSERT_EQUAL(StringList("first").append("second"),
+                           tag.properties()["COMMENT"]);
+
+      tag.setProperties(tag.properties());
+      CPPUNIT_ASSERT_EQUAL(1u, tag.frameList("TXXX").size());
+      CPPUNIT_ASSERT_EQUAL(1u, tag.frameList("COMM").size());
+      CPPUNIT_ASSERT_EQUAL(StringList("first").append("second"),
+                           tag.properties()["COMMENT"]);
+    }
+
+    ScopedFileCopy copy("xing", ".mp3");
+    {
+      MPEG::File f(copy.fileName().c_str());
+      ID3v2::Tag *tag = f.ID3v2Tag(true);
+      addComment(*tag, "eng", "hello");
+      addComment(*tag, "deu", "hallo");
+      f.save();
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      f.setProperties(f.properties());
+      f.save();
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      const ID3v2::FrameList comments = f.ID3v2Tag()->frameList("COMM");
+      CPPUNIT_ASSERT_EQUAL(2u, comments.size());
+      auto eng = dynamic_cast<ID3v2::CommentsFrame *>(comments[0]);
+      auto deu = dynamic_cast<ID3v2::CommentsFrame *>(comments[1]);
+      CPPUNIT_ASSERT(eng);
+      CPPUNIT_ASSERT(deu);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("eng"), eng->language());
+      CPPUNIT_ASSERT_EQUAL(String("hello"), eng->text());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), deu->language());
+      CPPUNIT_ASSERT_EQUAL(String("hallo"), deu->text());
+      CPPUNIT_ASSERT(f.ID3v2Tag()->frameList("TXXX").isEmpty());
+    }
   }
 
   void testDeleteFrame()
