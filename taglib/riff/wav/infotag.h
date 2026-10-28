@@ -45,17 +45,13 @@ namespace TagLib {
     //! An abstraction for the string to data encoding in Info tags.
 
     /*!
-     * RIFF INFO tag has no clear definitions about character encodings.
-     * In practice, local encoding of each system is largely used and UTF-8 is
-     * popular too.
-     *
-     * Here is an option to read and write tags in your preferred encoding
-     * by subclassing this class, reimplementing parse() and render() and setting
-     * your reimplementation as the default with Info::Tag::setStringHandler().
-     *
-     * \see ID3v1::Tag::setStringHandler()
+     * Per the RIFF specification, the character encoding of the INFO tag is
+     * declared with a top-level CSET chunk; when it is absent, the default is
+     * the ISO 8859-1 (Latin-1) ANSI code page. A declared code page is applied
+     * as the tag is read, so the text is a normal in-memory String from there
+     * on, and render() writes UTF-8.
+     * https://www.robotplanet.dk/audio/wav_meta_data/riff_mci.pdf#page=25
      */
-
     class TAGLIB_EXPORT StringHandler
     {
     public:
@@ -67,7 +63,8 @@ namespace TagLib {
 
       /*!
        * Decode a string from \a data.  The default implementation assumes that
-       * \a data is an UTF-8 character array.
+       * \a data is an ISO 8859-1 (Latin-1) character array, which is the RIFF
+       * default when the file declares no CSET code page.
        */
       virtual String parse(const ByteVector &data) const;
 
@@ -102,8 +99,39 @@ namespace TagLib {
 
       /*!
        * Constructs an INFO tag read from \a data which is the contents of the "LIST" chunk.
+       *
+       * \a data comes from a file that declares no code page, so the text is decoded
+       * with assumedCodePage(), unless a handler installed with setStringHandler()
+       * takes over.
+       *
+       * \see assumedCodePage()
        */
       Tag(const ByteVector &data);
+
+      /*!
+       * Constructs an INFO tag read from \a data which is the contents of the "LIST" chunk,
+       * decoding the text with the code page \a codePage declared by the file's top-level
+       * CSET chunk.
+       *
+       * \a codePage only decides how \a data is read. The text becomes a normal
+       * in-memory String the moment it is read, and render() writes UTF-8, which is
+       * what RIFF::WAV::File::save() declares in the CSET chunk it writes. A tag is
+       * never converted back into the code page it was read from.
+       *
+       * Code page 0 is the RIFF "unspecified" value, used when a file has no CSET
+       * chunk, and means the code page assumedCodePage() names, which is ISO 8859-1
+       * (Latin-1) unless the caller has stated another one. A code page this library
+       * has no table for also means ISO 8859-1: the number is a hint about how the
+       * text was written, and the fields are still read rather than dropped over a
+       * hint that could not be followed.
+       *
+       * \note A handler installed with setStringHandler() takes precedence over
+       * \a codePage, because installing one is an explicit override.
+       *
+       * \see assumedCodePage()
+       * \see setStringHandler()
+       */
+      Tag(const ByteVector &data, unsigned int codePage);
 
       ~Tag() override;
 
@@ -177,7 +205,12 @@ namespace TagLib {
        * Sets the string handler that decides how the text data will be
        * converted to and from binary data.
        * If the parameter \a handler is null, the previous handler is
-       * released and default UTF-8 handler is restored.
+       * released and the default (ISO 8859-1 decode, UTF-8 encode) handler
+       * is restored.
+       *
+       * \note Installing a handler is an explicit override, so it is used for
+       * every INFO tag, including those read from a file that declares a CSET
+       * code page. Pass null to hand those files back to their own code page.
        *
        * \note The caller is responsible for deleting the previous handler
        * as needed after it is released.
@@ -185,6 +218,44 @@ namespace TagLib {
        * \see StringHandler
        */
       static void setStringHandler(const StringHandler *handler);
+
+      /*!
+       * Returns the code page assumed for an INFO tag read from a file that declares
+       * none, which is 0 until setAssumedCodePage() states another one.
+       *
+       * \see setAssumedCodePage()
+       */
+      static unsigned int assumedCodePage();
+
+      /*!
+       * Sets the code page \a codePage assumed for an INFO tag whose file declares no
+       * charset: a file without a CSET chunk, a CSET chunk whose wCodePage is zero, or
+       * an INFO list read without its CSET chunk, as in Tag(const ByteVector &data).
+       *
+       * \a codePage is a Windows code page number, the same numbering the CSET chunk
+       * uses: 65001 assumes UTF-8, 1252 assumes Windows-1252, and 0, the initial value,
+       * assumes the ISO 8859-1 the RIFF specification prescribes for a file that says
+       * nothing.
+       * https://www.robotplanet.dk/audio/wav_meta_data/riff_mci.pdf#page=25
+       *
+       * The specification cannot tell a file holding UTF-8 or an ANSI code page without
+       * a CSET chunk from one holding ISO 8859-1, because all three look the same on
+       * disk. This is where the caller says which of them its files hold.
+       *
+       * \note This is a process wide setting, like setStringHandler(), and applies to
+       * the tags read after the call. It never overrides a code page a file declares
+       * itself, not even one this library has no table for.
+       *
+       * \note It only decides how text is read. save() writes UTF-8 and declares that
+       * in the CSET chunk it writes, whatever is assumed here.
+       *
+       * \note A code page this library cannot convert is refused: the call then has no
+       * effect and a debug message is emitted.
+       *
+       * \see assumedCodePage()
+       * \see setStringHandler()
+       */
+      static void setAssumedCodePage(unsigned int codePage);
 
     protected:
       /*!

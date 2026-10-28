@@ -108,6 +108,9 @@ option(WITH_SHORTEN "Build with Shorten" ON)
 option(WITH_TRUEAUDIO "Build with TrueAudio" ON)
 option(WITH_VORBIS "Build with Vorbis, FLAC, Ogg, Opus" ON)
 
+# Include character tables for legacy code pages.
+option(WITH_CHARSETTABLES "Build with code page charset tables" ON)
+
 # Determine whether zlib is installed.
 option(WITH_ZLIB "Build with ZLIB" ON)
 
@@ -218,6 +221,9 @@ if(WITH_TRUEAUDIO)
 endif()
 if(WITH_VORBIS)
   set(TAGLIB_WITH_VORBIS TRUE)
+endif()
+if(WITH_CHARSETTABLES)
+  set(TAGLIB_WITH_CHARSETTABLES TRUE)
 endif()
 
 configure_file(taglib/taglib_config.h.cmake "${CMAKE_CURRENT_BINARY_DIR}/taglib_config.h")

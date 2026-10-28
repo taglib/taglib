@@ -72,7 +72,9 @@ if(WITH_MATROSKA)
 endif()
 include_directories(${tag_HDR_DIRS})
 
-set(tag_PRIVATE_HDRS)
+set(tag_PRIVATE_HDRS
+  toolkit/charsettables.h
+)
 set(tag_HDRS
   tag.h
   fileref.h
@@ -96,6 +98,7 @@ set(tag_HDRS
   toolkit/tpicturetype.h
   toolkit/tpropertymap.h
   toolkit/tdebuglistener.h
+  toolkit/tcharset.h
   toolkit/tversionnumber.h
   mpeg/mpegfile.h
   mpeg/mpegproperties.h
@@ -517,7 +520,14 @@ set(toolkit_SRCS
   toolkit/tdebuglistener.cpp
   toolkit/tzlib.cpp
   toolkit/tversionnumber.cpp
+  toolkit/tcharset.cpp
 )
+
+if(WITH_CHARSETTABLES)
+  set(charsettables_SRCS
+    toolkit/charsettables.cpp
+  )
+endif()
 
 set(tag_LIB_SRCS
   ${mpeg_SRCS} ${id3v1_SRCS} ${id3v2_SRCS} ${frames_SRCS} ${ogg_SRCS}
@@ -525,6 +535,7 @@ set(tag_LIB_SRCS
   ${wavpack_SRCS} ${speex_SRCS} ${trueaudio_SRCS} ${riff_SRCS} ${aiff_SRCS} ${wav_SRCS}
   ${asf_SRCS} ${mp4_SRCS} ${mod_SRCS} ${s3m_SRCS} ${it_SRCS} ${xm_SRCS} ${opus_SRCS}
   ${dsf_SRCS} ${dsdiff_SRCS} ${shorten_SRCS} ${matroska_SRCS} ${ebml_SRCS}
+  ${charsettables_SRCS}
   tag.cpp
   tagunion.cpp
   fileref.cpp

@@ -13,5 +13,6 @@
 #cmakedefine TAGLIB_WITH_SHORTEN 1
 #cmakedefine TAGLIB_WITH_TRUEAUDIO 1
 #cmakedefine TAGLIB_WITH_VORBIS 1
+#cmakedefine TAGLIB_WITH_CHARSETTABLES 1
 
 #endif
