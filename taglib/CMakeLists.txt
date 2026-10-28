@@ -90,6 +90,7 @@ set(tag_HDRS
   toolkit/tbytevectorlist.h
   toolkit/tvariant.h
   toolkit/tbytevectorstream.h
+  toolkit/tdeferredwritestream.h
   toolkit/tiostream.h
   toolkit/tfile.h
   toolkit/tfilestream.h
@@ -511,6 +512,7 @@ set(toolkit_SRCS
   toolkit/tbytevectorlist.cpp
   toolkit/tvariant.cpp
   toolkit/tbytevectorstream.cpp
+  toolkit/tdeferredwritestream.cpp
   toolkit/tiostream.cpp
   toolkit/tfile.cpp
   toolkit/tfilestream.cpp
