@@ -28,6 +28,7 @@
 
 #include "taglib_config.h"
 #include "tstring.h"
+#include "tcharset.h"
 #include "mpegfile.h"
 #include "id3v1tag.h"
 #include "id3v1genres.h"
@@ -64,6 +65,7 @@ class TestID3v1 : public CppUnit::TestFixture
   CPPUNIT_TEST(testStripWhiteSpace);
   CPPUNIT_TEST(testGenres);
   CPPUNIT_TEST(testRenamedGenres);
+  CPPUNIT_TEST(testRenderLatin1Substitutes);
 #ifdef TAGLIB_WITH_CHARSETTABLES
   CPPUNIT_TEST(testAssumedCodePageDefaultIsLatin1);
   CPPUNIT_TEST(testAssumedCodePage);
@@ -114,6 +116,22 @@ public:
     tag.setGenre("Hardcore");
     CPPUNIT_ASSERT_EQUAL(String("Hardcore Techno"), tag.genre());
     CPPUNIT_ASSERT_EQUAL(129U, tag.genreNumber());
+  }
+
+  // Encoding into Latin1 has to substitute '?' for characters it cannot hold;
+  // truncating them to the low byte would write garbage into a file.
+  void testRenderLatin1Substitutes()
+  {
+    const ByteVector expected("A ? B", 5);
+
+    CPPUNIT_ASSERT_EQUAL(expected,
+      Charset::encode(kCyrillicArtistText, Charset::Type::Latin1));
+
+    // A fresh tag has no code page stated and is Latin1, so this is what
+    // render() writes for the artist field at offset 3 + 30.
+    ID3v1::Tag tag;
+    tag.setArtist(kCyrillicArtistText);
+    CPPUNIT_ASSERT_EQUAL(expected, tag.render().mid(33, 5));
   }
 
 #ifdef TAGLIB_WITH_CHARSETTABLES

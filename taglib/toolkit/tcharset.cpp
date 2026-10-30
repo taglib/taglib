@@ -73,9 +73,18 @@ ByteVector TagLib::Charset::encode(const String &s, Type type)
   if(type == Type::UTF8)
     return s.data(String::UTF8);
 
-  // Fast path for likely Latin-1 case
-  if(type == Type::Latin1)
-    return s.data(String::Latin1);
+  if(type == Type::Latin1) {
+    // String::data(Latin1) casts every code point to char, keeping only the
+    // low byte, so the '?' substitution the header promises is done here.
+    ByteVector data(s.size(), '?');
+    char *p = data.data();
+    for(const wchar_t c : s) {
+      if(c < 256)
+        *p = static_cast<char>(c);
+      ++p;
+    }
+    return data;
+  }
 
   const auto *entry = detail::entryForCodePage(static_cast<unsigned int>(type));
   if(!entry)
