@@ -134,6 +134,7 @@
 #include "matroskachapteredition.h"
 #include "matroskachapters.h"
 #include "matroskasimpletag.h"
+#include "ebml/ebmlutils.h"
 #include "plainfile.h"
 #include "tfilestream.h"
 #include <cppunit/extensions/HelperMacros.h>
@@ -160,6 +161,56 @@ namespace {
     size_t bytesRead = 0;
   };
 
+  //! Reads the EBML variable size integer at \a offset into \a value, without
+  //! its length marker. Returns its length, 0 if it cannot be read.
+  int readVINT(const ByteVector &data, unsigned long long offset,
+               unsigned long long &value)
+  {
+    if(offset >= data.size())
+      return 0;
+    const auto first = static_cast<unsigned char>(data[offset]);
+    int length = 1;
+    while(length <= 8 && !(first & (0x80 >> (length - 1))))
+      ++length;
+    if(length > 8 || offset + length > data.size())
+      return 0;
+    value = first & ((0x80 >> (length - 1)) - 1);
+    for(int i = 1; i < length; ++i)
+      value = (value << 8) | static_cast<unsigned char>(data[offset + i]);
+    return length;
+  }
+
+  //! Walks the children of the Segment by their sizes and returns the offset
+  //! where the last one ends, 0 if a child cannot be parsed. \a segmentEnd is
+  //! set to the end declared by the Segment, \a clusterPos to the offset of
+  //! its first Cluster.
+  unsigned long long segmentChildrenEnd(const ByteVector &data,
+                                        unsigned long long &segmentEnd,
+                                        unsigned long long &clusterPos)
+  {
+    const ByteVector clusterId = ByteVector::fromUInt(0x1F43B675U, true);
+    const int segmentPos = data.find(ByteVector::fromUInt(0x18538067U, true));
+    unsigned long long size = 0;
+    const int sizeLength = segmentPos < 0 ? 0 : readVINT(data, segmentPos + 4, size);
+    if(!sizeLength)
+      return 0;
+    unsigned long long offset = segmentPos + 4 + sizeLength;
+    segmentEnd = offset + size;
+    clusterPos = 0;
+    while(offset < segmentEnd) {
+      unsigned long long id = 0;
+      const int idLength = readVINT(data, offset, id);
+      const int childSizeLength = idLength < 1 || idLength > 4
+        ? 0 : readVINT(data, offset + idLength, size);
+      if(!childSizeLength)
+        return 0;
+      if(clusterPos == 0 && data.containsAt(clusterId, static_cast<unsigned int>(offset)))
+        clusterPos = offset;
+      offset += idLength + childSizeLength + size;
+    }
+    return offset;
+  }
+
 }
 
 class TestMatroska : public CppUnit::TestFixture
@@ -181,11 +232,14 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testSaveTypesBeforeCues);
   CPPUNIT_TEST(testSaveTypesNoTrailingVoid);
   CPPUNIT_TEST(testSaveTypesReclaimVoid);
+  CPPUNIT_TEST(testSaveTypesMoveAndAdd);
   CPPUNIT_TEST(testUnknownSizeSegment);
   CPPUNIT_TEST(testFastReadStyleLargeSegment);
   CPPUNIT_TEST(testAttachedFileDataReadOnDemand);
   CPPUNIT_TEST(testSaveUnrequestedAttachedFileData);
   CPPUNIT_TEST(testSegmentTitleWithoutAudioProperties);
+  CPPUNIT_TEST(testElementSizeLength);
+  CPPUNIT_TEST(testSaveElementSizeAtLengthLimit);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -1550,6 +1604,58 @@ public:
     }
   }
 
+  void testSaveTypesMoveAndAdd()
+  {
+    // tags-before-cues.mkv layout:
+    //   SeekHead | Void | SegInfo | Tracks | Tags | Cluster | Cues
+    //
+    // With AvoidInsert, growing the Tags moves them to the end of the
+    // segment. A new Attachments element added in the same save must be
+    // placed with them, so that the children of the segment still run
+    // contiguously to its end.
+    ScopedFileCopy copy("tags-before-cues", ".mkv");
+    const string newname = copy.fileName();
+
+    unsigned long long segmentEnd = 0;
+    unsigned long long origClusterPos = 0;
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("tags-before-cues.mkv")).readAll();
+    unsigned long long childrenEnd = segmentChildrenEnd(origData, segmentEnd, origClusterPos);
+    CPPUNIT_ASSERT_EQUAL(segmentEnd, childrenEnd);
+    CPPUNIT_ASSERT(origClusterPos > 0);
+
+    const String longTitle = String(ByteVector(1000, 'x'));
+    const ByteVector attachedData(4096, 'a');
+    {
+      Matroska::File f(newname.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT(!f.attachments(false));
+      f.tag(false)->setTitle(longTitle);
+      f.attachments(true)->addAttachedFile(Matroska::AttachedFile(
+        attachedData, "cover.jpg", "image/jpeg"));
+      CPPUNIT_ASSERT(f.save(Matroska::WriteStyle::AvoidInsert));
+    }
+    {
+      Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.tag(false));
+      CPPUNIT_ASSERT_EQUAL(longTitle, f.tag(false)->title());
+      const auto attachments = f.attachments(false);
+      CPPUNIT_ASSERT(attachments);
+      const auto &attachedFiles = attachments->attachedFileList();
+      CPPUNIT_ASSERT_EQUAL(1U, attachedFiles.size());
+      CPPUNIT_ASSERT_EQUAL(String("cover.jpg"), attachedFiles.front().fileName());
+      CPPUNIT_ASSERT(attachedData == attachedFiles.front().data());
+    }
+
+    const ByteVector newData = PlainFile(newname.c_str()).readAll();
+    unsigned long long clusterPos = 0;
+    childrenEnd = segmentChildrenEnd(newData, segmentEnd, clusterPos);
+    CPPUNIT_ASSERT_EQUAL(origClusterPos, clusterPos);
+    CPPUNIT_ASSERT_EQUAL(static_cast<unsigned long long>(newData.size()), segmentEnd);
+    CPPUNIT_ASSERT_EQUAL(segmentEnd, childrenEnd);
+  }
+
   void testSaveTypes()
   {
     // Helper lambdas for adding data of different sizes
@@ -1925,6 +2031,45 @@ public:
     Matroska::File noTitle(TEST_FILE_PATH_C("no-tags.mka"), false);
     CPPUNIT_ASSERT(noTitle.isValid());
     CPPUNIT_ASSERT_EQUAL(String(""), noTitle.tag()->title());
+  }
+
+  void testElementSizeLength()
+  {
+    for(int length = 1; length <= 8; ++length) {
+      // 2^(7n) - 1 is the "unknown size" value of a size length of n bytes.
+      const uint64_t unknownSize = (1ULL << (7 * length)) - 1;
+      CPPUNIT_ASSERT_EQUAL(length, EBML::minSize(unknownSize - 1));
+      if(length < 8) {
+        CPPUNIT_ASSERT_EQUAL(length + 1, EBML::minSize(unknownSize));
+      }
+    }
+    CPPUNIT_ASSERT_EQUAL(1, EBML::minSize(0));
+    CPPUNIT_ASSERT_EQUAL(0, EBML::minSize(0xFFFFFFFFFFFFFFULL));
+    CPPUNIT_ASSERT_EQUAL(0, EBML::minSize(0xFFFFFFFFFFFFFFFFULL));
+  }
+
+  void testSaveElementSizeAtLengthLimit()
+  {
+    // A title of 127 or 16383 bytes gives its string element a size equal to
+    // the "unknown size" value of a size length of 1 or 2 bytes.
+    for(const unsigned int length : {126U, 127U, 128U, 16382U, 16383U, 16384U}) {
+      ScopedFileCopy copy("no-tags", ".mka");
+      string newname = copy.fileName();
+      const String title(string(length, 'a'));
+      {
+        Matroska::File f(newname.c_str());
+        CPPUNIT_ASSERT(f.isValid());
+        f.tag(true)->setTitle(title);
+        CPPUNIT_ASSERT(f.save());
+      }
+      {
+        Matroska::File f(newname.c_str(), true, AudioProperties::Accurate);
+        CPPUNIT_ASSERT(f.isValid());
+        CPPUNIT_ASSERT(f.tag(false));
+        CPPUNIT_ASSERT_EQUAL(title, f.tag()->title());
+        CPPUNIT_ASSERT_EQUAL(444, f.audioProperties()->lengthInMilliseconds());
+      }
+    }
   }
 
   void testUnknownSizeSegment()

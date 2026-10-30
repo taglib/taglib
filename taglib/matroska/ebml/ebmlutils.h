@@ -59,18 +59,27 @@ namespace TagLib {
 
     unsigned long long randomUID();
 
+    // A size with all value bits set is reserved for "unknown size" (see
+    // https://datatracker.ietf.org/doc/rfc8794/ section 6.2), so a size length
+    // of n bytes can hold sizes up to 2^(7n) - 2.
     constexpr int minSize(uint64_t data)
     {
-      if(data <= 0x7Fu)
+      if(data < 0x7Fu)
         return 1;
-      if(data <= 0x3FFFu)
+      if(data < 0x3FFFu)
         return 2;
-      if(data <= 0x1FFFFFu)
+      if(data < 0x1FFFFFu)
         return 3;
-      if(data <= 0xFFFFFFFu)
+      if(data < 0xFFFFFFFu)
         return 4;
-      if(data <= 0x7FFFFFFFFu)
+      if(data < 0x7FFFFFFFFu)
         return 5;
+      if(data < 0x3FFFFFFFFFFu)
+        return 6;
+      if(data < 0x1FFFFFFFFFFFFu)
+        return 7;
+      if(data < 0xFFFFFFFFFFFFFFu)
+        return 8;
       return 0;
     }
 
