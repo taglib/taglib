@@ -30,6 +30,7 @@
 #include "tbytevector.h"
 #include "tbytevectorlist.h"
 #include "tbytevectorstream.h"
+#include "tdeferredwritestream.h"
 #include "tdebuglistener.h"
 #include "tfile.h"
 #include "tfilestream.h"
@@ -179,6 +180,7 @@ public:
         CPPUNIT_ASSERT_EQUAL(classSize(0, false), sizeof(TagLib::ByteVector));
         CPPUNIT_ASSERT_EQUAL(classSize(2, false), sizeof(TagLib::ByteVectorList));
         CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::ByteVectorStream));
+        CPPUNIT_ASSERT_EQUAL(classSize(1, true), sizeof(TagLib::DeferredWriteStream));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::DebugListener));
         CPPUNIT_ASSERT_EQUAL(classSize(0, true), sizeof(TagLib::File));
         CPPUNIT_ASSERT_EQUAL(classSize(1, false), sizeof(TagLib::FileRef));
