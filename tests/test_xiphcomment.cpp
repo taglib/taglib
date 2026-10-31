@@ -47,6 +47,7 @@ class TestXiphComment : public CppUnit::TestFixture
   CPPUNIT_TEST(testClearComment);
   CPPUNIT_TEST(testRemoveFields);
   CPPUNIT_TEST(testPicture);
+  CPPUNIT_TEST(testWrappedPicture);
   CPPUNIT_TEST(testLowercaseFields);
   CPPUNIT_TEST_SUITE_END();
 
@@ -190,6 +191,43 @@ public:
       CPPUNIT_ASSERT_EQUAL(String("image/jpeg"), lst[0]->mimeType());
       CPPUNIT_ASSERT_EQUAL(String("new image"), lst[0]->description());
       CPPUNIT_ASSERT_EQUAL(ByteVector("JPEG data"), lst[0]->data());
+    }
+  }
+
+  void testWrappedPicture()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    string newname = copy.fileName();
+
+    FLAC::Picture picture;
+    picture.setType(FLAC::Picture::FrontCover);
+    picture.setMimeType("image/jpeg");
+    picture.setData(ByteVector(200, 'x'));
+
+    // Base64 with a line break every 76 characters, as MIME style encoders write it.
+    const ByteVector base64 = picture.render().toBase64();
+    ByteVector wrapped;
+    for(unsigned int i = 0; i < base64.size(); i += 76) {
+      wrapped.append(base64.mid(i, 76));
+      wrapped.append('\n');
+    }
+
+    {
+      Vorbis::File f(newname.c_str());
+      f.tag()->addField("METADATA_BLOCK_PICTURE", String(wrapped, String::Latin1));
+      f.save();
+    }
+    {
+      Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(1U, f.tag()->pictureList().size());
+      CPPUNIT_ASSERT_EQUAL(ByteVector(200, 'x'), f.tag()->pictureList().front()->data());
+      f.tag()->setTitle("Title");
+      f.save();
+    }
+    {
+      Vorbis::File f(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(String("Title"), f.tag()->title());
+      CPPUNIT_ASSERT_EQUAL(1U, f.tag()->pictureList().size());
     }
   }
 
