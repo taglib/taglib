@@ -98,11 +98,11 @@ public:
   bool hasiXML { false };
   bool hasBEXT { false };
   bool hasDISP { false };
-  bool DISPModified { false };
+  bool dispModified { false };
 
   String iXMLData;
   ByteVector bextData;
-  ByteVectorList DISPData;
+  ByteVectorList dispData;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,13 +180,13 @@ void RIFF::WAV::File::setBEXTData(const ByteVector &data)
 
 ByteVectorList RIFF::WAV::File::DISPData() const
 {
-  return d->DISPData;
+  return d->dispData;
 }
 
 void RIFF::WAV::File::setDISPData(const ByteVectorList &data)
 {
-  d->DISPData = data;
-  d->DISPModified = true;
+  d->dispData = data;
+  d->dispModified = true;
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -287,7 +287,7 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     }
   }
 
-  if(d->DISPModified) {
+  if(d->dispModified) {
     // There can be several DISP chunks, one per clipboard format.  Those
     // already in the file are overwritten in place to keep their position,
     // then the extra ones are appended or the surplus ones removed.
@@ -298,7 +298,7 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     }
 
     size_t count = 0;
-    for(const auto &data : std::as_const(d->DISPData)) {
+    for(const auto &data : std::as_const(d->dispData)) {
       if(count < chunkIndexes.size())
         setChunkData(chunkIndexes[count], data);
       else
@@ -310,8 +310,8 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     for(size_t i = chunkIndexes.size(); i > count; --i)
       removeChunk(chunkIndexes[i - 1]);
 
-    d->hasDISP = !d->DISPData.isEmpty();
-    d->DISPModified = false;
+    d->hasDISP = !d->dispData.isEmpty();
+    d->dispModified = false;
   }
 
   return true;
@@ -394,7 +394,7 @@ void RIFF::WAV::File::read(bool readProperties)
     }
     else if(name == "DISP") {
       d->hasDISP = true;
-      d->DISPData.append(chunkData(i));
+      d->dispData.append(chunkData(i));
     }
   }
 
