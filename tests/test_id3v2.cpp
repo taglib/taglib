@@ -131,6 +131,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesMovement);
   CPPUNIT_TEST(testPropertyGrouping);
   CPPUNIT_TEST(testSetPropertiesKeepsSpreadFrames);
+  CPPUNIT_TEST(testSetPropertiesUpdatesFrameInPlace);
   CPPUNIT_TEST(testDeleteFrame);
   CPPUNIT_TEST(testSaveAndStripID3v1ShouldNotAddFrameFromID3v1ToId3v2);
   CPPUNIT_TEST(testParseChapterFrame);
@@ -1484,6 +1485,98 @@ public:
       CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), deu->language());
       CPPUNIT_ASSERT_EQUAL(String("hallo"), deu->text());
       CPPUNIT_ASSERT(f.ID3v2Tag()->frameList("TXXX").isEmpty());
+    }
+  }
+
+  void testSetPropertiesUpdatesFrameInPlace()
+  {
+    {
+      // An edited value goes into the frame that held it, which keeps its
+      // language, description, position and encoding.
+      ID3v2::Tag tag;
+      auto title = new ID3v2::TextIdentificationFrame("TIT2", String::Latin1);
+      title->setText("Title");
+      tag.addFrame(title);
+      auto comment = new ID3v2::CommentsFrame(String::Latin1);
+      comment->setLanguage("deu");
+      comment->setText("hallo");
+      tag.addFrame(comment);
+      auto lyrics = new ID3v2::UnsynchronizedLyricsFrame(String::Latin1);
+      lyrics->setLanguage("deu");
+      lyrics->setText("la la");
+      tag.addFrame(lyrics);
+      auto userText = new ID3v2::UserTextIdentificationFrame("MyTag", StringList("x"),
+                                                             String::Latin1);
+      tag.addFrame(userText);
+
+      PropertyMap properties = tag.properties();
+      CPPUNIT_ASSERT(properties.contains("LYRICS"));
+      CPPUNIT_ASSERT(properties.contains("MYTAG"));
+      properties["TITLE"] = StringList("Title, edited");
+      properties["COMMENT"] = StringList("tschuess");
+      properties["LYRICS"] = StringList("la la la");
+      properties["MYTAG"] = StringList("y");
+      CPPUNIT_ASSERT(tag.setProperties(properties).isEmpty());
+
+      const ID3v2::FrameList frames = tag.frameList();
+      CPPUNIT_ASSERT_EQUAL(4u, frames.size());
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(title), frames[0]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(comment), frames[1]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(lyrics), frames[2]);
+      CPPUNIT_ASSERT_EQUAL(static_cast<ID3v2::Frame *>(userText), frames[3]);
+      CPPUNIT_ASSERT_EQUAL(String("Title, edited"), title->toString());
+      CPPUNIT_ASSERT_EQUAL(String::Latin1, title->textEncoding());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), comment->language());
+      CPPUNIT_ASSERT_EQUAL(String("tschuess"), comment->text());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), lyrics->language());
+      CPPUNIT_ASSERT_EQUAL(String("la la la"), lyrics->text());
+      CPPUNIT_ASSERT_EQUAL(String("MyTag"), userText->description());
+      CPPUNIT_ASSERT_EQUAL(StringList("y"), tag.properties()["MYTAG"]);
+    }
+    {
+      // A value the frame cannot hold, and a removed key, are handled as before.
+      ID3v2::Tag tag;
+      auto comment = new ID3v2::CommentsFrame;
+      comment->setLanguage("deu");
+      comment->setText("hallo");
+      tag.addFrame(comment);
+      tag.addFrame(new ID3v2::UserTextIdentificationFrame("MyTag", StringList("x")));
+
+      PropertyMap properties;
+      properties["COMMENT"] = StringList("a").append("b");
+      tag.setProperties(properties);
+      CPPUNIT_ASSERT(tag.frameList("COMM").isEmpty());
+      CPPUNIT_ASSERT_EQUAL(1u, tag.frameList("TXXX").size());
+      CPPUNIT_ASSERT(ID3v2::UserTextIdentificationFrame::find(&tag, "COMMENT"));
+      CPPUNIT_ASSERT(!ID3v2::UserTextIdentificationFrame::find(&tag, "MyTag"));
+    }
+
+    // A Latin-1 frame given text Latin-1 cannot hold is promoted when rendered.
+    ScopedFileCopy copy("xing", ".mp3");
+    const String text("\xc5\x81\xc3\xb3" "d\xc5\xba \xe2\x9c\x93", String::UTF8);
+    {
+      MPEG::File f(copy.fileName().c_str());
+      auto comment = new ID3v2::CommentsFrame(String::Latin1);
+      comment->setLanguage("deu");
+      comment->setText("hallo");
+      f.ID3v2Tag(true)->addFrame(comment);
+      f.save(MPEG::File::ID3v2, File::StripOthers, ID3v2::v3);
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      PropertyMap properties = f.properties();
+      properties["COMMENT"] = StringList(text);
+      f.setProperties(properties);
+      f.save(MPEG::File::ID3v2, File::StripOthers, ID3v2::v3);
+    }
+    {
+      MPEG::File f(copy.fileName().c_str());
+      const ID3v2::FrameList comments = f.ID3v2Tag()->frameList("COMM");
+      CPPUNIT_ASSERT_EQUAL(1u, comments.size());
+      auto comment = dynamic_cast<ID3v2::CommentsFrame *>(comments.front());
+      CPPUNIT_ASSERT(comment);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("deu"), comment->language());
+      CPPUNIT_ASSERT_EQUAL(text, comment->text());
     }
   }
 
