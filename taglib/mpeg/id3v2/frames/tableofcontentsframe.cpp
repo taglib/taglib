@@ -25,6 +25,7 @@
 
 #include "tableofcontentsframe.h"
 
+#include <algorithm>
 #include <utility>
 
 #include "tpropertymap.h"
@@ -293,8 +294,13 @@ ByteVector TableOfContentsFrame::renderFields() const
   if(d->isOrdered)
     flags += 1;
   data.append(flags);
-  data.append(static_cast<char>(entryCount()));
+  // The entry count is a single byte, so only the first 255 child elements are rendered.
+  const unsigned int count = std::min(entryCount(), 255U);
+  data.append(static_cast<char>(count));
+  unsigned int i = 0;
   for(const auto &element : std::as_const(d->childElements)) {
+    if(i++ >= count)
+      break;
     data.append(element);
     data.append('\0');
   }

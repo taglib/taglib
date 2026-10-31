@@ -137,6 +137,7 @@ class TestID3v2 : public CppUnit::TestFixture
   CPPUNIT_TEST(testRenderChapterFrame);
   CPPUNIT_TEST(testParseTableOfContentsFrame);
   CPPUNIT_TEST(testRenderTableOfContentsFrame);
+  CPPUNIT_TEST(testRenderTableOfContentsFrameWithManyChildren);
   CPPUNIT_TEST(testShrinkPadding);
   CPPUNIT_TEST(testEmptyFrame);
   CPPUNIT_TEST(testDuplicateTags);
@@ -1705,6 +1706,28 @@ public:
                  "\x00"                     // TIT2 frame text encoding
                  "TC1", 32),                // Table of contents title
       f.render());
+  }
+
+  void testRenderTableOfContentsFrameWithManyChildren()
+  {
+    const unsigned int counts[] = { 255, 256, 300 };
+    for(unsigned int count : counts) {
+      ID3v2::Header header;
+      ID3v2::TableOfContentsFrame f(&header, "CTOC");
+      f.setElementID("T");
+      for(unsigned int i = 0; i < count; ++i)
+        f.addChildElement(ByteVector("C") + ByteVector(String::number(i).toCString()));
+      auto eF = new ID3v2::TextIdentificationFrame("TIT2");
+      eF->setText("TC1");
+      f.addEmbeddedFrame(eF);
+
+      ID3v2::TableOfContentsFrame parsed(&header, f.render());
+      CPPUNIT_ASSERT_EQUAL(255U, parsed.entryCount());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("C254"), parsed.childElements().back());
+      CPPUNIT_ASSERT_EQUAL(1U, parsed.embeddedFrameList().size());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("TIT2"),
+                           parsed.embeddedFrameList().front()->frameID());
+    }
   }
 
   void testShrinkPadding()
