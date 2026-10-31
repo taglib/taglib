@@ -25,6 +25,7 @@
 
 #include <initializer_list>
 #include <string>
+#include <utility>
 #include <cstdio>
 
 #include "taglib_config.h"
@@ -290,6 +291,55 @@ namespace
 }
 #endif // TAGLIB_WITH_CHARSETTABLES
 
+namespace
+{
+  // A DISP payload: a clipboard format ID followed by data in that format.
+  ByteVector dispPayload(unsigned int format, const ByteVector &data)
+  {
+    return ByteVector::fromUInt(format, false) + data;
+  }
+
+  // A CF_TEXT DISP payload: the NUL-terminated text, padded to an even size
+  // inside the payload.
+  ByteVector dispTextPayload(const char *text)
+  {
+    ByteVector payload = dispPayload(1, ByteVector(text) + ByteVector(1, '\0'));
+    if(payload.size() % 2)
+      payload.append('\0');
+    return payload;
+  }
+
+  // The names and payload offsets of the top-level chunks of a RIFF file, or
+  // an empty list if the chunks do not exactly fill the size in the header.
+  List<std::pair<ByteVector, unsigned int>> riffChunkLayout(const ByteVector &file)
+  {
+    List<std::pair<ByteVector, unsigned int>> chunks;
+    if(file.size() < 12 || file.toUInt(4, false) != file.size() - 8)
+      return {};
+
+    unsigned int offset = 12;
+    while(offset + 8 <= file.size()) {
+      const unsigned int size = file.toUInt(offset + 4, false);
+      chunks.append({file.mid(offset, 4), offset + 8});
+      offset += 8 + size + size % 2;
+    }
+    if(offset != file.size())
+      return {};
+    return chunks;
+  }
+
+  // The payload offsets of the chunks called \a name, in file order.
+  List<unsigned int> riffChunkOffsets(const ByteVector &file, const ByteVector &name)
+  {
+    List<unsigned int> offsets;
+    for(const auto &[chunkName, offset] : riffChunkLayout(file)) {
+      if(chunkName == name)
+        offsets.append(offset);
+    }
+    return offsets;
+  }
+}
+
 class TestWAV : public CppUnit::TestFixture
 {
   CPPUNIT_TEST_SUITE(TestWAV);
@@ -319,6 +369,12 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testBEXTTagWithOtherTags);
   CPPUNIT_TEST(testiXMLTag);
   CPPUNIT_TEST(testiXMLTagWithOtherTags);
+  CPPUNIT_TEST(testDISPChunk);
+  CPPUNIT_TEST(testDISPChunkOddSize);
+  CPPUNIT_TEST(testDISPChunkGrow);
+  CPPUNIT_TEST(testDISPChunkShrink);
+  CPPUNIT_TEST(testDISPChunkUntouchedOnSave);
+  CPPUNIT_TEST(testDISPChunkWithOtherTags);
 #ifdef TAGLIB_WITH_CHARSETTABLES
   CPPUNIT_TEST(testInfoLatin1Default);
   CPPUNIT_TEST(testInfoWindows1252);
@@ -1600,6 +1656,243 @@ public:
       CPPUNIT_ASSERT(f.iXMLData().isEmpty());
       CPPUNIT_ASSERT(!f.hasBEXTData());
       CPPUNIT_ASSERT(f.BEXTData().isEmpty());
+    }
+
+    // Check if file without tags is same as original empty file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("empty.wav")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
+  }
+
+  void testDISPChunk()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector text = dispTextPayload("Title");
+    const ByteVector dib = dispPayload(8, ByteVector("\x28\x00\x00\x00", 4));
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasDISPData());
+      CPPUNIT_ASSERT(f.DISPData().isEmpty());
+
+      f.setDISPData(ByteVectorList({text, dib}));
+      f.save();
+      CPPUNIT_ASSERT(f.hasDISPData());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.hasDISPData());
+      CPPUNIT_ASSERT_EQUAL(2U, f.DISPData().size());
+      CPPUNIT_ASSERT_EQUAL(text, f.DISPData()[0]);
+      CPPUNIT_ASSERT_EQUAL(dib, f.DISPData()[1]);
+
+      f.setDISPData(ByteVectorList());
+      f.save();
+      CPPUNIT_ASSERT(!f.hasDISPData());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasDISPData());
+      CPPUNIT_ASSERT(f.DISPData().isEmpty());
+    }
+
+    // Check if file without DISP is same as original empty file
+    const ByteVector origData = PlainFile(TEST_FILE_PATH_C("empty.wav")).readAll();
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT(origData == fileData);
+  }
+
+  void testDISPChunkOddSize()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector odd = dispPayload(1, ByteVector("odd", 3));
+    CPPUNIT_ASSERT_EQUAL(7U, odd.size());
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setDISPData(ByteVectorList({odd}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setBEXTData(ByteVector("bext data"));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(1U, f.DISPData().size());
+      CPPUNIT_ASSERT_EQUAL(odd, f.DISPData()[0]);
+      CPPUNIT_ASSERT_EQUAL(ByteVector("bext data"), f.BEXTData());
+    }
+
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    const auto layout = riffChunkLayout(fileData);
+    CPPUNIT_ASSERT_EQUAL(4U, layout.size());
+    CPPUNIT_ASSERT_EQUAL(ByteVector("DISP"), layout[2].first);
+    CPPUNIT_ASSERT_EQUAL(ByteVector("bext"), layout[3].first);
+    CPPUNIT_ASSERT_EQUAL(layout[2].second + 8, layout[3].second - 8);
+  }
+
+  void testDISPChunkGrow()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector first = dispTextPayload("First");
+    const ByteVector second = dispTextPayload("Second");
+    const ByteVector third = dispPayload(8, ByteVector("\x28\x00\x00\x00", 4));
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setDISPData(ByteVectorList({dispTextPayload("Original")}));
+      f.save();
+    }
+
+    const List<unsigned int> before =
+      riffChunkOffsets(PlainFile(filename.c_str()).readAll(), "DISP");
+    CPPUNIT_ASSERT_EQUAL(1U, before.size());
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setDISPData(ByteVectorList({first, second, third}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(3U, f.DISPData().size());
+      CPPUNIT_ASSERT_EQUAL(first, f.DISPData()[0]);
+      CPPUNIT_ASSERT_EQUAL(second, f.DISPData()[1]);
+      CPPUNIT_ASSERT_EQUAL(third, f.DISPData()[2]);
+    }
+
+    const List<unsigned int> after =
+      riffChunkOffsets(PlainFile(filename.c_str()).readAll(), "DISP");
+    CPPUNIT_ASSERT_EQUAL(3U, after.size());
+    CPPUNIT_ASSERT_EQUAL(before[0], after[0]);
+  }
+
+  void testDISPChunkShrink()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector kept = dispTextPayload("Kept");
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setDISPData(ByteVectorList({dispTextPayload("First"), dispTextPayload("Second"),
+                                    dispTextPayload("Third")}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setBEXTData(ByteVector("bext data"));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT_EQUAL(3U, f.DISPData().size());
+      f.setDISPData(ByteVectorList({kept}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(1U, f.DISPData().size());
+      CPPUNIT_ASSERT_EQUAL(kept, f.DISPData()[0]);
+      CPPUNIT_ASSERT(f.hasBEXTData());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("bext data"), f.BEXTData());
+    }
+
+    const ByteVector fileData = PlainFile(filename.c_str()).readAll();
+    CPPUNIT_ASSERT_EQUAL(1U, riffChunkOffsets(fileData, "DISP").size());
+    CPPUNIT_ASSERT_EQUAL(1U, riffChunkOffsets(fileData, "bext").size());
+  }
+
+  void testDISPChunkUntouchedOnSave()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector text = dispTextPayload("Display Title");
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setDISPData(ByteVectorList({text}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.setBEXTData(ByteVector("bext data"));
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      f.save();
+    }
+
+    const List<unsigned int> before =
+      riffChunkOffsets(PlainFile(filename.c_str()).readAll(), "DISP");
+    CPPUNIT_ASSERT_EQUAL(1U, before.size());
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.InfoTag()->setTitle("New INFO Title");
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("New INFO Title"), f.InfoTag()->title());
+      CPPUNIT_ASSERT_EQUAL(1U, f.DISPData().size());
+      CPPUNIT_ASSERT_EQUAL(text, f.DISPData()[0]);
+    }
+
+    const List<unsigned int> after =
+      riffChunkOffsets(PlainFile(filename.c_str()).readAll(), "DISP");
+    CPPUNIT_ASSERT(before == after);
+  }
+
+  void testDISPChunkWithOtherTags()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    string filename = copy.fileName();
+
+    const ByteVector text = dispTextPayload("Display Title");
+
+    {
+      RIFF::WAV::File f(filename.c_str());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      f.setDISPData(ByteVectorList({text}));
+      f.save();
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.hasID3v2Tag());
+      CPPUNIT_ASSERT(f.hasInfoTag());
+      CPPUNIT_ASSERT(f.hasDISPData());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("INFO Title"), f.InfoTag()->title());
+      CPPUNIT_ASSERT(ByteVectorList({text}) == f.DISPData());
+
+      f.setDISPData(ByteVectorList());
+      f.strip();
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      RIFF::WAV::File f(filename.c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(!f.hasID3v2Tag());
+      CPPUNIT_ASSERT(!f.hasInfoTag());
+      CPPUNIT_ASSERT(!f.hasDISPData());
     }
 
     // Check if file without tags is same as original empty file

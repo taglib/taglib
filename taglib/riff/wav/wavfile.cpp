@@ -26,6 +26,8 @@
 #include "wavfile.h"
 
 #include <optional>
+#include <utility>
+#include <vector>
 
 #include "tcharset.h"
 #include "tdebug.h"
@@ -95,9 +97,12 @@ public:
   bool hasCSET { false };
   bool hasiXML { false };
   bool hasBEXT { false };
+  bool hasDISP { false };
+  bool dispModified { false };
 
   String iXMLData;
   ByteVector bextData;
+  ByteVectorList dispData;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -171,6 +176,17 @@ ByteVector RIFF::WAV::File::BEXTData() const
 void RIFF::WAV::File::setBEXTData(const ByteVector &data)
 {
   d->bextData = data;
+}
+
+ByteVectorList RIFF::WAV::File::DISPData() const
+{
+  return d->dispData;
+}
+
+void RIFF::WAV::File::setDISPData(const ByteVectorList &data)
+{
+  d->dispData = data;
+  d->dispModified = true;
 }
 
 void RIFF::WAV::File::strip(TagTypes tags)
@@ -271,6 +287,33 @@ bool RIFF::WAV::File::save(TagTypes tags, StripTags strip, ID3v2::Version versio
     }
   }
 
+  if(d->dispModified) {
+    // There can be several DISP chunks, one per clipboard format.  Those
+    // already in the file are overwritten in place to keep their position,
+    // then the extra ones are appended or the surplus ones removed.
+    std::vector<unsigned int> chunkIndexes;
+    for(unsigned int i = 0; i < chunkCount(); ++i) {
+      if(chunkName(i) == "DISP")
+        chunkIndexes.push_back(i);
+    }
+
+    size_t count = 0;
+    for(const auto &data : std::as_const(d->dispData)) {
+      if(count < chunkIndexes.size())
+        setChunkData(chunkIndexes[count], data);
+      else
+        appendChunk("DISP", data);
+      ++count;
+    }
+
+    // Remove from the end, as removing a chunk shifts the indexes behind it.
+    for(size_t i = chunkIndexes.size(); i > count; --i)
+      removeChunk(chunkIndexes[i - 1]);
+
+    d->hasDISP = !d->dispData.isEmpty();
+    d->dispModified = false;
+  }
+
   return true;
 }
 
@@ -292,6 +335,11 @@ bool RIFF::WAV::File::hasiXMLData() const
 bool RIFF::WAV::File::hasBEXTData() const
 {
   return d->hasBEXT;
+}
+
+bool RIFF::WAV::File::hasDISPData() const
+{
+  return d->hasDISP;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -343,6 +391,10 @@ void RIFF::WAV::File::read(bool readProperties)
     else if(name == "bext") {
       d->hasBEXT = true;
       d->bextData = chunkData(i);
+    }
+    else if(name == "DISP") {
+      d->hasDISP = true;
+      d->dispData.append(chunkData(i));
     }
   }
 

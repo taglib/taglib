@@ -233,6 +233,16 @@ void RIFF::File::setChunkData(const ByteVector &name, const ByteVector &data, bo
 
   // Couldn't find an existing chunk, so let's create a new one.
 
+  appendChunk(name, data);
+}
+
+void RIFF::File::appendChunk(const ByteVector &name, const ByteVector &data)
+{
+  if(d->chunks.empty()) {
+    debug("RIFF::File::appendChunk - No valid chunks found.");
+    return;
+  }
+
   // Adjust the padding of the last chunk to place the new chunk at even position.
 
   Chunk &last = d->chunks.back();

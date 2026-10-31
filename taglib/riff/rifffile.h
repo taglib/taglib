@@ -136,6 +136,14 @@ namespace TagLib {
       void setChunkData(const ByteVector &name, const ByteVector &data, bool alwaysCreate);
 
       /*!
+       * Creates a new chunk \a name with \a data after the existing chunks,
+       * regardless of whether or not a chunk with the given name exists.
+       *
+       * \warning This will update the file immediately.
+       */
+      void appendChunk(const ByteVector &name, const ByteVector &data);
+
+      /*!
        * Removes the specified chunk.
        *
        * \warning This will update the file immediately.

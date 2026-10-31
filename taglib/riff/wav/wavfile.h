@@ -26,6 +26,7 @@
 #ifndef TAGLIB_WAVFILE_H
 #define TAGLIB_WAVFILE_H
 
+#include "tbytevectorlist.h"
 #include "rifffile.h"
 #include "id3v2tag.h"
 #include "infotag.h"
@@ -171,6 +172,30 @@ namespace TagLib {
         void setBEXTData(const ByteVector &data);
 
         /*!
+         * Returns the raw data of the DISP (display) chunks, one entry per
+         * chunk in file order.  Each entry is the whole chunk payload,
+         * starting with the 32-bit little-endian clipboard format ID.
+         * Empty if no DISP chunk is present.
+         *
+         * \see setDISPData()
+         * \see hasDISPData()
+         */
+        ByteVectorList DISPData() const;
+
+        /*!
+         * Sets the DISP chunk data, one chunk per entry.  Each entry should
+         * start with the clipboard format ID.  Entries are written as given,
+         * without validation, so an entry shorter than that, even an empty one,
+         * is written as a chunk of that size.  Pass an empty list to remove all
+         * DISP chunks on save.  The DISP chunks are only rewritten on save if
+         * this was called.
+         *
+         * \see DISPData()
+         * \see hasDISPData()
+         */
+        void setDISPData(const ByteVectorList &data);
+
+        /*!
          * This will strip the tags that match the OR-ed together TagTypes from the
          * file.  By default it strips all tags.  It returns \c true if the tags are
          * successfully stripped.
@@ -240,6 +265,13 @@ namespace TagLib {
          * \see bextTag
          */
         bool hasBEXTData() const;
+
+        /*!
+         * Returns whether or not the file on disk actually has a DISP chunk.
+         *
+         * \see DISPData()
+         */
+        bool hasDISPData() const;
 
         /*!
          * Returns whether or not the given \a stream can be opened as a WAV
