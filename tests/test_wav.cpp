@@ -397,6 +397,7 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testInfoAssumedCodePageAcceptsUtf8);
   CPPUNIT_TEST(testInfoAssumedCodePageWindows1252);
   CPPUNIT_TEST(testInfoAssumedCodePageOnlyWhenUndeclared);
+  CPPUNIT_TEST(testInfoAssumedUtf8FallsBackToLatin1);
   CPPUNIT_TEST(testInfoAssumedCodePageRejectsUnsupported);
 #endif
   CPPUNIT_TEST_SUITE_END();
@@ -1108,6 +1109,33 @@ public:
       RIFF::WAV::File f(&stream);
       CPPUNIT_ASSERT(f.isValid());
       CPPUNIT_ASSERT_EQUAL(String(L"Caf\xE9"), f.InfoTag()->artist());
+    }
+  }
+
+  // An assumed UTF-8 is a hint, and a field that is not valid UTF-8 contradicts
+  // it. Such a field is read as the RIFF default ISO 8859-1 instead of as empty,
+  // field by field, while a file that declares UTF-8 itself is taken at its word.
+  void testInfoAssumedUtf8FallsBackToLatin1()
+  {
+    const RestoreAssumedCodePage restore;
+
+    RIFF::Info::Tag::setAssumedCodePage(65001);
+
+    {
+      ByteVectorStream stream(riffWithInfo({{"IART", ByteVector("Caf\xC3\xA9", 5)},
+                                            {"ICOP", ByteVector("\xA9 2019 BOOM", 11)}}));
+      RIFF::WAV::File f(&stream);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String(L"Caf\xE9"), f.InfoTag()->artist());
+      CPPUNIT_ASSERT_EQUAL(String(L"\xA9 2019 BOOM"), f.InfoTag()->fieldText("ICOP"));
+    }
+
+    {
+      ByteVectorStream stream(riffWithInfo({{"ICOP", ByteVector("\xA9 2019 BOOM", 11)}},
+                                           65001));
+      RIFF::WAV::File f(&stream);
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT(f.InfoTag()->fieldText("ICOP").isEmpty());
     }
   }
 
