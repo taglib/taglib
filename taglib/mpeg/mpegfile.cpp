@@ -46,6 +46,10 @@ using namespace TagLib;
 
 namespace
 {
+  // Searching for a frame sync reads this much at a time; with 1 kB reads the
+  // seeks dominate when much of the file is not audio.
+  constexpr unsigned int frameScanBlockSize = 64 * 1024;
+
   enum { ID3v2Index = 0, APEIndex = 1, ID3v1Index = 2 };
 } // namespace
 
@@ -385,45 +389,49 @@ bool MPEG::File::strip(int tags, bool freeMemory)
 
 offset_t MPEG::File::nextFrameOffset(offset_t position)
 {
-  ByteVector frameSyncBytes(2, '\0');
+  // The byte before the current one, carried across buffers.
+  unsigned char previous = 0;
 
   while(true) {
     seek(position);
-    const ByteVector buffer = readBlock(bufferSize());
+    const ByteVector buffer = readBlock(frameScanBlockSize);
     if(buffer.isEmpty())
       return -1;
 
+    const auto data = reinterpret_cast<const unsigned char *>(buffer.data());
     for(unsigned int i = 0; i < buffer.size(); ++i) {
-      frameSyncBytes[0] = frameSyncBytes[1];
-      frameSyncBytes[1] = buffer[i];
-      if(isFrameSync(frameSyncBytes)) {
+      const unsigned char current = data[i];
+      if(isFrameSync(previous, current)) {
         if(const Header header(this, position + i - 1, true); header.isValid())
           return position + i - 1;
       }
+      previous = current;
     }
 
-    position += bufferSize();
+    position += buffer.size();
   }
 }
 
 offset_t MPEG::File::previousFrameOffset(offset_t position)
 {
-  ByteVector frameSyncBytes(2, '\0');
+  // The byte following the current one, carried across buffers.
+  unsigned char next = 0;
 
   while(position > 0) {
-    const offset_t bufferLength = std::min<offset_t>(position, bufferSize());
+    const offset_t bufferLength = std::min<offset_t>(position, frameScanBlockSize);
     position -= bufferLength;
 
     seek(position);
     const ByteVector buffer = readBlock(bufferLength);
+    const auto data = reinterpret_cast<const unsigned char *>(buffer.data());
 
     for(int i = buffer.size() - 1; i >= 0; --i) {
-      frameSyncBytes[1] = frameSyncBytes[0];
-      frameSyncBytes[0] = buffer[i];
-      if(isFrameSync(frameSyncBytes)) {
+      const unsigned char current = data[i];
+      if(isFrameSync(current, next)) {
         if(const Header header(this, position + i, true); header.isValid())
           return position + i + header.frameLength();
       }
+      next = current;
     }
   }
 
@@ -533,31 +541,34 @@ offset_t MPEG::File::findID3v2(Properties::ReadStyle readStyle)
 
   // Look for an ID3v2 tag until reaching the first valid MPEG frame.
 
-  ByteVector frameSyncBytes(2, '\0');
-  ByteVector tagHeaderBytes(3, '\0');
-  long position = 0;
+  // The two bytes before the current one, carried across buffers.
+  unsigned char beforePrevious = 0;
+  unsigned char previous = 0;
+  offset_t position = 0;
 
   while(true) {
     seek(position);
-    const ByteVector buffer = readBlock(bufferSize());
+    const ByteVector buffer = readBlock(frameScanBlockSize);
     if(buffer.isEmpty())
       return -1;
 
+    const auto data = reinterpret_cast<const unsigned char *>(buffer.data());
     for(unsigned int i = 0; i < buffer.size(); ++i) {
-      frameSyncBytes[0] = frameSyncBytes[1];
-      frameSyncBytes[1] = buffer[i];
-      if(isFrameSync(frameSyncBytes)) {
+      const unsigned char current = data[i];
+      if(isFrameSync(previous, current)) {
         if(const Header header(this, position + i - 1, true); header.isValid())
           return -1;
       }
 
-      tagHeaderBytes[0] = tagHeaderBytes[1];
-      tagHeaderBytes[1] = tagHeaderBytes[2];
-      tagHeaderBytes[2] = buffer[i];
-      if(tagHeaderBytes == headerID)
+      if(beforePrevious == static_cast<unsigned char>(headerID[0]) &&
+         previous == static_cast<unsigned char>(headerID[1]) &&
+         current == static_cast<unsigned char>(headerID[2]))
         return position + i - 2;
+
+      beforePrevious = previous;
+      previous = current;
     }
 
-    position += bufferSize();
+    position += buffer.size();
   }
 }
