@@ -67,6 +67,10 @@ void EBML::MkTracks::parse(Matroska::Properties *properties) const
       if(const Id trackEntryChildId = trackEntryChild->getId(); trackEntryChildId == Id::MkCodecID)
         codecId = element_cast<Id::MkCodecID>(trackEntryChild)->getValue();
       else if(trackEntryChildId == Id::MkAudio) {
+        // Their defaults (RFC 9559, 5.1.4.1.29), which a muxer may leave out
+        // when the value equals them (RFC 8794, 11.1.19).
+        samplingFrequency = 8000.0;
+        channels = 1;
         const auto audio = element_cast<Id::MkAudio>(trackEntryChild);
         for(const auto &audioChild : *audio) {
           if(const Id audioChildId = audioChild->getId(); audioChildId == Id::MkSamplingFrequency)
