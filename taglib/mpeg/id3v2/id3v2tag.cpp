@@ -79,6 +79,18 @@ namespace
            (!frame2 || frame2->textEncoding() == String::Latin1)
        ? String::Latin1 : String::UTF16;
   }
+
+  // Whether a frame ID of the length \a version uses, made of uppercase
+  // letters and digits, starts at \a offset in \a data.
+  bool startsWithFrameID(const ByteVector &data, unsigned int offset, unsigned int version)
+  {
+    const unsigned int idSize = version < 3 ? 3 : 4;
+    if(offset + idSize > data.size())
+      return false;
+
+    return std::none_of(data.begin() + offset, data.begin() + offset + idSize,
+      [](auto c) { return (c < 'A' || c > 'Z') && (c < '0' || c > '9'); });
+  }
 }  // namespace
 
 class ID3v2::Tag::TagPrivate
@@ -902,8 +914,21 @@ void ID3v2::Tag::parse(const ByteVector &origData)
     unsigned int headerVersion = tagHeader->majorVersion();
     Frame *frame = d->factory->createFrame(origData, tagHeader);
 
-    if(!frame)
+    if(!frame) {
+      // A frame that cannot be read, such as one with an invalid ID, is skipped
+      // when what follows where its size ends is another frame, padding or the
+      // end of the frames. Anything else is taken for corruption and ends the tag.
+      const Frame::Header frameHeader(origData, headerVersion);
+      const unsigned long long next = static_cast<unsigned long long>(frameDataPosition) +
+                                      frameHeader.size() + frameHeader.frameSize();
+      if(next <= frameDataLength &&
+         (next == frameDataLength || data.at(static_cast<unsigned int>(next)) == 0 ||
+          startsWithFrameID(data, static_cast<unsigned int>(next), headerVersion))) {
+        frameDataPosition = static_cast<unsigned int>(next);
+        continue;
+      }
       return;
+    }
 
     if(frame->header()->version() == headerVersion) {
       frameDataPosition += frame->size() + frame->headerSize();
