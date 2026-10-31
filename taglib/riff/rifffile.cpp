@@ -46,6 +46,8 @@ struct Chunk
   //! May exceed 32 bits for the "data" chunk of an RF64/BW64 file.
   offset_t size;
   unsigned int padding;
+  //! The audio chunk, declared larger than the file and read to its end instead.
+  bool clamped { false };
 };
 
 class RIFF::File::FilePrivate
@@ -243,9 +245,17 @@ void RIFF::File::appendChunk(const ByteVector &name, const ByteVector &data)
     return;
   }
 
-  // Adjust the padding of the last chunk to place the new chunk at even position.
-
   Chunk &last = d->chunks.back();
+
+  // A clamped chunk gets its real size before anything follows it, or the next read
+  // takes the new chunk for part of it.
+  if(last.clamped && !d->isLongForm) {
+    insert(ByteVector::fromUInt(static_cast<unsigned int>(last.size), d->endianness == BigEndian),
+           last.offset - 4, 4);
+    last.clamped = false;
+  }
+
+  // Adjust the padding of the last chunk to place the new chunk at even position.
 
   offset_t offset = last.offset + last.size + last.padding;
   if(offset & 1) {
@@ -386,13 +396,19 @@ void RIFF::File::read()
         : static_cast<long long>(d->dataSize64);
     }
 
+    bool clamped = false;
     if(chunkSize > static_cast<long long>(available)) {
-      // Clamp to available bytes rather than rejecting the chunk outright.
-      // Some encoders write a correct data chunk but with a slightly too-large
-      // declared size, or place the data chunk outside the declared RIFF boundary.
-      // Lenient parsers (ffmpeg, QuickTime) handle this by clamping; we do the same.
+      // Some encoders write a correct audio chunk with a slightly too-large declared
+      // size, or place it outside the declared RIFF boundary. Lenient parsers (ffmpeg,
+      // QuickTime) clamp it to the available bytes; we do the same. Any other chunk
+      // running past the end is trailing data, such as an APE tag, and not a chunk.
+      if(chnkName != (bigEndian ? "SSND" : "data")) {
+        debug("RIFF::File::read() -- Chunk '" + chnkName + "' has invalid size (larger than the file size)");
+        break;
+      }
       debug("RIFF::File::read() -- Chunk '" + chnkName + "' is truncated; clamping size to available bytes.");
-      chunkSize = length() - offset - 8;
+      chunkSize = available;
+      clamped = true;
     }
 
     Chunk chunk;
@@ -400,6 +416,7 @@ void RIFF::File::read()
     chunk.size    = static_cast<offset_t>(chunkSize);
     chunk.offset  = offset + 8;
     chunk.padding = 0;
+    chunk.clamped = clamped;
 
     offset = chunk.offset + chunk.size;
 

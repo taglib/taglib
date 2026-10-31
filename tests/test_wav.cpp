@@ -29,6 +29,7 @@
 #include <cstdio>
 
 #include "taglib_config.h"
+#include "apetag.h"
 #include "tcharset.h"
 #include "id3v2tag.h"
 #include "infotag.h"
@@ -356,6 +357,8 @@ class TestWAV : public CppUnit::TestFixture
   CPPUNIT_TEST(testFuzzedFile1);
   CPPUNIT_TEST(testFuzzedFile2);
   CPPUNIT_TEST(testFileWithGarbageAppended);
+  CPPUNIT_TEST(testTrailingAPETagIsNotAChunk);
+  CPPUNIT_TEST(testSaveAfterOversizedDataChunk);
   CPPUNIT_TEST(testStripAndProperties);
   CPPUNIT_TEST(testPCMWithFactChunk);
   CPPUNIT_TEST(testWaveFormatExtensible);
@@ -1215,7 +1218,7 @@ public:
     {
       FileStream stream(copy.fileName().c_str());
       stream.seek(0, IOStream::End);
-      constexpr char garbage[] = "\r2345678";
+      constexpr char garbage[] = "12345678";
       stream.writeBlock(ByteVector(garbage, sizeof(garbage) - 1));
       stream.seek(0);
       contentsBeforeModification = stream.readBlock(stream.length());
@@ -1235,6 +1238,66 @@ public:
       FileStream stream(copy.fileName().c_str());
       ByteVector contentsAfterModification = stream.readBlock(stream.length());
       CPPUNIT_ASSERT_EQUAL(contentsBeforeModification, contentsAfterModification);
+    }
+  }
+
+  void testTrailingAPETagIsNotAChunk()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    APE::Tag ape;
+    ape.setTitle("APE Title");
+    const ByteVector apeData = ape.render();
+    {
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(0, IOStream::End);
+      stream.writeBlock(apeData);
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("INFO Title"), f.InfoTag()->title());
+    }
+    {
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(-static_cast<offset_t>(apeData.size()), IOStream::End);
+      CPPUNIT_ASSERT_EQUAL(apeData, stream.readBlock(apeData.size()));
+    }
+  }
+
+  void testSaveAfterOversizedDataChunk()
+  {
+    ScopedFileCopy copy("empty", ".wav");
+    {
+      // empty.wav ends with its "data" chunk; declare 100 bytes more than it holds.
+      FileStream stream(copy.fileName().c_str());
+      stream.seek(40);
+      const unsigned int dataSize = stream.readBlock(4).toUInt(false);
+      stream.seek(40);
+      stream.writeBlock(ByteVector::fromUInt(dataSize + 100, false));
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      f.ID3v2Tag()->setTitle("ID3v2 Title");
+      f.InfoTag()->setTitle("INFO Title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      RIFF::WAV::File f(copy.fileName().c_str());
+      CPPUNIT_ASSERT(f.isValid());
+      CPPUNIT_ASSERT_EQUAL(String("ID3v2 Title"), f.ID3v2Tag()->title());
+      CPPUNIT_ASSERT_EQUAL(String("INFO Title"), f.InfoTag()->title());
+      RIFF::WAV::File original(TEST_FILE_PATH_C("empty.wav"));
+      CPPUNIT_ASSERT_EQUAL(original.audioProperties()->lengthInMilliseconds(),
+                           f.audioProperties()->lengthInMilliseconds());
     }
   }
 
