@@ -60,6 +60,9 @@
 #ifdef TAGLIB_WITH_MOD
 #include "xmfile.h"
 #endif
+#ifdef TAGLIB_WITH_MATROSKA
+#include "matroskafile.h"
+#endif
 #ifdef TAGLIB_WITH_DSF
 #include "dsffile.h"
 #include "dsdifffile.h"
@@ -141,6 +144,9 @@ class TestFileRef : public CppUnit::TestFixture
 #ifdef TAGLIB_WITH_DSF
   CPPUNIT_TEST(testDSF);
   CPPUNIT_TEST(testDSDIFF);
+#endif
+#ifdef TAGLIB_WITH_MATROSKA
+  CPPUNIT_TEST(testMatroskaWithOtherExtension);
 #endif
   CPPUNIT_TEST_SUITE_END();
 
@@ -400,6 +406,31 @@ public:
   void testDSDIFF()
   {
     fileRefSave<DSDIFF::File>("empty10ms",".dff");
+  }
+#endif
+
+#ifdef TAGLIB_WITH_MATROSKA
+  void testMatroskaWithOtherExtension()
+  {
+    // The parsers for these extensions reject Matroska, so the file is found
+    // by content detection after a failed parse.
+    for(const char *ext : { ".flac", ".m4a" }) {
+      ScopedFileCopy copy("no-tags", ".mka");
+      const string newname = copy.fileName() + ext;
+      CPPUNIT_ASSERT_EQUAL(0, std::rename(copy.fileName().c_str(), newname.c_str()));
+      {
+        FileRef f(newname.c_str());
+        CPPUNIT_ASSERT(dynamic_cast<Matroska::File *>(f.file()));
+        CPPUNIT_ASSERT(!f.isNull());
+      }
+      {
+        FileStream s(newname.c_str());
+        FileRef f(&s);
+        CPPUNIT_ASSERT(dynamic_cast<Matroska::File *>(f.file()));
+        CPPUNIT_ASSERT(!f.isNull());
+      }
+      deleteFile(newname);
+    }
   }
 #endif
 
