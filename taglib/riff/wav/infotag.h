@@ -242,6 +242,10 @@ namespace TagLib {
        * a CSET chunk from one holding ISO 8859-1, because all three look the same on
        * disk. This is where the caller says which of them its files hold.
        *
+       * An assumed UTF-8 is still only a hint: a field whose bytes are not valid UTF-8
+       * is read as ISO 8859-1 instead. A code page the file declares is never second
+       * guessed this way.
+       *
        * \note This is a process wide setting, like setStringHandler(), and applies to
        * the tags read after the call. It never overrides a code page a file declares
        * itself, not even one this library has no table for.
