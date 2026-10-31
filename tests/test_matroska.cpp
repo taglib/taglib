@@ -168,7 +168,7 @@ namespace {
   {
     if(offset >= data.size())
       return 0;
-    const auto first = static_cast<unsigned char>(data[offset]);
+    const auto first = static_cast<unsigned char>(data[static_cast<int>(offset)]);
     int length = 1;
     while(length <= 8 && !(first & (0x80 >> (length - 1))))
       ++length;
@@ -176,7 +176,7 @@ namespace {
       return 0;
     value = first & ((0x80 >> (length - 1)) - 1);
     for(int i = 1; i < length; ++i)
-      value = (value << 8) | static_cast<unsigned char>(data[offset + i]);
+      value = (value << 8) | static_cast<unsigned char>(data[static_cast<int>(offset) + i]);
     return length;
   }
 
