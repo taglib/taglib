@@ -639,7 +639,9 @@ namespace TagLib {
     ByteVector toBase64() const;
 
     /*!
-     * Decodes the base64 encoded byte vector.
+     * Decodes the base64 encoded byte vector.  Whitespace (space, tab, CR and
+     * LF), e.g. from line wrapped input, is ignored.  Returns an empty byte
+     * vector if the input contains other invalid characters.
      *
      * \see toBase64()
      */
