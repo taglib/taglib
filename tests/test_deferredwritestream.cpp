@@ -126,7 +126,7 @@ public:
         const long long length = reference.length();
 
         // Weighted so most of the original content survives to be moved by the commit.
-        const unsigned int kind = random() % 20;
+        const auto kind = random() % 20;
         if(kind < 6) {
           const long long at = below(length + 16);
           const ByteVector data = bytes(1 + below(300));
