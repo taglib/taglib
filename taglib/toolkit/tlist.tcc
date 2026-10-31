@@ -24,6 +24,7 @@
  ***************************************************************************/
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 
 namespace TagLib {
@@ -43,6 +44,22 @@ class ListPrivateBase
 {
 public:
   bool autoDelete{};
+
+  // If the standard library checks indices in std::vector::operator[], e.g.
+  // with _GLIBCXX_ASSERTIONS or a libc++ hardening mode, List::operator[]
+  // is checked too.
+  static void checkIndex(unsigned int i, size_t size)
+  {
+#if defined(_GLIBCXX_ASSERTIONS) || \
+    (defined(_LIBCPP_HARDENING_MODE) && \
+     _LIBCPP_HARDENING_MODE != _LIBCPP_HARDENING_MODE_NONE)
+    if(i >= size)
+      std::abort();
+#else
+    static_cast<void>(i);
+    static_cast<void>(size);
+#endif
+  }
 };
 
 // A generic implementation
@@ -289,6 +306,7 @@ T &List<T>::back()
 template <class T>
 T &List<T>::operator[](unsigned int i)
 {
+  ListPrivateBase::checkIndex(i, d->list.size());
   auto it = d->list.begin();
   std::advance(it, i);
 
@@ -298,6 +316,7 @@ T &List<T>::operator[](unsigned int i)
 template <class T>
 const T &List<T>::operator[](unsigned int i) const
 {
+  ListPrivateBase::checkIndex(i, d->list.size());
   auto it = d->list.begin();
   std::advance(it, i);
 
