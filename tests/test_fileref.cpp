@@ -148,6 +148,18 @@ class TestFileRef : public CppUnit::TestFixture
 #ifdef TAGLIB_WITH_MATROSKA
   CPPUNIT_TEST(testMatroskaWithOtherExtension);
 #endif
+  CPPUNIT_TEST(testOtherFormatsWithMPEGExtension);
+  CPPUNIT_TEST(testEmptyFileWithMPEGExtension);
+  CPPUNIT_TEST(testMPEGInWaveWithMPEGExtension);
+#ifdef TAGLIB_WITH_VORBIS
+  CPPUNIT_TEST(testFLACWithMPEGExtensionSave);
+#endif
+#ifdef TAGLIB_WITH_APE
+  CPPUNIT_TEST(testOtherFormatsWithAPEExtensions);
+#endif
+#ifdef TAGLIB_WITH_RIFF
+  CPPUNIT_TEST(testOtherFormatsWithRIFFExtensions);
+#endif
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -431,6 +443,133 @@ public:
       }
       deleteFile(newname);
     }
+  }
+#endif
+
+  template <typename T>
+  void fileRefWithOtherExtension(const string &filename, const string &ext,
+                                 const string &otherExt)
+  {
+    ScopedFileCopy copy(filename, ext);
+    const string newname = copy.fileName() + otherExt;
+    CPPUNIT_ASSERT_EQUAL(0, std::rename(copy.fileName().c_str(), newname.c_str()));
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<T *>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+    }
+    {
+      FileStream s(newname.c_str());
+      FileRef f(&s);
+      CPPUNIT_ASSERT(dynamic_cast<T *>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+    }
+    deleteFile(newname);
+  }
+
+  void testOtherFormatsWithMPEGExtension()
+  {
+#ifdef TAGLIB_WITH_MP4
+    fileRefWithOtherExtension<MP4::File>("has-tags", ".m4a", ".mp3");
+    {
+      ScopedFileCopy copy("has-tags", ".m4a");
+      const string newname = copy.fileName() + ".mp3";
+      CPPUNIT_ASSERT_EQUAL(0, std::rename(copy.fileName().c_str(), newname.c_str()));
+      {
+        FileRef f(newname.c_str());
+        CPPUNIT_ASSERT(!f.tag()->isEmpty());
+      }
+      deleteFile(newname);
+    }
+#endif
+#ifdef TAGLIB_WITH_VORBIS
+    fileRefWithOtherExtension<FLAC::File>("no-tags", ".flac", ".mp3");
+#endif
+#ifdef TAGLIB_WITH_TRUEAUDIO
+    fileRefWithOtherExtension<TrueAudio::File>("tagged", ".tta", ".aac");
+#endif
+  }
+
+  void testEmptyFileWithMPEGExtension()
+  {
+    ScopedFileCopy copy("xing", ".mp3");
+    const string name = copy.fileName();
+    std::ofstream(name.c_str(), std::ios::binary | std::ios::trunc).close();
+    {
+      FileRef f(name.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()));
+      CPPUNIT_ASSERT(!f.isNull());
+      f.tag()->setTitle("test title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      FileRef f(name.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()));
+      CPPUNIT_ASSERT_EQUAL(String("test title"), f.tag()->title());
+    }
+  }
+
+  void testMPEGInWaveWithMPEGExtension()
+  {
+    // Only the MPEG parser reads the ID3v1 tag appended after the RIFF data.
+    ScopedFileCopy copy("mpeg-in-wave", ".wav");
+    const string newname = copy.fileName() + ".mp3";
+    CPPUNIT_ASSERT_EQUAL(0, std::rename(copy.fileName().c_str(), newname.c_str()));
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()));
+      CPPUNIT_ASSERT_EQUAL(String("RIFF MP3 Title"), f.tag()->title());
+    }
+    {
+      FileStream s(newname.c_str());
+      FileRef f(&s);
+      CPPUNIT_ASSERT(dynamic_cast<MPEG::File *>(f.file()));
+      CPPUNIT_ASSERT_EQUAL(String("RIFF MP3 Title"), f.tag()->title());
+    }
+    deleteFile(newname);
+  }
+
+#ifdef TAGLIB_WITH_VORBIS
+  void testFLACWithMPEGExtensionSave()
+  {
+    ScopedFileCopy copy("no-tags", ".flac");
+    const string newname = copy.fileName() + ".mp3";
+    CPPUNIT_ASSERT_EQUAL(0, std::rename(copy.fileName().c_str(), newname.c_str()));
+    {
+      FileRef f(newname.c_str());
+      f.tag()->setTitle("test title");
+      CPPUNIT_ASSERT(f.save());
+    }
+    {
+      FileStream s(newname.c_str());
+      CPPUNIT_ASSERT_EQUAL(ByteVector("fLaC"), s.readBlock(4));
+    }
+    {
+      FileRef f(newname.c_str());
+      CPPUNIT_ASSERT(dynamic_cast<FLAC::File *>(f.file()));
+      CPPUNIT_ASSERT_EQUAL(String("test title"), f.tag()->title());
+    }
+    deleteFile(newname);
+  }
+#endif
+
+#ifdef TAGLIB_WITH_APE
+  void testOtherFormatsWithAPEExtensions()
+  {
+    fileRefWithOtherExtension<WavPack::File>("click", ".wv", ".mpc");
+    fileRefWithOtherExtension<MPC::File>("click", ".mpc", ".ape");
+    fileRefWithOtherExtension<APE::File>("mac-399", ".ape", ".wv");
+#ifdef TAGLIB_WITH_TRUEAUDIO
+    fileRefWithOtherExtension<WavPack::File>("click", ".wv", ".tta");
+#endif
+  }
+#endif
+
+#ifdef TAGLIB_WITH_RIFF
+  void testOtherFormatsWithRIFFExtensions()
+  {
+    fileRefWithOtherExtension<RIFF::AIFF::File>("noise", ".aif", ".wav");
+    fileRefWithOtherExtension<RIFF::WAV::File>("empty", ".wav", ".aif");
   }
 #endif
 
