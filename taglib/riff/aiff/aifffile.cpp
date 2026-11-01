@@ -36,7 +36,8 @@ class RIFF::AIFF::File::FilePrivate
 public:
   FilePrivate(const ID3v2::FrameFactory *frameFactory)
         : ID3v2FrameFactory(frameFactory ? frameFactory
-                                         : ID3v2::FrameFactory::instance())
+                                         : ID3v2::FrameFactory::instance()),
+          nativeTag(std::make_unique<RIFF::AIFF::NativeTag>())
   {
   }
 
@@ -45,8 +46,10 @@ public:
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   std::unique_ptr<Properties> properties;
   std::unique_ptr<ID3v2::Tag> tag;
+  std::unique_ptr<RIFF::AIFF::NativeTag> nativeTag;
 
   bool hasID3v2 { false };
+  bool hasNative { false };
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +91,11 @@ RIFF::AIFF::File::~File() = default;
 ID3v2::Tag *RIFF::AIFF::File::tag() const
 {
   return d->tag.get();
+}
+
+RIFF::AIFF::NativeTag *RIFF::AIFF::File::nativeTag() const
+{
+  return d->nativeTag.get();
 }
 
 PropertyMap RIFF::AIFF::File::properties() const
@@ -138,6 +146,16 @@ bool RIFF::AIFF::File::save(ID3v2::Version version)
     d->hasID3v2 = true;
   }
 
+  d->hasNative = false;
+  for(const auto &[id, payload] : d->nativeTag->render()) {
+    if(payload.isEmpty())
+      removeChunk(id);
+    else {
+      setChunkData(id, payload);
+      d->hasNative = true;
+    }
+  }
+
   return true;
 }
 
@@ -146,12 +164,19 @@ bool RIFF::AIFF::File::hasID3v2Tag() const
   return d->hasID3v2;
 }
 
+bool RIFF::AIFF::File::hasNativeTag() const
+{
+  return d->hasNative;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
 void RIFF::AIFF::File::read(bool readProperties)
 {
+  NativeTag::FieldDataMap nativeFields;
+
   for(unsigned int i = 0; i < chunkCount(); ++i) {
     if(const ByteVector name = chunkName(i); name == "ID3 " || name == "id3 ") {
       if(!d->tag) {
@@ -163,10 +188,19 @@ void RIFF::AIFF::File::read(bool readProperties)
         debug("RIFF::AIFF::File::read() - Duplicate ID3v2 tag found.");
       }
     }
+    else if(NativeTag::isNativeField(name)) {
+      if(nativeFields.contains(name))
+        debug("RIFF::AIFF::File::read() - Duplicate native field found.");
+      else
+        nativeFields[name] = chunkData(i);
+    }
   }
 
   if(!d->tag)
     d->tag = std::make_unique<ID3v2::Tag>(nullptr, 0, d->ID3v2FrameFactory);
+
+  d->hasNative = !nativeFields.isEmpty();
+  d->nativeTag = std::make_unique<NativeTag>(nativeFields);
 
   if(readProperties)
     d->properties = std::make_unique<Properties>(this, Properties::Average);

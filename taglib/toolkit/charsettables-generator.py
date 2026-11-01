@@ -89,6 +89,10 @@ PAGES = [
     (1147,  "EBCDIC1147",  "IBM297 EBCDIC France with Euro",              "CP1147"),
     (1148,  "EBCDIC1148",  "IBM500 EBCDIC International with Euro",       "CP1148"),
     (1149,  "EBCDIC1149",  "IBM871 EBCDIC Icelandic with Euro",           "CP1149"),
+
+    # Not a Windows ANSI page, but a Microsoft code page number all the same:
+    # 10000 is what Windows calls Mac OS Roman, the classic Macintosh charset.
+    (10000, "MacRoman",    "Mac OS Roman",                                "MACINTOSH"),
 ]
 
 def via_iconv(name):

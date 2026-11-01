@@ -175,6 +175,7 @@ if(WITH_RIFF)
   set(tag_HDRS ${tag_HDRS}
     riff/rifffile.h
     riff/aiff/aifffile.h
+    riff/aiff/aiffnativetag.h
     riff/aiff/aiffproperties.h
     riff/wav/wavfile.h
     riff/wav/wavproperties.h
@@ -412,6 +413,7 @@ if(WITH_RIFF)
 
   set(aiff_SRCS
     riff/aiff/aifffile.cpp
+    riff/aiff/aiffnativetag.cpp
     riff/aiff/aiffproperties.cpp
   )
 
