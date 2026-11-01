@@ -59,6 +59,46 @@ namespace
   constexpr unsigned int MAX_ID3V2_FRAME_COUNT = 50000;
 
   /*!
+   * Sets \a values as the value of \a frame, the only frame holding \a key,
+   * if its type can hold them, keeping its other fields.
+   * \return false, leaving \a frame unchanged, if it cannot.
+   */
+  bool updateFrameInPlace(ID3v2::Frame *frame, const String &key, const StringList &values)
+  {
+    if(auto f = dynamic_cast<ID3v2::UserTextIdentificationFrame *>(frame)) {
+      f->setText(values);
+      return true;
+    }
+    if(auto f = dynamic_cast<ID3v2::TextIdentificationFrame *>(frame)) {
+      if(ID3v2::Frame::keyToFrameID(key) != frame->frameID())
+        return false;
+      f->setText(values);
+      return true;
+    }
+    if(values.size() != 1)
+      return false;
+    if(auto f = dynamic_cast<ID3v2::CommentsFrame *>(frame)) {
+      f->setText(values.front());
+      return true;
+    }
+    if(auto f = dynamic_cast<ID3v2::UnsynchronizedLyricsFrame *>(frame)) {
+      f->setText(values.front());
+      return true;
+    }
+    if(auto f = dynamic_cast<ID3v2::UserUrlLinkFrame *>(frame)) {
+      f->setUrl(values.front());
+      return true;
+    }
+    if(auto f = dynamic_cast<ID3v2::UrlLinkFrame *>(frame)) {
+      if(ID3v2::Frame::keyToFrameID(key) != frame->frameID())
+        return false;
+      f->setUrl(values.front());
+      return true;
+    }
+    return false;
+  }
+
+  /*!
    * Downgrade ID3v2.4 text \a encoding to value supported by ID3v2.3.
    */
   String::Type downgradeTextEncoding(String::Type encoding)
@@ -437,9 +477,13 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
   // languages), whose values properties() merges in frame order. Keep all of
   // them if the requested values are the merged ones.
   PropertyMap spreadProperties;
+  Map<String, unsigned int> framesPerKey;
   for(const auto &frame : std::as_const(frameList())) {
     if(const ByteVector id = frame->frameID(); id != "TIPL" && id != "TMCL") {
-      if(PropertyMap frameProperties = frame->asProperties(); frameProperties.size() == 1)
+      PropertyMap frameProperties = frame->asProperties();
+      for(const auto &[key, values] : std::as_const(frameProperties))
+        framesPerKey[key] += 1;
+      if(frameProperties.size() == 1)
         spreadProperties.merge(frameProperties);
     }
   }
@@ -467,8 +511,19 @@ PropertyMap ID3v2::Tag::setProperties(const PropertyMap &origProps)
       }
       else if(frameProperties.size() == 1 && keptKeys.contains(frameProperties.begin()->first))
         continue;
-      else if(!singleFrameProperties.contains(frameProperties))
+      else if(!singleFrameProperties.contains(frameProperties)) {
+        // The only frame holding an edited key keeps its other fields if it can hold the new value.
+        if(frameProperties.size() == 1) {
+          const String &key = frameProperties.begin()->first;
+          if(framesPerKey[key] == 1 && singleFrameProperties.contains(key) &&
+             !singleFrameProperties[key].isEmpty() &&
+             updateFrameInPlace(frame, key, singleFrameProperties[key])) {
+            singleFrameProperties.erase(key);
+            continue;
+          }
+        }
         framesToDelete.append(frame);
+      }
       else
         singleFrameProperties.erase(frameProperties);
     }
