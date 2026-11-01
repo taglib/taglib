@@ -628,6 +628,18 @@ public:
       CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(invalid));
     }
 
+    // Skip whitespace, as in line wrapped input
+    {
+      CPPUNIT_ASSERT_EQUAL(s1,ByteVector::fromBase64("YW55IGNhcm5h\nbCBwbGVhc3VyZS4="));
+      CPPUNIT_ASSERT_EQUAL(s1,ByteVector::fromBase64("YW55IGNhcm5hbCBw\r\nbGVhc3VyZS4=\r\n"));
+      CPPUNIT_ASSERT_EQUAL(s3,ByteVector::fromBase64(" YW55 IGNh\tcm5hbCBwbGVhc3Vy\n"));
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64(" \r\n\t"));
+
+      // Whitespace does not make otherwise invalid input valid
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64("YW55\nIGNh-cm5hbCBwbGVhc3VyZS4="));
+      CPPUNIT_ASSERT_EQUAL(sempty,ByteVector::fromBase64("YW55IGNhcm5hbCBwbGVhc3VyZQ=\n"));
+    }
+
   }
 
   void testEmpty()
