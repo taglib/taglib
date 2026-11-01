@@ -28,6 +28,8 @@
 #include <memory>
 #include <utility>
 
+#include <utf8.h>
+
 #include "tcharset.h"
 #include "tbytevector.h"
 #include "tdebug.h"
@@ -102,6 +104,9 @@ public:
   //! the default.
   Charset::Type charset { Charset::Type::Latin1 };
 
+  //! Whether the charset comes from setAssumedCodePage() rather than the file.
+  bool charsetAssumed { false };
+
   String parseField(const ByteVector &data) const
   {
     // A handler the user installed with setStringHandler() is an explicit
@@ -109,6 +114,13 @@ public:
     // handler installed the field is decoded with the charset.
     if(stringHandler != &defaultStringHandler)
       return stringHandler->parse(data);
+
+    // An assumed UTF-8 is a hint: a field that is not valid UTF-8 contradicts
+    // it and falls back to the RIFF default rather than decoding as empty.
+    if(charsetAssumed && charset == Charset::Type::UTF8 &&
+       !utf8::is_valid(data.begin(), data.end()))
+      return decodeField(data, Charset::Type::Latin1);
+
     return decodeField(data, charset);
   }
 };
@@ -148,6 +160,7 @@ RIFF::Info::Tag::Tag(const ByteVector &data, unsigned int codePage) :
   d(std::make_unique<TagPrivate>())
 {
   d->charset = charsetForCodePage(codePage);
+  d->charsetAssumed = codePage == 0 && codePageAssumed != 0;
   parse(data);
 }
 
