@@ -31,6 +31,7 @@
 #include "tstring.h"
 #include "tpropertymap.h"
 #include "mpegfile.h"
+#include "tbytevectorstream.h"
 #include "id3v2tag.h"
 #include "id3v1tag.h"
 #ifdef TAGLIB_WITH_APE
@@ -74,6 +75,7 @@ class TestMPEG : public CppUnit::TestFixture
   CPPUNIT_TEST(testEmptyAPE);
 #endif
   CPPUNIT_TEST(testIgnoreGarbage);
+  CPPUNIT_TEST(testFrameSearchThroughJunk);
   CPPUNIT_TEST(testExtendedHeader);
   CPPUNIT_TEST(testReadStyleFast);
   CPPUNIT_TEST(testID3v22Properties);
@@ -575,6 +577,37 @@ public:
       CPPUNIT_ASSERT(f.hasID3v2Tag());
       CPPUNIT_ASSERT_EQUAL(String("Title B"), f.ID3v2Tag()->title());
     }
+  }
+
+  void testFrameSearchThroughJunk()
+  {
+    // 100 MPEG-1 Layer III frames, 128 kbps at 44.1 kHz: 417 bytes each, no
+    // padding and no Xing header, so the length comes from the frame search.
+    ByteVector frames;
+    for(int i = 0; i < 100; ++i)
+      frames.append(ByteVector("\xff\xfb\x90\x00", 4) + ByteVector(413, '\0'));
+    const ByteVector junk(1024 * 1024, '\0');
+
+    ByteVectorStream cleanStream(frames);
+    MPEG::File clean(&cleanStream);
+    CPPUNIT_ASSERT(clean.isValid());
+    CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(0), clean.firstFrameOffset());
+    CPPUNIT_ASSERT(clean.audioProperties()->lengthInMilliseconds() > 0);
+
+    ByteVectorStream tailStream(frames + junk);
+    MPEG::File tail(&tailStream);
+    CPPUNIT_ASSERT_EQUAL(clean.firstFrameOffset(), tail.firstFrameOffset());
+    CPPUNIT_ASSERT_EQUAL(clean.lastFrameOffset(), tail.lastFrameOffset());
+    CPPUNIT_ASSERT_EQUAL(clean.audioProperties()->lengthInMilliseconds(),
+                         tail.audioProperties()->lengthInMilliseconds());
+
+    ByteVectorStream leadStream(junk + frames);
+    MPEG::File lead(&leadStream);
+    const auto shift = static_cast<offset_t>(junk.size());
+    CPPUNIT_ASSERT_EQUAL(clean.firstFrameOffset() + shift, lead.firstFrameOffset());
+    CPPUNIT_ASSERT_EQUAL(clean.lastFrameOffset() + shift, lead.lastFrameOffset());
+    CPPUNIT_ASSERT_EQUAL(clean.audioProperties()->lengthInMilliseconds(),
+                         lead.audioProperties()->lengthInMilliseconds());
   }
 
   void testExtendedHeader()
