@@ -25,6 +25,7 @@
 
 #include "aifffile.h"
 
+#include "aiffnativetag.h"
 #include "tdebug.h"
 #include "tpropertymap.h"
 #include "tagutils.h"
@@ -37,7 +38,7 @@ public:
   FilePrivate(const ID3v2::FrameFactory *frameFactory)
         : ID3v2FrameFactory(frameFactory ? frameFactory
                                          : ID3v2::FrameFactory::instance()),
-          nativeTag(std::make_unique<RIFF::AIFF::NativeTag>())
+          nativeTag(std::make_unique<NativeTag>())
   {
   }
 
@@ -46,7 +47,7 @@ public:
   const ID3v2::FrameFactory *ID3v2FrameFactory;
   std::unique_ptr<Properties> properties;
   std::unique_ptr<ID3v2::Tag> tag;
-  std::unique_ptr<RIFF::AIFF::NativeTag> nativeTag;
+  std::unique_ptr<NativeTag> nativeTag;
 
   bool hasID3v2 { false };
   bool hasNative { false };

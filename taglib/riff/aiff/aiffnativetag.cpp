@@ -29,7 +29,6 @@
 #include "tdebug.h"
 #include "tutils.h"
 #include "tpropertymap.h"
-#include "riffutils.h"
 
 using namespace TagLib;
 using namespace RIFF::AIFF;

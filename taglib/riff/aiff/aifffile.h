@@ -29,7 +29,6 @@
 #include "rifffile.h"
 #include "id3v2tag.h"
 #include "aiffproperties.h"
-#include "aiffnativetag.h"
 
 namespace TagLib {
 
@@ -42,11 +41,13 @@ namespace TagLib {
      *
      * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
      * chunk as well as properties from the file, and the native text fields
-     * (NAME, AUTH, "(c) ", ANNO) an AIFF file carried before ID3v1 existed,
+     * (NAME, AUTH, "(c) ", ANNO) an AIFF file carried before ID3v2 existed,
      * which are reached through nativeTag().
      */
 
     namespace AIFF {
+
+      class NativeTag;
 
       //! An implementation of TagLib::File with AIFF specific methods
 
@@ -129,7 +130,9 @@ namespace TagLib {
         Properties *audioProperties() const override;
 
         /*!
-         * Saves the file: the ID3v2 tag is written back to its chunk, and each
+         * Saves the file.
+         *
+         * The ID3v2 tag is written back to its chunk, and each
          * native field that holds text is written to its own chunk, encoded
          * with the charset the native tag was read with, while a native field
          * that holds none loses its chunk.
@@ -160,7 +163,7 @@ namespace TagLib {
 
         /*!
          * Returns the native text tag for this file: the NAME, AUTH, "(c) "
-         * and ANNO chunks an AIFF file held before ID3v1 existed.
+         * and ANNO chunks an AIFF file held before ID3v2 existed.
          *
          * \note This always returns a valid pointer regardless of whether or
          * not the file on disk has native text chunks.  Use hasNativeTag() to

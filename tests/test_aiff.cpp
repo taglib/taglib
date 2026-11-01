@@ -30,6 +30,7 @@
 #include "tag.h"
 #include "taglib_config.h"
 #include "aifffile.h"
+#include "aiffnativetag.h"
 #include "tbytevectorstream.h"
 #include "tpropertymap.h"
 #include <cppunit/extensions/HelperMacros.h>
@@ -245,7 +246,7 @@ public:
 
   void testNativeFields()
   {
-    // The four text chunks of a file that predates ID3v1.
+    // The four text chunks of a file that predates ID3v2.
     RIFF::AIFF::File f(TEST_FILE_PATH_C("alaw.aifc"));
     CPPUNIT_ASSERT(f.hasNativeTag());
     CPPUNIT_ASSERT(!f.nativeTag()->isEmpty());
