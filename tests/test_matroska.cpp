@@ -219,6 +219,7 @@ class TestMatroska : public CppUnit::TestFixture
   CPPUNIT_TEST(testPropertiesMka);
   CPPUNIT_TEST(testPropertiesMkv);
   CPPUNIT_TEST(testPropertiesWebm);
+  CPPUNIT_TEST(testPropertiesAudioDefaults);
   CPPUNIT_TEST(testSimpleTagsAndAttachments);
   CPPUNIT_TEST(testAddRemoveTagsAttachments);
   CPPUNIT_TEST(testTagsWebm);
@@ -289,6 +290,27 @@ public:
 
     Matroska::File noProps(TEST_FILE_PATH_C("no-tags.webm"), false);
     CPPUNIT_ASSERT(!noProps.audioProperties());
+  }
+
+  void testPropertiesAudioDefaults()
+  {
+    // no-tags.mka's Audio element holds SamplingFrequency (44100) and Channels (2).
+    // Replaced by Void elements of the same size, they are absent, and their
+    // defaults apply.
+    ScopedFileCopy copy("no-tags", ".mka");
+    {
+      FileStream stream(copy.fileName().c_str());
+      const ByteVector audio("\xe1\x89\xb5\x84\x47\x2c\x44\x00\x9f\x81\x02", 11);
+      const offset_t offset = stream.readBlock(stream.length()).find(audio);
+      CPPUNIT_ASSERT(offset > 0);
+      stream.seek(offset + 2);
+      stream.writeBlock(ByteVector("\xec\x84\x00\x00\x00\x00\xec\x81\x00", 9));
+    }
+    Matroska::File f(copy.fileName().c_str());
+    CPPUNIT_ASSERT(f.audioProperties());
+    CPPUNIT_ASSERT_EQUAL(8000, f.audioProperties()->sampleRate());
+    CPPUNIT_ASSERT_EQUAL(1, f.audioProperties()->channels());
+    CPPUNIT_ASSERT_EQUAL(String("A_MPEG/L3"), f.audioProperties()->codecName());
   }
 
   void testSimpleTagsAndAttachments()
