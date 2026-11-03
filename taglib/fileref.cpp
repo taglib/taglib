@@ -38,6 +38,7 @@
 #include "tstringlist.h"
 #include "tvariant.h"
 #include "tdebug.h"
+#include "tagutils.h"
 #include "mpegfile.h"
 #ifdef TAGLIB_WITH_RIFF
 #include "aifffile.h"
@@ -130,6 +131,46 @@ namespace
     return nullptr;
   }
 
+  File *detectByContent(IOStream *stream, bool readAudioProperties,
+                        AudioProperties::ReadStyle audioPropertiesStyle);
+
+  // Some extension-based parsers accept the content of another format as valid.
+  // They are only used when content-based detection finds nothing, so the stream
+  // is rewound for them.
+
+  File *detectByContentAndRewind(IOStream *stream, bool readAudioProperties,
+                                 AudioProperties::ReadStyle audioPropertiesStyle)
+  {
+    File *file = detectByContent(stream, readAudioProperties, audioPropertiesStyle);
+    stream->seek(0);
+    return file;
+  }
+
+  // MPEG has no signature of its own, so a file named as MPEG is checked for
+  // another container's signature instead, after any ID3v2 tag.
+
+  bool hasOtherContainerSignature(IOStream *stream)
+  {
+    static const ByteVector asfGuid("\x30\x26\xB2\x75\x8E\x66\xCF\x11"
+                                    "\xA6\xD9\x00\xAA\x00\x62\xCE\x6C", 16);
+    const ByteVector id = Utils::readHeader(stream, 24, true);
+
+    // A WAVE holding MPEG audio is read as MPEG, which also finds tags
+    // appended after the RIFF data.
+    if(id.startsWith("RIFF") && id.containsAt("WAVE", 8) && id.containsAt("fmt ", 12)) {
+      const unsigned short format = id.toUShort(20, false);
+      if(format == 0x0050 || format == 0x0055)
+        return false;
+    }
+
+    return id.startsWith("RIFF") || id.startsWith("RF64") || id.startsWith("BW64") ||
+           id.startsWith("FORM") || id.containsAt("ftyp", 4) || id.startsWith("fLaC") ||
+           id.startsWith("OggS") || id.startsWith("\x1A\x45\xDF\xA3") || id.startsWith(asfGuid) ||
+           id.startsWith("MAC ") || id.startsWith("wvpk") || id.startsWith("TTA") ||
+           id.startsWith("MPCK") || id.startsWith("MP+") || id.startsWith("DSD ") ||
+           id.startsWith("FRM8") || id.startsWith("ajkg");
+  }
+
   // Detect the file type based on the file extension.
 
   File* detectByExtension(IOStream *stream, bool readAudioProperties,
@@ -156,8 +197,12 @@ namespace
 
     File *file = nullptr;
 
-    if(ext == "MP3" || ext == "MP2" || ext == "AAC")
-      file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
+    if(ext == "MP3" || ext == "MP2" || ext == "AAC") {
+      if(hasOtherContainerSignature(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new MPEG::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 #ifdef TAGLIB_WITH_VORBIS
     else if(ext == "OGG")
       file = new Ogg::Vorbis::File(stream, readAudioProperties, audioPropertiesStyle);
@@ -177,16 +222,32 @@ namespace
       file = new Ogg::Opus::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef TAGLIB_WITH_APE
-    else if(ext == "MPC")
-      file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "WV")
-      file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "APE")
-      file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "MPC") {
+      if(!MPC::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new MPC::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
+    else if(ext == "WV") {
+      if(!WavPack::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new WavPack::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
+    else if(ext == "APE") {
+      if(!APE::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new APE::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 #endif
 #ifdef TAGLIB_WITH_TRUEAUDIO
-    else if(ext == "TTA")
-      file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "TTA") {
+      if(!TrueAudio::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new TrueAudio::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 #endif
 #ifdef TAGLIB_WITH_MP4
     else if(ext == "M4A" || ext == "M4R" || ext == "M4B" || ext == "M4P" || ext == "MP4" || ext == "3G2" || ext == "M4V")
@@ -197,10 +258,18 @@ namespace
       file = new ASF::File(stream, readAudioProperties, audioPropertiesStyle);
 #endif
 #ifdef TAGLIB_WITH_RIFF
-    else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC")
-      file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
-    else if(ext == "WAV")
-      file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
+    else if(ext == "AIF" || ext == "AIFF" || ext == "AFC" || ext == "AIFC") {
+      if(!RIFF::AIFF::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new RIFF::AIFF::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
+    else if(ext == "WAV") {
+      if(!RIFF::WAV::File::isSupported(stream))
+        file = detectByContentAndRewind(stream, readAudioProperties, audioPropertiesStyle);
+      if(!file)
+        file = new RIFF::WAV::File(stream, readAudioProperties, audioPropertiesStyle);
+    }
 #endif
 #ifdef TAGLIB_WITH_MOD
     // module, nst and wow are possible but uncommon extensions
