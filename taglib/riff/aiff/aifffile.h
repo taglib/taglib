@@ -40,10 +40,14 @@ namespace TagLib {
      * This is an implementation of AIFF metadata.
      *
      * This supports an ID3v2 tag as well as reading stream from the ID3 RIFF
-     * chunk as well as properties from the file.
+     * chunk as well as properties from the file, and the native text fields
+     * (NAME, AUTH, "(c) ", ANNO) an AIFF file carried before ID3v2 existed,
+     * which are reached through nativeTag().
      */
 
     namespace AIFF {
+
+      class NativeTag;
 
       //! An implementation of TagLib::File with AIFF specific methods
 
@@ -127,6 +131,13 @@ namespace TagLib {
 
         /*!
          * Saves the file.
+         *
+         * The ID3v2 tag is written back to its chunk, and each
+         * native field that holds text is written to its own chunk, encoded
+         * with the charset the native tag was read with, while a native field
+         * that holds none loses its chunk.
+         *
+         * \see nativeTag()
          */
         bool save() override;
 
@@ -149,6 +160,29 @@ namespace TagLib {
          * not necessarily be correct.
          */
         static bool isSupported(IOStream *stream);
+
+        /*!
+         * Returns the native text tag for this file: the NAME, AUTH, "(c) "
+         * and ANNO chunks an AIFF file held before ID3v2 existed.
+         *
+         * \note This always returns a valid pointer regardless of whether or
+         * not the file on disk has native text chunks.  Use hasNativeTag() to
+         * check if the file on disk actually has them.
+         *
+         * \note This is a separate tag next to the ID3v2 one tag() returns;
+         * neither covers the other's fields.
+         *
+         * \see hasNativeTag()
+         */
+        NativeTag *nativeTag() const;
+
+        /*!
+         * Returns whether or not the file on disk actually has native text
+         * chunks.
+         *
+         * \see nativeTag()
+         */
+        bool hasNativeTag() const;
 
       private:
         void read(bool readProperties);
