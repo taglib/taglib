@@ -134,8 +134,12 @@ T toNumber(const ByteVector &v, size_t offset, bool mostSignificantByteFirst)
   const bool isBigEndian = Utils::systemByteOrder() == Utils::BigEndian;
   const bool swap = mostSignificantByteFirst != isBigEndian;
 
-  if(offset + sizeof(T) > v.size())
-    return toNumber<T>(v, offset, v.size() - offset, mostSignificantByteFirst);
+  if(offset >= v.size())
+    return toNumber<T>(v, offset, 0, mostSignificantByteFirst);
+
+  const size_t remaining = v.size() - offset;
+  if(sizeof(T) > remaining)
+    return toNumber<T>(v, offset, remaining, mostSignificantByteFirst);
 
   // Uses memcpy instead of reinterpret_cast to avoid an alignment exception.
   T tmp;

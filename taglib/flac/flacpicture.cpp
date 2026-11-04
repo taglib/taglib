@@ -72,7 +72,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   pos += 4;
   unsigned int mimeTypeLength = data.toUInt(pos);
   pos += 4;
-  if(pos + mimeTypeLength + 24 > data.size()) {
+  if(mimeTypeLength > data.size() - pos - 24) {
     debug("Invalid picture block.");
     return false;
   }
@@ -80,7 +80,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   pos += mimeTypeLength;
   unsigned int descriptionLength = data.toUInt(pos);
   pos += 4;
-  if(pos + descriptionLength + 20 > data.size()) {
+  if(descriptionLength > data.size() - pos - 20) {
     debug("Invalid picture block.");
     return false;
   }
@@ -96,7 +96,7 @@ bool FLAC::Picture::parse(const ByteVector &data)
   pos += 4;
   unsigned int dataLength = data.toUInt(pos);
   pos += 4;
-  if(pos + dataLength > data.size()) {
+  if(dataLength > data.size() - pos) {
     debug("Invalid picture block.");
     return false;
   }
