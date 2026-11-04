@@ -27,6 +27,7 @@
 
 #include <cstring>
 
+#include "tdebug.h"
 #include "tstring.h"
 
 using namespace TagLib;
@@ -82,7 +83,15 @@ void ByteVectorStream::writeBlock(const ByteVector &data)
 
 void ByteVectorStream::insert(const ByteVector &data, offset_t start, size_t replace)
 {
-  offset_t sizeDiff = data.size() - replace;
+  const offset_t streamLength = length();
+  if(start < 0 || start > streamLength ||
+     replace > static_cast<size_t>(streamLength - start)) {
+    debug("ByteVectorStream::insert() -- replacement range is out of bounds");
+    return;
+  }
+
+  const offset_t sizeDiff = static_cast<offset_t>(data.size()) -
+                            static_cast<offset_t>(replace);
   if(sizeDiff < 0) {
     removeBlock(start + data.size(), -sizeDiff);
   }

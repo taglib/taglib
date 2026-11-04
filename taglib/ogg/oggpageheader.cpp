@@ -272,6 +272,13 @@ void Ogg::PageHeader::read(Ogg::File *file, offset_t pageOffset)
   else
     d->lastPacketCompleted = true;
 
+  const offset_t streamLength = file->length();
+  if(streamLength < 0 || pageOffset > streamLength ||
+     d->size + d->dataSize > streamLength - pageOffset) {
+    debug("Ogg::PageHeader::read() -- page data exceeds stream length");
+    return;
+  }
+
   d->isValid = true;
 }
 
