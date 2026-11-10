@@ -441,8 +441,11 @@ bool ByteVector::containsAt(const ByteVector &pattern, unsigned int offset, unsi
     patternLength = pattern.size();
 
   // do some sanity checking -- all of these things are needed for the search to be valid
+  if(patternLength == 0 || patternOffset >= patternLength || offset > size())
+    return false;
+
   const unsigned int compareLength = patternLength - patternOffset;
-  if(offset + compareLength > size() || patternOffset >= pattern.size() || patternLength == 0)
+  if(compareLength > size() - offset)
     return false;
 
   return ::memcmp(data() + offset, pattern.data() + patternOffset, compareLength) == 0;
@@ -455,7 +458,8 @@ bool ByteVector::startsWith(const ByteVector &pattern) const
 
 bool ByteVector::endsWith(const ByteVector &pattern) const
 {
-  return containsAt(pattern, size() - pattern.size());
+  return pattern.size() <= size() &&
+         containsAt(pattern, size() - pattern.size());
 }
 
 ByteVector &ByteVector::replace(char oldByte, char newByte)
