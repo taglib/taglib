@@ -1,0 +1,48 @@
+# Dictionary of format/container magic tokens for the round-trip fuzzer
+# (taglib_roundtrip_fuzzer). Its purpose is to keep mutations inside valid
+# containers while the harness derives tag strings from the payload.
+
+# Container magics
+"ID3"
+"fLaC"
+"OggS"
+"ftyp"
+"moov"
+"RIFF"
+"WAVE"
+"MAC "
+"wvpk"
+"MPCK"
+"ajkg"
+"TTA1"
+"DSD "
+"FRM8"
+"\x1a\x45\xdf\xa3"
+"Extended Module: "
+"IMPM"
+"SCRM"
+"M.K."
+
+# MP4 atoms the writer edits or creates
+"udta"
+"chpl"
+"chap"
+"text"
+"mvhd"
+"tkhd"
+"stco"
+
+# ASF / RIFF extras
+"\x30\x26\xb2\x75\x8e\x66\xcf\x11"
+"INFO"
+"INAM"
+"IART"
+"iXML"
+"bext"
+
+# Matroska element names
+"Segment"
+"Tags"
+"Chapters"
+"Attachments"
+"Cues"
