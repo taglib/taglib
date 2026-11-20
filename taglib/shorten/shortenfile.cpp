@@ -124,7 +124,7 @@ namespace {
     if(bitsAvailable == 0 && !refillBitBuffer())
       return false;
 
-    int32_t result;
+    uint32_t result;
     for(result = 0; !(bitBuffer & (1L << --bitsAvailable)); ++result) {
       if(bitsAvailable == 0 && !refillBitBuffer())
         return false;
@@ -132,13 +132,13 @@ namespace {
 
     while(k != 0) {
       if(bitsAvailable >= k) {
-        result = (result << k) | static_cast<int32_t>(
+        result = (result << k) | static_cast<uint32_t>(
           (bitBuffer >> (bitsAvailable - k)) & sMaskTable[k]);
         bitsAvailable -= k;
         k = 0;
       }
       else {
-        result = (result << bitsAvailable) | static_cast<int32_t>(
+        result = (result << bitsAvailable) | static_cast<uint32_t>(
           bitBuffer & sMaskTable[bitsAvailable]);
         k -= bitsAvailable;
         if(!refillBitBuffer())
@@ -146,7 +146,7 @@ namespace {
       }
     }
 
-    i32 = result;
+    i32 = static_cast<int32_t>(result);
     return true;
   }
 
