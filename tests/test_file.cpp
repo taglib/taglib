@@ -35,6 +35,7 @@ class TestFile : public CppUnit::TestFixture
   CPPUNIT_TEST_SUITE(TestFile);
   CPPUNIT_TEST(testFindInSmallFile);
   CPPUNIT_TEST(testRFindInSmallFile);
+  CPPUNIT_TEST(testRFindAcrossBufferBoundary);
   CPPUNIT_TEST(testSeek);
   CPPUNIT_TEST(testTruncate);
   CPPUNIT_TEST_SUITE_END();
@@ -94,6 +95,41 @@ public:
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23")),    file.rfind("23"));
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23", 7)), file.rfind("23", 7));
       CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(v.rfind("23", 6)), file.rfind("23", 6));
+    }
+  }
+
+  void testRFindAcrossBufferBoundary()
+  {
+    ScopedFileCopy copy("empty", ".ogg");
+    std::string name = copy.fileName();
+    {
+      PlainFile file(name.c_str());
+      file.seek(0);
+      file.writeBlock(ByteVector(3000, 'x'));
+      file.truncate(3000);
+    }
+    {
+      PlainFile file(name.c_str());
+      for(offset_t pos = 0; pos <= 2996; ++pos) {
+        file.seek(pos);
+        file.writeBlock("OggS");
+        CPPUNIT_ASSERT_EQUAL(pos, file.rfind("OggS"));
+        CPPUNIT_ASSERT_EQUAL(pos, file.rfind("OggS", pos));
+        file.seek(pos);
+        file.writeBlock("xxxx");
+      }
+
+      file.seek(100);
+      file.writeBlock("OggS");
+      file.seek(1978);
+      file.writeBlock("OggS");
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(1978), file.rfind("OggS"));
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(100), file.rfind("OggS", 1977));
+
+      const ByteVector longPattern(1024, 'y');
+      file.seek(1976);
+      file.writeBlock(longPattern);
+      CPPUNIT_ASSERT_EQUAL(static_cast<offset_t>(1976), file.rfind(longPattern));
     }
   }
 

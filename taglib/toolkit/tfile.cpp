@@ -226,20 +226,12 @@ offset_t File::find(const ByteVector &pattern, offset_t fromOffset, const ByteVe
 
 offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteVector &before)
 {
-  if(!d->stream || pattern.size() > bufferSize())
+  if(!d->stream || pattern.isEmpty() || pattern.size() > bufferSize())
       return -1;
 
   // The position in the file that the current buffer starts at.
 
   ByteVector buffer;
-
-  // These variables are used to keep track of a partial match that happens at
-  // the end of a buffer.
-
-  /*
-  int previousPartialMatch = -1;
-  int beforePreviousPartialMatch = -1;
-  */
 
   // Save the location of the current read pointer.  We will restore the
   // position using seek() before all returns.
@@ -253,6 +245,11 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
 
   offset_t bufferLength = bufferSize();
   offset_t bufferOffset = fromOffset + pattern.size();
+
+  // Don't start past the end of the file, the first read would be empty.
+
+  if(bufferOffset > length())
+    bufferOffset = length();
 
   // See the notes in find() for an explanation of this algorithm.
 
@@ -271,10 +268,6 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
     if(buffer.isEmpty())
       break;
 
-    // TODO: (1) previous partial match
-
-    // (2) pattern contained in current buffer
-
     if(const long location = buffer.rfind(pattern); location >= 0) {
       seek(originalPosition);
       return bufferOffset + location;
@@ -285,7 +278,13 @@ offset_t File::rfind(const ByteVector &pattern, offset_t fromOffset, const ByteV
       return -1;
     }
 
-    // TODO: (3) partial match
+    if(bufferOffset == 0)
+      break;
+
+    // Overlap the next buffer with this one so that a match spanning the
+    // boundary between the two is not missed.
+
+    bufferOffset += pattern.size() - 1;
   }
 
   // Since we hit the end of the file, reset the status before continuing.
